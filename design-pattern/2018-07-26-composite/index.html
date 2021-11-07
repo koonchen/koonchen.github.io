@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="代码链接koonchen/design-patterns/composite 要点 将对象组合成树形结构以表示 部分—整体 的层次结构。 Composite 使得用户对单个对象和组合对象的使用具有一致性。  我们假设存在一个图形编辑器，用户可以组合多个简单组件以形成一个较大的组件，这些组件又可以组合成更大的组件。一个简单的想法是使用 Text 和 Line 这样的图元来定义一些类，与此同时，定义另">
+<meta name="keywords" content="组合">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初探组合模式">
+<meta property="og:url" content="http://koon.cool/design-pattern/2018-07-26-composite/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="代码链接koonchen/design-patterns/composite 要点 将对象组合成树形结构以表示 部分—整体 的层次结构。 Composite 使得用户对单个对象和组合对象的使用具有一致性。  我们假设存在一个图形编辑器，用户可以组合多个简单组件以形成一个较大的组件，这些组件又可以组合成更大的组件。一个简单的想法是使用 Text 和 Line 这样的图元来定义一些类，与此同时，定义另">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/composite-1.jpg">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/composite-2.jpg">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/composite-pattern.jpg">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初探组合模式">
+<meta name="twitter:description" content="代码链接koonchen/design-patterns/composite 要点 将对象组合成树形结构以表示 部分—整体 的层次结构。 Composite 使得用户对单个对象和组合对象的使用具有一致性。  我们假设存在一个图形编辑器，用户可以组合多个简单组件以形成一个较大的组件，这些组件又可以组合成更大的组件。一个简单的想法是使用 Text 和 Line 这样的图元来定义一些类，与此同时，定义另">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/composite-1.jpg">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>初探组合模式</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/design-pattern/2018-08-07-decorator/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/design-pattern/2018-07-22-bridge/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/design-pattern/2018-07-26-composite/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/design-pattern/2018-07-26-composite/&text=初探组合模式"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/design-pattern/2018-07-26-composite/&title=初探组合模式"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/design-pattern/2018-07-26-composite/&is_video=false&description=初探组合模式"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=初探组合模式&body=Check out this article: http://koon.cool/design-pattern/2018-07-26-composite/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/design-pattern/2018-07-26-composite/&title=初探组合模式"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/design-pattern/2018-07-26-composite/&title=初探组合模式"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/design-pattern/2018-07-26-composite/&title=初探组合模式"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/design-pattern/2018-07-26-composite/&title=初探组合模式"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/design-pattern/2018-07-26-composite/&name=初探组合模式&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#代码链接"><span class="toc-number">1.</span> <span class="toc-text">代码链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#要点"><span class="toc-number">2.</span> <span class="toc-text">要点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">3.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java-实现"><span class="toc-number">3.1.</span> <span class="toc-text">java 实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#python-实现"><span class="toc-number">3.2.</span> <span class="toc-text">python 实现</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        初探组合模式
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-07-25T16:00:00.000Z" itemprop="datePublished">2018-07-26</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/design-pattern/">design pattern</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/组合/">组合</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a>代码链接</h2><p><a href="https://github.com/koonchen/design-patterns/tree/master/composite" target="_blank" rel="noopener">koonchen/design-patterns/composite</a></p>
+<h2 id="要点"><a href="#要点" class="headerlink" title="要点"></a>要点</h2><blockquote>
+<p>将对象组合成树形结构以表示 <strong>部分—整体</strong> 的层次结构。 Composite 使得用户对单个对象和组合对象的使用具有一致性。</p>
+</blockquote>
+<p>我们假设存在一个图形编辑器，用户可以组合多个简单组件以形成一个较大的组件，这些组件又可以组合成更大的组件。一个简单的想法是使用 <code>Text</code> 和 <code>Line</code> 这样的图元来定义一些类，与此同时，定义另一些类作为图元的容器类。</p>
+<p>然而，这样做的后果是我们将区别对待图元对象和容器对象，而实际上大多数情况下用户认为他们是一样的。区别对待将使得程序更加复杂。 Composite 模式描述了如何使用递归组合，使得用户不必对这些类进行区别对待，如下图：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/composite-1.jpg" alt="cover"></p>
+<p>Composite 模式的关键是一个抽象类，它既可以代表图元也可以代表图元的容器。在图形系统中这个类就是 <code>Graphic</code> ，它声明了一些与特定图形对象相关的操作。在其子类如 <code>Line</code> 、 <code>Rectangle</code> 、 <code>Text</code> 中定义图元，并实现一些图元操作。而子类如 <code>Picture</code> 定义了图元容器，实现了图元容器的方法。而因为图元和容器使用了相同的父类 ( 接口 ) ，因此容器对象可以递归组合其他 <code>Graphic</code> 子类。其结构如下图：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/composite-2.jpg" alt="cover"></p>
+<p>什么情况下适用这种模式：</p>
+<blockquote>
+<ul>
+<li>想表示对象的 部分—整体 层次结构。</li>
+<li>希望用户忽略组合对象与单个对象的不同，用户将统一地适用组合结构中的所有对象。</li>
+</ul>
+</blockquote>
+<p>他的参与者如下：</p>
+<blockquote>
+<ul>
+<li>Component ( Graphic ) — 为组合中的对象声明的接口。</li>
+<li>Leaf ( Rectangle 等 ) — 定义图元对象。</li>
+<li>Composite ( Picture 等 ) — 定义容器 ( 部件 ) 对象。</li>
+<li>Client — 通过 Composite 接口操纵组合容器的对象。</li>
+</ul>
+</blockquote>
+<p>现在 composite 结构就很明显了：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/composite-pattern.jpg" alt="cover"></p>
+<p>composite 模式具有以下特点：</p>
+<blockquote>
+<ul>
+<li>定义了包含基本对象和组合对象的类层次结构：基本对象可以被组合成更复杂的组合对象，而这个组合对象可以被二次组合，这样不断递归下去。</li>
+<li>简化客户代码：客户可以一致地使用组合结构和单个对象。客户也无需知道使用的子节点还是组合组件。</li>
+<li>使得更容易增加新类型的组件：新定义的 <code>Composite</code> 或 <code>Leaf</code> 自动地与已有的结构和客户代码一起工作，无需对原有组件进行更改。</li>
+<li>使得设计变得更加一般化：容易增加新组件也会产生一些问题，那就是很难限制组合中的组件。比如你希望只是用某些特定的组件来组合一个 <code>Composite</code> ，但是不能通过类型系统来进行约束，而是在运行时进行检查。</li>
+</ul>
+</blockquote>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>在实现 composite 模式时，有以下几点需要注意：</p>
+<blockquote>
+<ul>
+<li>显式的父部件引用：保持从子部件到父部件的引用能简化组合结构的遍历和管理。</li>
+<li>共享组件：减少对存储的需求。</li>
+<li>最大化 <code>Component</code> 接口： composite 模式的目的之一是使用户不知道他们使用的是 <code>Leaf</code> 还是 <code>Composite</code> 。为了达到这个目的，公共接口应该尽量多定义操作，通常实现缺省。</li>
+<li>声明管理子部件的操作：虽然 <code>Composite</code> 类实现了部分操作，但现在我们要作抉择：应该在 <code>Component</code> 中声明这些操作，并使这些操作对 <code>Leaf</code> 有意义呢？还是只在 <code>Composite</code> 和它的子类中声明并定义这些操作？</li>
+</ul>
+<p>这需要在安全性和透明性之间做出抉择：</p>
+<blockquote>
+<ul>
+<li>在类层次结构的根部定义子节点管理结构的方法，具有良好的透明性，因为你一致地使用所有的组件，但是这一方法是以安全性为代价的，因为客户有可能会做一些无意义的事情，例如在 <code>Leaf</code> 中增加和删除对象等。</li>
+<li>在 <code>Composite</code> 类中定义管理子部件的方法具有良好的安全性，因为在 C++ 这样的静态语言中，在编译时任何任何从 <code>Leaf</code> 中增加或删除对象的尝试都将被发现。但是这损失了透明性，因为现在 <code>Leaf</code> 和 <code>Composite</code> 相当于使用了不同的接口。</li>
+</ul>
+<p><strong>推荐的是选择透明性，即选择第一种方式。</strong>因为第二种方式可能会丢失类型信息，以至于我们不得不将一个组件转换成一个组件，这样的类型转换必定不是类型安全的。</p>
+</blockquote>
+</blockquote>
+<h3 id="java-实现"><a href="#java-实现" class="headerlink" title="java 实现"></a>java 实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">operation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    System.out.println(<span class="string">"Component instance has been created"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">add</span><span class="params">(Component component)</span> </span>&#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">remove</span><span class="params">(Component component)</span> </span>&#123;&#125;</span><br><span class="line">  <span class="function">Component <span class="title">getChild</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Leaf</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">operation</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    System.out.println(<span class="string">"Leaf instance has been created"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Composite</span> <span class="keyword">extends</span> <span class="title">Component</span> </span>&#123;</span><br><span class="line">  List list = <span class="keyword">new</span> ArrayList&lt;Component&gt;();</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">add</span><span class="params">(Component component)</span> </span>&#123;</span><br><span class="line">    list.add(component);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">remove</span><span class="params">(Component component)</span> </span>&#123;</span><br><span class="line">    list.remove(component);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function">Component <span class="title">getChild</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (Component) list.get(index);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CompositeClient</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Leaf leaf = <span class="keyword">new</span> Leaf();</span><br><span class="line">    Composite composite = <span class="keyword">new</span> Composite();</span><br><span class="line">    composite.add(leaf);</span><br><span class="line">    composite.getChild(<span class="number">0</span>).operation();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>java 的实现比较统一，实现如上。</p>
+<h3 id="python-实现"><a href="#python-实现" class="headerlink" title="python 实现"></a>python 实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Component</span><span class="params">(object)</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">operation</span><span class="params">(self)</span>:</span> <span class="keyword">pass</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(self, obj)</span>:</span> <span class="keyword">pass</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">remove</span><span class="params">(self, obj)</span>:</span> <span class="keyword">pass</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">get_child</span><span class="params">(self, index)</span>:</span> <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Leaf</span><span class="params">(Component)</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'a leaf'</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">operation</span><span class="params">(self)</span>:</span></span><br><span class="line">    print(<span class="string">'Leaf instance has been created'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Composite</span><span class="params">(Component)</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">    self._array = list()</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(self, obj)</span>:</span></span><br><span class="line">    self._array.append(obj)</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">remove</span><span class="params">(self, obj)</span>:</span></span><br><span class="line">    self._array.remove(obj)</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">get_child</span><span class="params">(self, index)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> self._array[index]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  composite = Composite()</span><br><span class="line">  leaf = Leaf()</span><br><span class="line">  composite.add(leaf)</span><br><span class="line">  composite.get_child(<span class="number">0</span>).operation()</span><br></pre></td></tr></table></figure>
+<p>其他实现也大同小异。</p>
+<p>从其他模式出发：</p>
+<blockquote>
+<ul>
+<li>部件—父部件 的连接可用于 responsibility of chain 模式。</li>
+<li>decorator 模式经常和 composite 模式一起使用。</li>
+<li>flyweight 模式可以共享组件，但不再能引用他们的父组件。</li>
+<li>iterator 可用于遍历 composite 。</li>
+<li>visitor 将本来应该分布在 <code>Composite</code> 和 <code>Leaf</code> 类中的操作和行为局部化。</li>
+</ul>
+</blockquote>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#代码链接"><span class="toc-number">1.</span> <span class="toc-text">代码链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#要点"><span class="toc-number">2.</span> <span class="toc-text">要点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">3.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java-实现"><span class="toc-number">3.1.</span> <span class="toc-text">java 实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#python-实现"><span class="toc-number">3.2.</span> <span class="toc-text">python 实现</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/design-pattern/2018-07-26-composite/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/design-pattern/2018-07-26-composite/&text=初探组合模式"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/design-pattern/2018-07-26-composite/&title=初探组合模式"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/design-pattern/2018-07-26-composite/&is_video=false&description=初探组合模式"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=初探组合模式&body=Check out this article: http://koon.cool/design-pattern/2018-07-26-composite/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/design-pattern/2018-07-26-composite/&title=初探组合模式"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/design-pattern/2018-07-26-composite/&title=初探组合模式"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/design-pattern/2018-07-26-composite/&title=初探组合模式"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/design-pattern/2018-07-26-composite/&title=初探组合模式"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/design-pattern/2018-07-26-composite/&name=初探组合模式&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="像一条咸鱼的学习让我不得不把这些记下来。  不过介个确实容易遗忘鸭😅。  前提概要首先我们知道：  \text { softmax } \left( f \left( \vec { x _ { i } } ; \vec { w } \right) \right) _ { j } = \frac { e ^ { f _ { j } } } { \sum _ { k = 1 } ^ { n } e">
+<meta name="keywords" content="机器学习,softmax">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Softmax 推导">
+<meta property="og:url" content="http://koon.cool/machine-learning/2018-10-08-softmax/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="像一条咸鱼的学习让我不得不把这些记下来。  不过介个确实容易遗忘鸭😅。  前提概要首先我们知道：  \text { softmax } \left( f \left( \vec { x _ { i } } ; \vec { w } \right) \right) _ { j } = \frac { e ^ { f _ { j } } } { \sum _ { k = 1 } ^ { n } e">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Softmax 推导">
+<meta name="twitter:description" content="像一条咸鱼的学习让我不得不把这些记下来。  不过介个确实容易遗忘鸭😅。  前提概要首先我们知道：  \text { softmax } \left( f \left( \vec { x _ { i } } ; \vec { w } \right) \right) _ { j } = \frac { e ^ { f _ { j } } } { \sum _ { k = 1 } ^ { n } e">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>Softmax 推导</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/machine-learning/2018-10-12-batch-normalization/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/after-reading/2018-09-12-cai-zhi-zhong-for-striving/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/machine-learning/2018-10-08-softmax/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/machine-learning/2018-10-08-softmax/&text=Softmax 推导"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/machine-learning/2018-10-08-softmax/&is_video=false&description=Softmax 推导"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Softmax 推导&body=Check out this article: http://koon.cool/machine-learning/2018-10-08-softmax/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/machine-learning/2018-10-08-softmax/&name=Softmax 推导&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提概要"><span class="toc-number">1.</span> <span class="toc-text">前提概要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#公式推导"><span class="toc-number">2.</span> <span class="toc-text">公式推导</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Softmax 推导
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-10-07T16:00:00.000Z" itemprop="datePublished">2018-10-08</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/machine-learning/">machine learning</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/softmax/">softmax</a>, <a class="tag-link" href="/tags/机器学习/">机器学习</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <p>像一条咸鱼的学习让我不得不把这些记下来。</p>
+<blockquote>
+<p>不过介个确实容易遗忘鸭😅。</p>
+</blockquote>
+<h2 id="前提概要"><a href="#前提概要" class="headerlink" title="前提概要"></a>前提概要</h2><p>首先我们知道：</p>
+<script type="math/tex; mode=display">
+\text { softmax } \left( f \left( \vec { x _ { i } } ; \vec { w } \right) \right) _ { j } = \frac { e ^ { f _ { j } } } { \sum _ { k = 1 } ^ { n } e ^ { f _ { k } } }</script><p>其中：</p>
+<script type="math/tex; mode=display">
+f \left( \vec { x _ { i } } ; \vec { w } \right) = \vec { w } \cdot \vec { x _ { i } }</script><script type="math/tex; mode=display">
+f _ { j } \left( \vec { x _ { i } } ; \vec { w } \right) = \vec { w } _ { j } \cdot \vec { x _ { i } }</script><hr>
+<p>我们现在将可能性转化为非标准化的对数概率，使用交叉熵损失：</p>
+<script type="math/tex; mode=display">
+L _ { i } = - \log \left( \frac { e ^ { f _ { y _ { i } } } } { \sum _ { j } e ^ { f _ { j } } } \right)</script><p>或者说等价于：</p>
+<script type="math/tex; mode=display">
+L _ { i } = - f _ { y _ { i } } + \log \sum _ { j } e ^ { f _ { j } }</script><hr>
+<p>给定图像 $x_{i}​$ 由 $W​$ 参数化，被分配为正确 $y_{i}​$ 的概率：</p>
+<script type="math/tex; mode=display">
+P \left( y _ { i } | x _ { i } ; w \right) = \frac { e ^ { f _ { y _ { i } } } } { \sum _ { k } e ^ { f _ { k } } }  = \text { softmax } \left( f \left( \vec { x _ { i } } ; \vec { w } \right) \right) _ { j }</script><p>这些指数计算结果可能会非常大，下面的表达式不会改变结果，但是会让结果数值更加稳定：</p>
+<script type="math/tex; mode=display">
+\frac { e ^ { f _ { i } } } { \sum _ { j } e ^ { f _ { j } } } = \frac { C e ^ { f _ { i } } } { C \sum _ { j } e ^ { \ell _ { j } } } = \frac { e ^ { f _ { y _ { i } } + \log C } } { \sum _ { j } e ^ { f _ { j } + \log C } }</script><blockquote>
+<p>一般，我们令 $\log C = - \max _ { j } f _ { j }$</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 原始</span></span><br><span class="line">f = np.array([<span class="number">123</span>, <span class="number">456</span>, <span class="number">789</span>]) <span class="comment"># example with 3 classes and each having large scores</span></span><br><span class="line">p = np.exp(f) / np.sum(np.exp(f)) <span class="comment"># Bad: Numeric problem, potential blowup</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 现在</span></span><br><span class="line">f -= np.max(f) <span class="comment"># f becomes [-666, -333, 0]</span></span><br><span class="line">p = np.exp(f) / np.sum(np.exp(f)) <span class="comment"># safe to do, gives the correct answer</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>softmax 只有挤压功能，但它是一种相对常用的简写。</p>
+</blockquote>
+<h2 id="公式推导"><a href="#公式推导" class="headerlink" title="公式推导"></a>公式推导</h2><p>MLE 最大似然估计的推导：</p>
+<script type="math/tex; mode=display">\begin{aligned} \dot{x} &= \sigma(y-x) \ \dot{y} &= \rho x - y - xz \ \dot{z} &= -\beta z + xy \end{aligned}</script><script type="math/tex; mode=display">
+\left.\begin{aligned}L ( w ) &= \prod _ { N } P \left( y _ { i } , x _ { i } | w \right)\newline &=\sum _ { i } ^ { N } \log \left( \frac { e ^ { f _ { y _ { i } } } } { \sum _ { k = 1 } ^ { n } e ^ { f _ { k }  } } \right)\newline &=\sum _ { i } ^ { N } \left( f _ { y _ { i } }  - \log \sum _ { k = 1 } ^ { n } e ^ { f _ { k }  } \right) \end{aligned} \right.</script><blockquote>
+<p>ps：向量求解 softmax 的 loss 时，直接用这里的第二步。</p>
+</blockquote>
+<p>MLE 求解最大似然估计，等价于下面的损失函数求最小：</p>
+<script type="math/tex; mode=display">
+\operatorname { loss } ( w ) = - L ( w ) = \sum _ { i } ^ { N } \left( - f _ { y _ { i } }  + \log \sum _ { k = 1 } ^ { n } e ^ { f _ { k }  } \right)</script><p>重新定义损失函数，取平均，加上正则化：</p>
+<script type="math/tex; mode=display">
+\operatorname { loss } ( w ) = \frac { 1 } { N } \sum _ { i } ^ { N } \left( - f _ { y _ { i } } + \log \sum _ { k = 1 } ^ { n } e ^ { f _ { k } } \right) + \lambda \| w \| ^ { 2 }</script><p>对损失函数进行求导：</p>
+<script type="math/tex; mode=display">
+if \space (u==y_{i}) \space => \space \frac { d L ( \vec { w } ) } { d w _ { u } ^ { ( v ) } } = \frac { 1 } { N } \sum _ { i } ^ { N } \left( - x _ { i } ^ { ( v ) } + \frac { x _ { i } ^ { ( v ) } e^{f_{i}} } { \sum _ { k = 1 } ^ { n } e ^ { f _ { k }  } } \right) + 2 \lambda w _ { u } ^ { ( v ) }</script><script type="math/tex; mode=display">
+if \space (u != y_{i}) \space => \space \frac { d L ( \vec { w } ) } { d w _ { u } ^ { ( v ) } } = \frac { 1 } { N } \sum _ { i } ^ { N } \left( 0 + \frac { x _ { i } ^ { ( v ) }e^{f_{i}} } { \sum _ { k = 1 } ^ { n } e ^ { f _ { k }  } } \right) + 2 \lambda w _ { u } ^ { ( v ) }</script>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前提概要"><span class="toc-number">1.</span> <span class="toc-text">前提概要</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#公式推导"><span class="toc-number">2.</span> <span class="toc-text">公式推导</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/machine-learning/2018-10-08-softmax/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/machine-learning/2018-10-08-softmax/&text=Softmax 推导"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/machine-learning/2018-10-08-softmax/&is_video=false&description=Softmax 推导"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Softmax 推导&body=Check out this article: http://koon.cool/machine-learning/2018-10-08-softmax/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/machine-learning/2018-10-08-softmax/&name=Softmax 推导&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

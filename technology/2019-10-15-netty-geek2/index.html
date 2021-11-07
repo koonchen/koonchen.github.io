@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="1. Netty 下三种 I/O 阻塞与非阻塞：要不要死等，阻塞会等待直到有数据；非阻塞会直接返回。 同步与异步：数据就绪后谁来操作，自己去读是同步；主动回调是异步。  BIO——阻塞同步；NIO——非阻塞同步；AIO——非阻塞异步。  Netty 对三者都有过支持，阻塞导致资源占用多因此不用，而 AIO 的弃用是因为 Linux 下 AIO 相较于 NIO 性能提升不明显，效益不够高，同时 Li">
+<meta name="keywords" content="netty">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从领域知识剖析 Netty">
+<meta property="og:url" content="http://koon.cool/technology/2019-10-15-netty-geek2/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="1. Netty 下三种 I/O 阻塞与非阻塞：要不要死等，阻塞会等待直到有数据；非阻塞会直接返回。 同步与异步：数据就绪后谁来操作，自己去读是同步；主动回调是异步。  BIO——阻塞同步；NIO——非阻塞同步；AIO——非阻塞异步。  Netty 对三者都有过支持，阻塞导致资源占用多因此不用，而 AIO 的弃用是因为 Linux 下 AIO 相较于 NIO 性能提升不明显，效益不够高，同时 Li">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200409205216.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410011726.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410011855.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410012456.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410012731.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410012842.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410013023.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410142247.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410142703.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200411020901.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200412174544.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200412174641.png">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.401Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从领域知识剖析 Netty">
+<meta name="twitter:description" content="1. Netty 下三种 I/O 阻塞与非阻塞：要不要死等，阻塞会等待直到有数据；非阻塞会直接返回。 同步与异步：数据就绪后谁来操作，自己去读是同步；主动回调是异步。  BIO——阻塞同步；NIO——非阻塞同步；AIO——非阻塞异步。  Netty 对三者都有过支持，阻塞导致资源占用多因此不用，而 AIO 的弃用是因为 Linux 下 AIO 相较于 NIO 性能提升不明显，效益不够高，同时 Li">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200409205216.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>从领域知识剖析 Netty</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2019-11-20-netty-geek3/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/technology/2019-09-13-netty-geek1/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-10-15-netty-geek2/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-10-15-netty-geek2/&text=从领域知识剖析 Netty"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-10-15-netty-geek2/&title=从领域知识剖析 Netty"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-10-15-netty-geek2/&is_video=false&description=从领域知识剖析 Netty"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=从领域知识剖析 Netty&body=Check out this article: http://koon.cool/technology/2019-10-15-netty-geek2/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-10-15-netty-geek2/&title=从领域知识剖析 Netty"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-10-15-netty-geek2/&title=从领域知识剖析 Netty"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-10-15-netty-geek2/&title=从领域知识剖析 Netty"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-10-15-netty-geek2/&title=从领域知识剖析 Netty"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-10-15-netty-geek2/&name=从领域知识剖析 Netty&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Netty-下三种-I-O"><span class="toc-number">1.</span> <span class="toc-text">1. Netty 下三种 I/O</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Netty-如何切换-I-O-模式？"><span class="toc-number">2.</span> <span class="toc-text">2. Netty 如何切换 I/O 模式？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Netty-对-Reactor-的支持"><span class="toc-number">3.</span> <span class="toc-text">3. Netty 对 Reactor 的支持</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-Thread-Per-Connection-模式"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 Thread-Per-Connection 模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-Reactor-单线程"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 Reactor 单线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-Reactor-多线程"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 Reactor 多线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-Reactor-主从"><span class="toc-number">3.4.</span> <span class="toc-text">3.4 Reactor 主从</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-以主从为例"><span class="toc-number">3.5.</span> <span class="toc-text">3.5 以主从为例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-5-1-如何实现-Reactor-模式？"><span class="toc-number">3.5.1.</span> <span class="toc-text">3.5.1 如何实现 Reactor 模式？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-5-2-为什么说的-Netty-main-reactor-大多都不能用到一个线程组？"><span class="toc-number">3.5.2.</span> <span class="toc-text">3.5.2 为什么说的 Netty main reactor 大多都不能用到一个线程组？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-5-3-Netty-给-Channel-分配-NIO-event-loop-的规则是什么？"><span class="toc-number">3.5.3.</span> <span class="toc-text">3.5.3 Netty 给 Channel 分配 NIO event loop 的规则是什么？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-5-4-Netty-如何跨平台？"><span class="toc-number">3.5.4.</span> <span class="toc-text">3.5.4 Netty 如何跨平台？</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-TCP-粘包、半包-Netty-处理"><span class="toc-number">4.</span> <span class="toc-text">4. TCP 粘包、半包 Netty 处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-二次编解码"><span class="toc-number">5.</span> <span class="toc-text">5. 二次编解码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-keepalive-与-Idle-监测"><span class="toc-number">6.</span> <span class="toc-text">6. keepalive 与 Idle 监测</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-什么是-keepalive-？"><span class="toc-number">6.1.</span> <span class="toc-text">6.1 什么是 keepalive ？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-为什么还需要应用层-keepalive-？"><span class="toc-number">6.2.</span> <span class="toc-text">6.2 为什么还需要应用层 keepalive ？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-什么是-Idle-检测？"><span class="toc-number">6.3.</span> <span class="toc-text">6.3 什么是 Idle 检测？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-4-Netty-中的-keepalive-如何生效"><span class="toc-number">6.4.</span> <span class="toc-text">6.4 Netty 中的 keepalive 如何生效</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-5-Netty-中的-Idle-如何生效"><span class="toc-number">6.5.</span> <span class="toc-text">6.5 Netty 中的 Idle 如何生效</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-Netty-锁事"><span class="toc-number">7.</span> <span class="toc-text">7. Netty 锁事</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-Netty-的内存使用"><span class="toc-number">8.</span> <span class="toc-text">8. Netty 的内存使用</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        从领域知识剖析 Netty
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-10-14T16:00:00.000Z" itemprop="datePublished">2019-10-15</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/netty/">netty</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-Netty-下三种-I-O"><a href="#1-Netty-下三种-I-O" class="headerlink" title="1. Netty 下三种 I/O"></a>1. Netty 下三种 I/O</h2><ul>
+<li>阻塞与非阻塞：要不要死等，阻塞会等待直到有数据；非阻塞会直接返回。</li>
+<li>同步与异步：数据就绪后谁来操作，自己去读是同步；主动回调是异步。</li>
+</ul>
+<p>BIO——阻塞同步；NIO——非阻塞同步；AIO——非阻塞异步。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200409205216.png" alt></p>
+<p>Netty 对三者都有过支持，阻塞导致资源占用多因此不用，而 AIO 的弃用是因为 Linux 下 AIO 相较于 NIO 性能提升不明显，效益不够高，同时 Linux 下 AIO 的实现不够完善。</p>
+<p>BIO 在连接数少，并发不高的情况下性能不输于 NIO ，所以我们应该结合具体场景进行分析。</p>
+<h2 id="2-Netty-如何切换-I-O-模式？"><a href="#2-Netty-如何切换-I-O-模式？" class="headerlink" title="2. Netty 如何切换 I/O 模式？"></a>2. Netty 如何切换 I/O 模式？</h2><p>我们需要换 <code>EventLoopGroup</code> （开发模式）与 <code>Channel</code> （I/O 模式）即可，</p>
+<p><code>Channel</code> 通过<strong>泛型+反射+工厂</strong>实现 I/O 模式的切换，可以跟进源码看到 <code>ReflectiveChannelFactory</code> 的实现，它作为一个工厂方法会生产通过传入的 class 进行 <code>Channel</code> 的反射实例化。这里 Netty 的 <code>Channel</code> 会帮助我们创建 <code>socketChannel</code> 。</p>
+<p>而 <code>EventLoopGroup</code> 是一种开发模式，这也是 Netty 标语中『事件驱动』的意义，也就是 Reactor 模式的实现。</p>
+<h2 id="3-Netty-对-Reactor-的支持"><a href="#3-Netty-对-Reactor-的支持" class="headerlink" title="3. Netty 对 Reactor 的支持"></a>3. Netty 对 Reactor 的支持</h2><ul>
+<li>Reactor 单线程——一个人包揽所有工作；</li>
+<li>Reactor 多线程——多个人做所有事情；</li>
+<li>Reactor 主从——一个或多个人专门做某些事情。</li>
+</ul>
+<p>对于 BIO 是 Thead-Per-Connection 模式，对于 NIO 是 Reactor 模式，对于 AIO 是 Proactor 模式。</p>
+<p>对于 Reactor 而言，核心流程：</p>
+<ol>
+<li>注册感兴趣的事件；</li>
+<li>扫描是否有感兴趣的事件发生；</li>
+<li>事件发生后做出相应的处理。</li>
+</ol>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410011726.png" alt></p>
+<h3 id="3-1-Thread-Per-Connection-模式"><a href="#3-1-Thread-Per-Connection-模式" class="headerlink" title="3.1 Thread-Per-Connection 模式"></a>3.1 Thread-Per-Connection 模式</h3><p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410011855.png" alt></p>
+<p>线程池可以解决这个问题吗？仅仅解决线程无限增多的问题，事实上我们还增加了等待线程的阻塞，下面是对应代码。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410012456.png" alt></p>
+<p>值得注意的是上文的 read 和 write 都是阻塞操作。</p>
+<h3 id="3-2-Reactor-单线程"><a href="#3-2-Reactor-单线程" class="headerlink" title="3.2 Reactor 单线程"></a>3.2 Reactor 单线程</h3><p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410012731.png" alt></p>
+<p>所有一切都是一个线程在做，如果线程挂了自然就都挂了。</p>
+<h3 id="3-3-Reactor-多线程"><a href="#3-3-Reactor-多线程" class="headerlink" title="3.3 Reactor 多线程"></a>3.3 Reactor 多线程</h3><p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410012842.png" alt></p>
+<p>它在单线程的基础上把 decode compute encode 这些操作放到一个单独的线程池中操作。</p>
+<h3 id="3-4-Reactor-主从"><a href="#3-4-Reactor-主从" class="headerlink" title="3.4 Reactor 主从"></a>3.4 Reactor 主从</h3><p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410013023.png" alt></p>
+<p>它把接收连接和具体操作进一步分离，让专业的人做专业的事。</p>
+<h3 id="3-5-以主从为例"><a href="#3-5-以主从为例" class="headerlink" title="3.5 以主从为例"></a>3.5 以主从为例</h3><h4 id="3-5-1-如何实现-Reactor-模式？"><a href="#3-5-1-如何实现-Reactor-模式？" class="headerlink" title="3.5.1 如何实现 Reactor 模式？"></a>3.5.1 如何实现 Reactor 模式？</h4><p>这里要注意一下，Netty 代码量非常大，我们通过 Usage of xxx 和 Hierarchy caller 先找调用处再看调用层次，非常有效。</p>
+<p>可以从代码里发现两种 channel (<code>ServerSocketChannel</code> 和 <code>SocketChannel</code>)绑定到两种 group (<code>parentGroup</code> 和 <code>childGroup</code>)中，这就完成了一个主从 Reactor 的支持。</p>
+<h4 id="3-5-2-为什么说的-Netty-main-reactor-大多都不能用到一个线程组？"><a href="#3-5-2-为什么说的-Netty-main-reactor-大多都不能用到一个线程组？" class="headerlink" title="3.5.2 为什么说的 Netty main reactor 大多都不能用到一个线程组？"></a>3.5.2 为什么说的 Netty main reactor 大多都不能用到一个线程组？</h4><p>通过调用栈可以发现，Netty 的 <code>group</code> 方法被 <code>doBind</code> 方法调用，它的作用是绑定地址和端口，对于一个服务器而言我们一般绑定一个地址和一个端口，也因此我们只会在一个 <code>group</code> 中绑定到一个子元素。</p>
+<h4 id="3-5-3-Netty-给-Channel-分配-NIO-event-loop-的规则是什么？"><a href="#3-5-3-Netty-给-Channel-分配-NIO-event-loop-的规则是什么？" class="headerlink" title="3.5.3 Netty 给 Channel 分配 NIO event loop 的规则是什么？"></a>3.5.3 Netty 给 Channel 分配 NIO event loop 的规则是什么？</h4><p>从 <code>ServerBootstrap</code> 类的 <code>channelRead</code> 方法可以找到一个 <code>register</code> 调用，它是对 <code>EventLoopGroup</code> 接口的调用，也就是这个问题的答案了。这个 <code>register</code> 方法有两个实现，进到 <code>MultithreadEventLoopGroup</code> 的实现中，发现 <code>next().register(channel)</code> 这样的代码，显然这是一个调用链，跟进 <code>next()</code> 找到 <code>chooser.next()</code> ，这里有一个选择器，它的 <code>next</code> 方法有两种，一种是 <code>GenericEventExecutorChooser</code> 另一种是 <code>PowerOfTwoEventExecutorChooser</code> ，找到了。</p>
+<ul>
+<li>对于一个数组而言，第一种方式 <code>generic</code> 采用的是——递增、取模、取正值的方式；</li>
+<li>第二种则要求数组长度为 2 的幂次，它会用 <code>&amp;</code> 进行操作，运算效率更高，但需要数组长度符合要求。</li>
+</ul>
+<h4 id="3-5-4-Netty-如何跨平台？"><a href="#3-5-4-Netty-如何跨平台？" class="headerlink" title="3.5.4 Netty 如何跨平台？"></a>3.5.4 Netty 如何跨平台？</h4><p>比如在 <code>NioEventLoopGroup</code> 类里有一个构造器，使用了 <code>SelectorProvider.provider()</code> 方法，有一句 <code>provider = sun.nio.ch.DefaultSelectorProvider.create()</code> 这里的 <code>create</code> 方法是跨平台的，在 mac 下实现是返回一个 <code>KQueueSelectorProvider</code> ，在 win 下返回的是 <code>WindowsSelectorProvider</code> ，这是 JDK 的不同返回的不同实现。</p>
+<h2 id="4-TCP-粘包、半包-Netty-处理"><a href="#4-TCP-粘包、半包-Netty-处理" class="headerlink" title="4. TCP 粘包、半包 Netty 处理"></a>4. TCP 粘包、半包 Netty 处理</h2><p>比如我们发 ABC DEF 收到的就不一定是原样，收到如果是 ABCDEF 就是粘包，收到如果是 AB CD EF 则是半包现象。</p>
+<p>粘包原因：</p>
+<ul>
+<li>发送方写入数据 &lt; 套接字缓冲区大小；</li>
+<li>对方读取数据不够及时。</li>
+</ul>
+<p>半包原因：</p>
+<ul>
+<li>发送方写如数据 &gt; 套接字缓冲区大小；</li>
+<li>发送的数据大于 MTU ，必须拆包。</li>
+</ul>
+<p>传输原因：</p>
+<ul>
+<li>一个发送可能被多次接收，多个发送可能被一次接收；</li>
+<li>一个发送可能占用多个传输包，多个发送可能共用一个传输包。</li>
+</ul>
+<p>真正的原因则是——<strong>TCP 是一个流式协议，消息无边界</strong>。</p>
+<blockquote>
+<p>UDP 则是有界限的，所以没有粘包和半包的现象。</p>
+</blockquote>
+<p>所以解决之本就是找到消息的边界。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410142247.png" alt></p>
+<p>Netty 在封装成帧的实现上有如下支持。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410142703.png" alt></p>
+<p>这三个解码类都继承自 <code>ByteToMessageDecoder</code> ，这个类就是用来解决粘包和半包问题的。解码入口在 <code>channelRead</code> 方法，这里有一个参数 <code>cumulation</code> 这是一个数据积累器，其后它就是方法参数中的 <code>ByteBuf</code> 对象，代码会走到 <code>decode</code> 这是一个模板方法，以 <code>FixedLengthFrameDecoder</code> 为例，当 <code>cumulation</code> 的数据长度满足 <code>frameLegnth</code> 的时候就会解析，多出来的数据还会保留，我们就这样解决了粘包和半包问题。</p>
+<p>说回 <code>cumulation</code> 的累加，它有两种方式，一种是内存复制，按需扩容；另一种方式是组合，它不是内存复制，而是一种视图。内存复制的是默认的使用，因为累加器最后还是服务于 <code>decode</code> 的行为，行为不同可能会因为内存复制与非内存复制的方式产生实现误差，因此选用更为通用的内存复制的方式。</p>
+<p>这里看一下 <code>LengthFieldBasedFrameDecoder</code> ，其文档非常强大。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** </span></span><br><span class="line"><span class="comment"> * lengthFieldOffset   =  0 // 偏移量</span></span><br><span class="line"><span class="comment"> * lengthFieldLength   =  2 // 长度字段的长度</span></span><br><span class="line"><span class="comment"> * lengthAdjustment    =  0 // 插在长度和实际内容直接的字段长度</span></span><br><span class="line"><span class="comment"> * initialBytesToStrip =  0 // 解析开始位置</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * BEFORE DECODE (14 bytes)         AFTER DECODE (14 bytes)</span></span><br><span class="line"><span class="comment"> * +--------+----------------+      +--------+----------------+</span></span><br><span class="line"><span class="comment"> * | Length | Actual Content |-----&gt;| Length | Actual Content |</span></span><br><span class="line"><span class="comment"> * | 0x000C | "HELLO, WORLD" |      | 0x000C | "HELLO, WORLD" |</span></span><br><span class="line"><span class="comment"> * +--------+----------------+      +--------+----------------+</span></span><br><span class="line"><span class="comment"> **/</span></span><br></pre></td></tr></table></figure>
+<h2 id="5-二次编解码"><a href="#5-二次编解码" class="headerlink" title="5. 二次编解码"></a>5. 二次编解码</h2><p>第一次解码是解决半包、粘包时的解码，这里我们得到了字节；接着我们还需要一层解码用来进行对象转换，也就是所谓的二次解码。</p>
+<ul>
+<li>一次解码：<code>ByteToMessageDecoder</code> ByteBuf 的转换</li>
+<li>二次解码：<code>MessageToMessageDecoder</code> 将 ByteBuf 转换成 Java Object</li>
+</ul>
+<p>这样做是为了分层、降耦合。Java 序列化、Marshaling、XML、JSON、MessagePack、Protobuf、其他…二次解码非常多。</p>
+<ul>
+<li><p>JSON、MessagePack、Protobuf 在时间和空间上较优；</p>
+</li>
+<li><p>可读性 JSON &gt; MessagePack；</p>
+</li>
+<li>最流行的是 Protobuf ，是一个灵活、高效的序列化数据的协议，但是它的可读性比较差。</li>
+</ul>
+<p>在 <code>netty-codec</code> 子工程下可以找到大量的编解码类。</p>
+<p>同时，Netty 下有一个世界时钟的例子，它是使用 <code>Protobuf</code> 进行二次编解码的。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200411020901.png" alt></p>
+<p>这里有 5 个 add 的内容，分别是一次编解码，二次编解码，执行内容。执行的顺序应该是一次解码、二次解码、执行、二次编码、一次编码。</p>
+<h2 id="6-keepalive-与-Idle-监测"><a href="#6-keepalive-与-Idle-监测" class="headerlink" title="6. keepalive 与 Idle 监测"></a>6. keepalive 与 Idle 监测</h2><h3 id="6-1-什么是-keepalive-？"><a href="#6-1-什么是-keepalive-？" class="headerlink" title="6.1 什么是 keepalive ？"></a>6.1 什么是 keepalive ？</h3><p>keepalive 就是一次 request 期望得到 response 。TCP 的 keepalive 有这样几个参数：</p>
+<ul>
+<li>net.ipv4.tcp_keepalive_time = 7200</li>
+<li>net.ipv4.tcp_keepalive_intvl = 75</li>
+<li>net.ipv4.tcp_keepalive_probes = 9</li>
+</ul>
+<p>通过的7200秒后发送 keepalive 消息，当探测没有确认时， 按75秒的重试频率重发，一直发 9 个探测包都没有确认，就认定 连接失效。所以总耗时一般为：2 小时 11 分钟 (7200 秒 + 75 秒* 9 次)。</p>
+<h3 id="6-2-为什么还需要应用层-keepalive-？"><a href="#6-2-为什么还需要应用层-keepalive-？" class="headerlink" title="6.2 为什么还需要应用层 keepalive ？"></a>6.2 为什么还需要应用层 keepalive ？</h3><p>传输层 TCP 的 keepalive 是判断是否『通路』，应用层的 keepalive 是用来判断服务是否存在；TCP 的 keepalive 是默认关闭的；TCP 的 keepalive 时间太长了。</p>
+<blockquote>
+<p>HTTP 的 keepalive 和这个不是一回事，它特指『长连接』。</p>
+</blockquote>
+<h3 id="6-3-什么是-Idle-检测？"><a href="#6-3-什么是-Idle-检测？" class="headerlink" title="6.3 什么是 Idle 检测？"></a>6.3 什么是 Idle 检测？</h3><p>Idle 检测仅仅负责诊断，而后做出不同行为，下面是两种 Idle 检测的使用方式。</p>
+<ul>
+<li>配合 keepalive ：当有数据传输时，不发送 keepalive，当没有数据传输时，先发 Idle 再发 keepalive ；</li>
+<li>直接关闭连接：简单粗暴。</li>
+</ul>
+<h3 id="6-4-Netty-中的-keepalive-如何生效"><a href="#6-4-Netty-中的-keepalive-如何生效" class="headerlink" title="6.4 Netty 中的 keepalive 如何生效"></a>6.4 Netty 中的 keepalive 如何生效</h3><p>在 <code>ServerBootStrap</code> 里有一个 <code>childOption</code> 方法，这里的 child 就是客户端使用的含义，把设置的值配置到 child 的 <code>Channel</code> 中，一路向下可以找到 <code>setOption</code> 方法，它有两种方式设置 keepalive 之类的参数：</p>
+<ul>
+<li>一种是通过配置 <code>NioSocketChannel</code> 它的实现是通过 Java NIO 的 api 来进行配置；</li>
+<li>另外一种是通过 <code>DefaultSocketChannelConfig</code>  的实现，堆砌 if else 代码。</li>
+</ul>
+<h3 id="6-5-Netty-中的-Idle-如何生效"><a href="#6-5-Netty-中的-Idle-如何生效" class="headerlink" title="6.5 Netty 中的 Idle 如何生效"></a>6.5 Netty 中的 Idle 如何生效</h3><p>Idle 对于 Netty 是一个扩展能力在 <code>handler/timeout</code> 下，被分为 read / write / all 三种。</p>
+<blockquote>
+<p>对于写而言，具有写意图和写成功是两回事，比如写了但是缓存满了，或者没有写了但是没有写完。</p>
+</blockquote>
+<p>这三种 Idle 的实现都是线程中执行的，是一种监控行为。</p>
+<p><code>ReadTimeoutHandler</code> 是由 <code>ReadTimeoutIdle</code> 触发的，但是 <code>WriteTimeoutHandler</code> 不是由 <code>WriteTimeoutIdle</code> 触发的，这是一个 Netty 的坑，前者是用来判断 read 空闲的，后者是判断 write 是否完成。</p>
+<h2 id="7-Netty-锁事"><a href="#7-Netty-锁事" class="headerlink" title="7. Netty 锁事"></a>7. Netty 锁事</h2><p>同步三要素：原子、可见、有序。</p>
+<p>如果我们需要一个原子 Long ，应该会最先想到使用 <code>AtomicLong</code> ，但是在 Netty 中使用了另外一种方式，它使用 <code>volatile long</code> ，同时定义一个 <code>AtomicLongFieldUpdater</code> ，这么做的好处就是节省空间，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> AtomicLongFieldUpdater&lt;ChannelOutboundBuffer&gt; TOTAL_PENDING_SIZE_UPDATER = AtomicLongFieldUpdater.newUpdater(ChannelOutboundBuffer.class, <span class="string">"totalPendingSize"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">long</span> totalPendingSize;</span><br></pre></td></tr></table></figure>
+<p><code>volatile long</code> 占用 8 byte ；而 <code>AtomicLong</code> 则是 8(volatile long) + 16(对象头) + 8 (引用) 共 32 byte ，当然也有指针压缩、对齐之类的技术，最后可能比 32 大也有可能比 32 小，但总归是大了 3 倍以上。</p>
+<p>当 JDK &gt;=8 时会尽量使用 <code>LongAdder</code> ，其效率高于 <code>AtomicLong</code> ，底层是一个 base 域和一个 cells 数组(保存计数值)，低并发（没有竞争/ CAS 不失败）直接修改 base ，高并发更新到 cells 数组，分离出热点更新，如果要获取真正的long值，只要将各个槽中的变量值与 base 累加返回。</p>
+<p>此外还有比如针对 JDK8 前的 <code>ConcurrentHashMapV8</code> 这样的实现（现在已经不用了），还有针对多写单读使用 <code>MpscChunkedArrayQueue</code> 而不是使用 <code>LinkedBlockingQueue</code> 。</p>
+<p>Netty 中大量使用局部串行，也就是 <code>Channel</code> 中的 I/O 请求都是 Pipeline 的方式执行，而同时它又是整体并行的方式：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200412174544.png" alt></p>
+<p>这里一个 <code>EventLoop</code> 服务于多个 <code>Channel</code> ，同时每一个 <code>Channel</code> 中都是局部串行：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200412174641.png" alt></p>
+<p>最后在 Netty 中能不用锁就不用锁，比如 <code>ThreadLocal</code> ，来避免资源争用，Netty 中实现了一个轻量级的 <code>ThreadLocal</code> 即 <code>FastThreadLocal</code> 。</p>
+<h2 id="8-Netty-的内存使用"><a href="#8-Netty-的内存使用" class="headerlink" title="8. Netty 的内存使用"></a>8. Netty 的内存使用</h2><p>目标：</p>
+<ul>
+<li>占用内存少；</li>
+<li>应用速度快。</li>
+</ul>
+<p>Netty 的实现方式：</p>
+<ol>
+<li>能用基本类型就不用包装类型；</li>
+<li>能定义成类变量就不要定义成实例变量；（实例越多，浪费越多）</li>
+<li>AtomicLong -&gt; volatile long + static AtomicLongFieldUpdater ，减少对象本身大小；</li>
+<li>对分配内存进行预估，比如 <code>HashMap</code> 提前给预估大小；</li>
+<li>Zero-Copy ，使用逻辑组合来替代实际的复制；使用包装来代替实际复制；调用 JDK 的 Zero-Copy 接口，比如使用 NIO 的 <code>FileChannel.transferTo()</code> 方法；</li>
+<li>堆外内存，堆——heap，非堆——non heap，堆外——off heap。堆外更大减轻了 GC 压力，但是速度慢，而且收 OS 管理风险更大；</li>
+<li>内存池，开源可以用 Apache Commons Pool ，Netty 有一个自己的内存池 <code>io.netty.util.Recycler</code> 。</li>
+</ol>
+<p>Netty 源码中内存的使用：</p>
+<ul>
+<li>Netty 默认使用了池化的实现，<code>io.netty.allocator.type</code> 默认值是 <code>pooled</code> ；<ul>
+<li>在 <code>PooledDirectBuf</code> 类下，可以找到 <code>PooledDirectByteBuf buf = RECYCLER.get()</code> 这里就是从对象池中获取了一个对象，本质上是通过 stack 的 <code>pop</code> 获取一个，没有再新建；</li>
+<li>再在调用 <code>PooledByteBuf.deallocate()</code> 的时候使用 <code>recycle()</code> 归还对象，还到 stack 中。</li>
+</ul>
+</li>
+<li>Netty 切换堆内和堆外内存；<ul>
+<li>参数设置，<code>io.netty.noPreferDirect = true</code> 可以使用堆外内存；</li>
+<li>类 <code>PooledByByteBufAllocator</code> 的构造方法写 <code>true</code> ，可以同样进行切换。</li>
+</ul>
+</li>
+<li>本质上，Netty 通过 <code>ByteBuffer.allocateDirect(initialCapacity)</code> 方法可以调用 JDK 的方法来分配堆外内存。</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Netty-下三种-I-O"><span class="toc-number">1.</span> <span class="toc-text">1. Netty 下三种 I/O</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Netty-如何切换-I-O-模式？"><span class="toc-number">2.</span> <span class="toc-text">2. Netty 如何切换 I/O 模式？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-Netty-对-Reactor-的支持"><span class="toc-number">3.</span> <span class="toc-text">3. Netty 对 Reactor 的支持</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-Thread-Per-Connection-模式"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 Thread-Per-Connection 模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-Reactor-单线程"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 Reactor 单线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-Reactor-多线程"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 Reactor 多线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-Reactor-主从"><span class="toc-number">3.4.</span> <span class="toc-text">3.4 Reactor 主从</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-5-以主从为例"><span class="toc-number">3.5.</span> <span class="toc-text">3.5 以主从为例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-5-1-如何实现-Reactor-模式？"><span class="toc-number">3.5.1.</span> <span class="toc-text">3.5.1 如何实现 Reactor 模式？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-5-2-为什么说的-Netty-main-reactor-大多都不能用到一个线程组？"><span class="toc-number">3.5.2.</span> <span class="toc-text">3.5.2 为什么说的 Netty main reactor 大多都不能用到一个线程组？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-5-3-Netty-给-Channel-分配-NIO-event-loop-的规则是什么？"><span class="toc-number">3.5.3.</span> <span class="toc-text">3.5.3 Netty 给 Channel 分配 NIO event loop 的规则是什么？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-5-4-Netty-如何跨平台？"><span class="toc-number">3.5.4.</span> <span class="toc-text">3.5.4 Netty 如何跨平台？</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-TCP-粘包、半包-Netty-处理"><span class="toc-number">4.</span> <span class="toc-text">4. TCP 粘包、半包 Netty 处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-二次编解码"><span class="toc-number">5.</span> <span class="toc-text">5. 二次编解码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-keepalive-与-Idle-监测"><span class="toc-number">6.</span> <span class="toc-text">6. keepalive 与 Idle 监测</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-什么是-keepalive-？"><span class="toc-number">6.1.</span> <span class="toc-text">6.1 什么是 keepalive ？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-为什么还需要应用层-keepalive-？"><span class="toc-number">6.2.</span> <span class="toc-text">6.2 为什么还需要应用层 keepalive ？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-什么是-Idle-检测？"><span class="toc-number">6.3.</span> <span class="toc-text">6.3 什么是 Idle 检测？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-4-Netty-中的-keepalive-如何生效"><span class="toc-number">6.4.</span> <span class="toc-text">6.4 Netty 中的 keepalive 如何生效</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-5-Netty-中的-Idle-如何生效"><span class="toc-number">6.5.</span> <span class="toc-text">6.5 Netty 中的 Idle 如何生效</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-Netty-锁事"><span class="toc-number">7.</span> <span class="toc-text">7. Netty 锁事</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-Netty-的内存使用"><span class="toc-number">8.</span> <span class="toc-text">8. Netty 的内存使用</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-10-15-netty-geek2/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-10-15-netty-geek2/&text=从领域知识剖析 Netty"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-10-15-netty-geek2/&title=从领域知识剖析 Netty"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-10-15-netty-geek2/&is_video=false&description=从领域知识剖析 Netty"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=从领域知识剖析 Netty&body=Check out this article: http://koon.cool/technology/2019-10-15-netty-geek2/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-10-15-netty-geek2/&title=从领域知识剖析 Netty"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-10-15-netty-geek2/&title=从领域知识剖析 Netty"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-10-15-netty-geek2/&title=从领域知识剖析 Netty"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-10-15-netty-geek2/&title=从领域知识剖析 Netty"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-10-15-netty-geek2/&name=从领域知识剖析 Netty&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="1. 线程安全定义：当多个线程访问一个对象时，如果不用考虑这些线程在运行时环境下的调度和交替执行，也不需要进行额外的同步，或者在调用方进行任何其他的协调操作，调用这个对象的行为都可以获得正确的结果，那这个对象是线程安全的。 1.1 Java 语言中的线程安全我们￼可以将Java语言中各种操作共享的数据分为以下5类：不可变、绝对线程安全、相对线程安全、线程兼容和线程对立。  不可变  在 Java">
+<meta name="keywords" content="java,深入理解 JVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线程安全与锁优化">
+<meta property="og:url" content="http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="1. 线程安全定义：当多个线程访问一个对象时，如果不用考虑这些线程在运行时环境下的调度和交替执行，也不需要进行额外的同步，或者在调用方进行任何其他的协调操作，调用这个对象的行为都可以获得正确的结果，那这个对象是线程安全的。 1.1 Java 语言中的线程安全我们￼可以将Java语言中各种操作共享的数据分为以下5类：不可变、绝对线程安全、相对线程安全、线程兼容和线程对立。  不可变  在 Java">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190125144109.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190125144139.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190125231742.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190125232008.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190125234043.png">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="线程安全与锁优化">
+<meta name="twitter:description" content="1. 线程安全定义：当多个线程访问一个对象时，如果不用考虑这些线程在运行时环境下的调度和交替执行，也不需要进行额外的同步，或者在调用方进行任何其他的协调操作，调用这个对象的行为都可以获得正确的结果，那这个对象是线程安全的。 1.1 Java 语言中的线程安全我们￼可以将Java语言中各种操作共享的数据分为以下5类：不可变、绝对线程安全、相对线程安全、线程兼容和线程对立。  不可变  在 Java">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190125144109.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>线程安全与锁优化</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2019-02-14-jdk-concurrent-package/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/technology/2018-12-22-jvm-understanding-chapter5/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&text=线程安全与锁优化"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&title=线程安全与锁优化"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&is_video=false&description=线程安全与锁优化"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=线程安全与锁优化&body=Check out this article: http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&title=线程安全与锁优化"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&title=线程安全与锁优化"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&title=线程安全与锁优化"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&title=线程安全与锁优化"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&name=线程安全与锁优化&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-线程安全"><span class="toc-number">1.</span> <span class="toc-text">1. 线程安全</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Java-语言中的线程安全"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 Java 语言中的线程安全</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-线程安全的实现方法"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 线程安全的实现方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-锁优化"><span class="toc-number">2.</span> <span class="toc-text">2. 锁优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-自旋锁与自适应自旋"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 自旋锁与自适应自旋</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-锁消除"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 锁消除</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-锁粗化"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 锁粗化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-轻量级锁"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 轻量级锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-偏向锁"><span class="toc-number">2.5.</span> <span class="toc-text">2.5 偏向锁</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        线程安全与锁优化
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-12-28T16:00:00.000Z" itemprop="datePublished">2018-12-29</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/java/">java</a>, <a class="tag-link" href="/tags/深入理解-JVM/">深入理解 JVM</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-线程安全"><a href="#1-线程安全" class="headerlink" title="1. 线程安全"></a>1. 线程安全</h2><p>定义：当多个线程访问一个对象时，如果不用考虑这些线程在运行时环境下的调度和交替执行，也不需要进行额外的同步，或者在调用方进行任何其他的协调操作，调用这个对象的行为都可以获得正确的结果，那这个对象是<strong>线程安全</strong>的。</p>
+<h3 id="1-1-Java-语言中的线程安全"><a href="#1-1-Java-语言中的线程安全" class="headerlink" title="1.1 Java 语言中的线程安全"></a>1.1 Java 语言中的线程安全</h3><p>我们￼可以将Java语言中各种操作共享的数据分为以下5类：不可变、绝对线程安全、相对线程安全、线程兼容和线程对立。</p>
+<ul>
+<li><strong>不可变</strong></li>
+</ul>
+<p>在 Java 语言中（特指JDK 1.5以后，即 Java 内存模型被修正之后的Java语言），不可变（Immutable）的对象一定是线程安全的，<strong>无论是对象的方法实现还是方法的调用者，都不需要再采取任何的线程安全保障措施</strong>，final 关键字带来的可见性时曾经提到过这一点，<strong>只要一个不可变的对象被正确地构建出来（没有发生 this 引用逃逸的情况），那其外部的可见状态永远也不会改变，永远也不会看到它在多个线程之中处于不一致的状态</strong>。“不可变”带来的安全性是最简单和最纯粹的。</p>
+<p>如果是一个基本数据类型，那么只需简单的 final 关键字就可以保证<strong>不可变</strong>，如果是对象，需要保证对象的行为不会对其状态产生影响。</p>
+<blockquote>
+<p>比如 String 类，它的所有方法都是产生一个新的值，而不是改变值。</p>
+</blockquote>
+<p>保证对象行为不影响自己状态的途径有很多种，其中最简单的就是把对象中带有状态的变量都声明为final，这样在构造函数结束之后，它就是不可变的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Integer JDK</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> value;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Integer</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.value = value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在 Java API 中符合不可变要求的类型，除了上面提到的 String 之外，常用的还有枚举类型，以及 java.lang.Number 的部分子类，如 Long 和 Double 等数值包装类型，BigInteger 和 BigDecimal 等大数据类型；但同为 Number 的子类型的原子类 AtomicInteger 和 AtomicLong 则并非不可变的。</p>
+<ul>
+<li><strong>绝对线程安全</strong></li>
+</ul>
+<p>绝对线程安全满足我们开头对于<strong>线程安全的定义</strong>，这个定义非常严格。</p>
+<p>在 Java API 中标注自己是线程安全的类，大多数都不是绝对的线程安全。我们可以通过 Java API 中一个不是“绝对线程安全”的线程安全类来看看这里的“绝对”是什么意思。<strong>Vector 就不是说永远不需要同步手段了</strong>。</p>
+<p>因为 Vetcot 中的方法都是以当前实例为锁对象，即同时只会有一个方法被执行，但是由于外部条件，预测到的都是 Vector 正常执行的情况，外部会出错，Vector 内部还是没有问题的，因此，假设我们在外部调用 size() 方法，一个线程删除的同时另外一个线程打印，就可能出错，<strong>因为现在 size() 可能变了，我们需要加上额外的锁在外部进行限制</strong>。</p>
+<ul>
+<li><strong>相对线程安全</strong></li>
+</ul>
+<p>这是我们通常意义上的线程安全，它需要保证对这个对象单独的操作是线程安全的，我们在调用的时候不需要做额外的保障措施，但是对于一些特定顺序的连续调用，就可能需要在调用端使用额外的同步手段来保证调用的正确性。<strong>我们的 Vector 的例子就是相对安全的典型</strong>。</p>
+<p>在 Java 语言中，大部分的线程安全类都属于这种类型，例如 Vector 、 HashTable 、 Collections 的 synchronizedCollection() 方法包装的集合等。</p>
+<ul>
+<li><strong>线程兼容</strong></li>
+</ul>
+<p>线程兼容是指对象本身并不是线程安全的，但是可以通过在调用端正确地使用同步手段来保证对象在并发环境中可以安全地使用，<strong>我们平常说一个类不是线程安全的，绝大多数时候指的是这一种情况</strong>。</p>
+<p>Java API 中大部分的类都是属于线程兼容的，如与前面的 Vector 和 HashTable 相对应的集合类ArrayList和 HashMap 等。</p>
+<ul>
+<li><strong>线程对立</strong></li>
+</ul>
+<p><strong>线程对立是指无论调用端是否采取了同步措施，都无法在多线程环境中并发使用的代码</strong>。</p>
+<p>一个线程对立的例子是 Thread 类的 suspend() 和 resume() 方法，如果有两个线程同时持有一个线程对象，一个尝试去中断线程，另一个尝试去恢复线程，如果并发进行的话，<strong>无论调用时是否进行了同步，目标线程都是存在死锁风险的</strong>，如果 suspend() 中断的线程就是即将要执行 resume() 的那个线程，<strong>那就肯定要产生死锁了</strong>。也正是由于这个原因， suspend() 和 resume() 方法已经被 JDK 声明废弃（@Deprecated）了。常见的线程对立的操作还有 System. setIn() 、 Sytem.setOut() 和 System.runFinalizersOnExit() 等。</p>
+<blockquote>
+<p>如果使用 suspend 的目标线程对一个重要的系统资源持有锁，那么没任何线程可以使用这个资源直到要 suspend 的目标线程被 resume ；如果一个线程在 resume 目标线程之前尝试持有这个重要的系统资源锁再去 resume 目标线程，这两条线程就相互死锁了。</p>
+</blockquote>
+<h3 id="1-2-线程安全的实现方法"><a href="#1-2-线程安全的实现方法" class="headerlink" title="1.2 线程安全的实现方法"></a>1.2 线程安全的实现方法</h3><p>这里我们更加侧重于<strong>虚拟机如何实现同步和锁</strong>，然后我们思考如何<strong>代码实现线程安全</strong>就不是一个困难的事情。</p>
+<ul>
+<li><strong>互斥同步</strong></li>
+</ul>
+<p>互斥同步（Mutual Exclusion &amp; Synchronization）是常见的一种并发正确性保障手段。同步是指在多个线程并发访问共享数据时，保证共享数据在同一个时刻只被一个（或者是一些，使用信号量的时候）线程使用。而互斥是实现同步的一种手段，临界区（Critical Section）、互斥量（Mutex）和信号量（Semaphore）都是主要的互斥实现方式。因此，在这4个字里面，<strong>互斥是因，同步是果；互斥是方法，同步是目的</strong>。</p>
+<p> synchronized 指定了 renfrence 那锁定的就是这个 reference ，实例方法没有指定 reference 锁定的就是该实例对象，类方法没有指定 reference 就是该 class 对象。</p>
+<p>在虚拟机规范对 monitorenter 和 monitorexit 的行为描述中，有两点是需要特别注意的:</p>
+<ol>
+<li>首先， synchronized 同步块对同一条线程来说是可重入的，不会出现自己把自己锁死的问题。</li>
+<li>其次，同步块在已进入的线程执行完之前，会阻塞后面其他线程的进入。</li>
+</ol>
+<blockquote>
+<p>Java 的线程是映射到操作系统的原生线程上的，因此，synchronized 关键字是一个重量级的操作，它会设计用户态转换成内核态。</p>
+</blockquote>
+<p><strong>ReentrantLock 实现同步</strong><br>除了 synchronized 之外，我们还可以使用 java.util.concurrent（下文称 J.U.C ）包中的重入锁（ReentrantLock）来实现同步，在基本用法上， ReentrantLock 与 synchronized 很相似，他们都具备一样的线程重入特性，只是代码写法上有点区别，一个表现为 API 层面的互斥锁（ lock() 和 unlock() 方法配合 try/finally 语句块来完成），另一个表现为原生语法层面的互斥锁。不过，相比 synchronized ， ReentrantLock 增加了一些高级功能，主要有以下3项：<strong>等待可中断</strong>、<strong>可实现公平锁</strong>，以及<strong>锁可以绑定多个条件</strong>。</p>
+<ol>
+<li><strong>等待可中断</strong>：等待可中断是指当持有锁的线程长期不释放锁的时候，正在等待的线程可以选择放弃等待，改为处理其他事情，可中断特性对处理执行时间非常长的同步块很有帮助。</li>
+<li><strong>公平锁</strong>：多个线程在等待同一个锁时，必须按照申请锁的时间顺序来依次获得锁；而非公平锁则不保证这一点，在锁被释放时，任何一个等待锁的线程都有机会获得锁。 synchronized 中的锁是非公平的， ReentrantLock 默认情况下也是非公平的，但可以通过带布尔值的构造函数要求使用公平锁。</li>
+<li><strong>锁绑定多个条件</strong>：锁绑定多个条件是指一个 ReentrantLock 对象可以同时绑定多个 Condition 对象，而在 synchronized 中，锁对象的 wait() 和 notify() 或 notifyAll() 方法可以实现一个隐含的条件，如果要和多于一个的条件关联的时候，就不得不额外地添加一个锁，而 ReentrantLock 则无须这样做，只需要多次调用 newCondition() 方法即可。</li>
+</ol>
+<p>我们用下面两个图来比较 JUC 包和 synchronized 关键字的性能：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190125144109.png" alt></p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190125144139.png" alt></p>
+<blockquote>
+<p>横坐标线程数、纵坐标吞吐量</p>
+</blockquote>
+<p>与其说 ReentrantLock 性能好，还不如说 synchronized 还有非常大的优化余地。后续的技术发展也证明了这一点， Jdk1.6 中加入了很多针对锁的优化措施， Jdk1.6 发布之后，人们就发现 synchronized 与 ReentrantLock 的性能基本上是完全持平了。因此，如果读者的程序是使用 Jdk1.6 或以上部署的话，性能因素就不再是选择 ReentrantLock 的理由了，虚拟机在未来的性能改进中肯定也会更加偏向于原生的 synchronized ，<strong>所以还是提倡在 synchronized 能实现需求的情况下，优先考虑使用 synchronized 来进行同步</strong>。</p>
+<ul>
+<li><strong>非阻塞同步</strong></li>
+</ul>
+<p><strong>互斥同步</strong>最主要的问题就是进行线程阻塞和唤醒所带来的性能问题，因此这种同步<strong>也称为阻塞同步</strong>（Blocking Synchronization）。阻塞同步是一种悲观的并发策略，总是认为只要不去做正确的同步措施，那么就会出现问题。</p>
+<p>随着硬件指令集的发展，我们有了另外一个选择：<strong>基于冲突检测的乐观并发策略</strong>。先进行操作，如果没有其他线程争用共享数据，那操作就成功了；如果共享数据有争用，产生了冲突，那就再采取其他的补偿措施。</p>
+<blockquote>
+<p>随着硬件指令集发展这一点，我们需要<strong>操作</strong>和<strong>冲突检测</strong>这两个步骤具备原子性。</p>
+</blockquote>
+<p>这种<strong>乐观的并发策略</strong>的许多实现都<strong>不需要把线程挂起</strong>，因此这种同步操作<strong>称为非阻塞同步</strong>（Non-Blocking Synchronization）。</p>
+<p><strong>操作</strong>和<strong>冲突检测</strong>这两个步骤如何具备原子性？再用互斥同步就失去意义了，所有我们依靠硬件来完成这一点，硬件保证一个从<strong>语义上看起来需要多次操作的行为只通过一条处理器指令就能完成</strong>，这类指令常用的有：</p>
+<ol>
+<li>测试并设置（Test-and-Set）</li>
+<li>获取并增加（Fetch-and-Increment）</li>
+<li>交换（Swap）</li>
+<li>比较并交换（Compare-and-Swap，下文称CAS）</li>
+<li>加载链接/条件存储（Load-Linked/Store-Conditional，下文称LL/SC）</li>
+</ol>
+<p>CAS 指令需要有3个操作数，分别是内存位置（在 Java 中可以简单理解为变量的内存地址，用V表示）、旧的预期值（用 A 表示）和新值（用 B 表示）。 CAS 指令执行时，当且仅当 V 符合旧预期值 A 时，处理器用新值 B 更新 V 的值，否则它就不执行更新，但是无论是否更新了 V 的值，都会返回 V 的旧值，上述的处理过程是一个原子操作。</p>
+<p>我们来看一下 AtomicInteger 的 incrementAndGet() 方法，它具有原子性，实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">￼/＊＊￼</span><br><span class="line">＊ Atomically increment by one the current value.￼</span><br><span class="line">＊ <span class="meta">@return</span> the updated value￼</span><br><span class="line">＊/￼</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">incrementAndGet</span><span class="params">()</span> </span>&#123;￼</span><br><span class="line">  <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">    <span class="keyword">int</span> current = get();</span><br><span class="line">    <span class="keyword">int</span> next = current + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span> (compareAndSet(current, next))￼</span><br><span class="line">    <span class="keyword">return</span> next;</span><br><span class="line">  &#125;￼</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>incrementAndGet() 方法在一个无限循环中，不断尝试将一个比当前值大1的新值赋给自己。如果失败了，那说明在执行“获取-设置”操作的时候值已经有了修改，于是再次循环进行下一次操作，直到设置成功为止。</p>
+<p>CAS 存在逻辑漏洞，被称为 <strong>ABA</strong> 问题：如果一个变量 V 初次读取的时候是 A 值，并且在准备赋值的时候检查到它仍然为 A 值，那我们就能说它的值没有被其他线程改变过了吗？如果在这段期间它的值曾经被改成了 B ，后来又被改回为 A ，那 CAS 操作就会误认为它从来没有被改变过。</p>
+<p>JUC 包为了解决这个问题，提供了一个带有标记的原子引用类“AtomicStampedReference”，它可以通过控制变量值的版本来保证 CAS 的正确性。不过目前来说这个类比较“鸡肋”，<strong>大部分情况下 ABA 问题不会影响程序并发的正确性，如果需要解决 ABA 问题，改用传统的互斥同步可能会比原子类更高效</strong>。</p>
+<ul>
+<li><strong>无同步方案</strong></li>
+</ul>
+<p>如果一个方法，本身就不涉及共享数据，那么它自然无需任何同步措施去保证正确性，有些代码天生线程安全，比如下面两种：</p>
+<ol>
+<li>可重入代码</li>
+</ol>
+<p>Reentrant Code ，或者称之为纯代码 Pure Code 。可以在代码执行的任何时刻中断它，转而去执行另外一段代码（包括递归调用它本身），而在控制权返回后，原来的程序不会出现任何错误。</p>
+<blockquote>
+<p>相对线程安全来说，可重入性是更基本的特性，它可以保证线程安全，即所有的可重入的代码都是线程安全的，但是并非所有的线程安全的代码都是可重入的。</p>
+</blockquote>
+<p>我们可以通过一个简单的原则来判断代码是否具备可重入性：<strong>如果一个方法，它的返回结果是可以预测的，只要输入了相同的数据，就都能返回相同的结果，那它就满足可重入性的要求，当然也就是线程安全的</strong>。</p>
+<ol>
+<li>线程本地存储</li>
+</ol>
+<p>Thread Local Storage ，如果一段代码中所需要的数据必须与其他代码共享，那就看看这些共享数据的代码是否能保证在同一个线程中执行？如果能保证，我们就可以把共享数据的可见范围限制在同一个线程之内，这样，无须同步也能保证线程之间不出现数据争用的问题。</p>
+<p>Java 语言中，如果一个变量要被多线程访问，可以使用 volatile 关键字声明它为“易变的”；如果一个变量要被某个线程独享，Java 可以通过 java.lang.ThreadLocal 类来实现线程本地存储的功能。</p>
+<h2 id="2-锁优化"><a href="#2-锁优化" class="headerlink" title="2. 锁优化"></a>2. 锁优化</h2><p>高效并发是从 Jdk1.5 到 Jdk1.6 的一个重要改进，HotSpot 虚拟机开发团队在这个版本上花费了大量的精力去实现各种锁优化技术，如适应性自旋（Adaptive Spinning）、锁消除（Lock Elimination）、锁粗化（Lock Coarsening）、轻量级锁（Lightweight Locking）和偏向锁（Biased Locking）等，这些技术都是为了在线程之间更高效地共享数据，以及解决竞争问题，从而提高程序的执行效率。</p>
+<h3 id="2-1-自旋锁与自适应自旋"><a href="#2-1-自旋锁与自适应自旋" class="headerlink" title="2.1 自旋锁与自适应自旋"></a>2.1 自旋锁与自适应自旋</h3><p>线程互斥同步的问题在于阻塞的实现，挂起和恢复都需要转入内核态，但是锁定可能仅仅是很短的一段时间，非常不值得。</p>
+<p>如果物理机器有一个以上的处理器，能让两个或以上的线程同时并行执行，我们就可以让<strong>后面请求锁的那个线程“稍等一下”</strong>，但不放弃处理器的执行时间，看看持有锁的线程是否很快就会释放锁。为了让线程等待，我们只需让线程执行一个忙循环（自旋），这项技术就是所谓的自旋锁。</p>
+<p>自旋锁在 Jdk1.4.2 中就已经引入，只不过默认是关闭的，可以使用 -XX:+UseSpinning 参数来开启，在 Jdk1.6 中就已经改为默认开启了。</p>
+<p>自旋等待本身虽然避免了线程切换的开销，但它是要占用处理器时间的，因此，如果锁被占用的时间很短，自旋等待的效果就会非常好，反之，如果锁被占用的时间很长，那么自旋的线程只会白白消耗处理器资源，而不会做任何有用的工作，反而会带来性能上的浪费。</p>
+<p>因此，自旋等待的时间必须要有一定的限度，<strong>如果自旋超过了限定的次数仍然没有成功获得锁，就应当使用传统的方式去挂起线程了</strong>。自旋次数的默认值是10次，用户可以使用参数 -XX:PreBlockSpin 来更改。</p>
+<p>在 Jdk1.6 中引入了<strong>自适应</strong>的自旋锁。自适应意味着自旋的时间不再固定了，而是由前一次在同一个锁上的自旋时间及锁的拥有者的状态来决定。</p>
+<h3 id="2-2-锁消除"><a href="#2-2-锁消除" class="headerlink" title="2.2 锁消除"></a>2.2 锁消除</h3><p>锁消除是指<strong>虚拟机即时编译器在运行时，对一些代码上要求同步，但是被检测到不可能存在共享数据竞争的锁进行消除</strong>。</p>
+<p>为什么要存在锁消除？难道我们自己不知道代码有没有加同步锁吗？我们看下面的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">concatString</span><span class="params">(String s1, String s2, String s3)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> s1 + s2 + s3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们也知道，由于 String 是一个不可变的类，对字符串的连接操作总是通过生成新的String对象来进行的，因此 Javac 编译器会对 String 连接做自动优化。在 Jdk1.5 之前，会转化为 StringBuffer 对象的连续 append() 操作，在 Jdk1.5 及以后的版本中，会转化为 StringBuilder 对象的连续 append() 操作：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">concatString</span><span class="params">(String s1, String s2, String s3)</span> </span>&#123;</span><br><span class="line">  StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">  sb.append(s1);</span><br><span class="line">  sb.sppend(s2);</span><br><span class="line">  sb.append(s3);</span><br><span class="line">  <span class="keyword">return</span> sb.toString();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每个 StringBuffer.append() 方法中都有一个同步块，锁就是 sb 对象。虚拟机观察变量 sb ，很快就会发现它的动态作用域被限制在 concatString() 方法内部。也就是说，sb 的所有引用永远不会“逃逸”到 concatString() 方法之外，其他线程无法访问到它，因此，虽然这里有锁，但是可以被安全地消除掉，<strong>在即时编译之后，这段代码就会忽略掉所有的同步而直接执行了</strong>。</p>
+<h3 id="2-3-锁粗化"><a href="#2-3-锁粗化" class="headerlink" title="2.3 锁粗化"></a>2.3 锁粗化</h3><p>如果一系列的连续操作都对同一个对象反复加锁和解锁，甚至加锁操作是出现在循环体中的，那即使没有线程竞争，频繁地进行互斥同步操作也会导致不必要的性能损耗。</p>
+<p>我们上面的代码 append() 方法就属于这类情况。如果虚拟机探测到有这样一串零碎的操作都对同一个对象加锁，将会把加锁同步的范围扩展（粗化）到整个操作序列的外部，就是扩展到第一个 append() 操作之前直至最后一个 append() 操作之后，<strong>这样只需要加锁一次就可以了</strong>。</p>
+<h3 id="2-4-轻量级锁"><a href="#2-4-轻量级锁" class="headerlink" title="2.4 轻量级锁"></a>2.4 轻量级锁</h3><p>轻量级锁是 Jdk1.6 之中加入的新型锁机制，它名字中的“轻量级”是相对于使用操作系统互斥量来实现的传统锁而言的，因此<strong>传统的锁机制就称为“重量级”锁</strong>。首先需要强调一点的是，<strong>轻量级锁并不是用来代替重量级锁的，它的本意是在没有多线程竞争的前提下，减少传统的重量级锁使用操作系统互斥量产生的性能消耗</strong>。</p>
+<p>我们回忆一下 HotSpot 虚拟机对象头 Mark Word ：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190125231742.png" alt></p>
+<p>在代码进入同步块的时候，如果此同步对象没有被锁定（锁标志位为“01”状态），虚拟机首先将在当前线程的栈帧中建立一个名为锁记录（Lock Record）的空间，用于存储锁对象目前的 Mark Word 的拷贝（官方把这份拷贝加了一个 Displaced 前缀，即 Displaced Mark Word ）。</p>
+<p>然后，虚拟机将使用 CAS 操作尝试将对象的 Mark Word 更新为指向 Lock Record 的指针。如果这个更新动作成功了，那么这个线程就拥有了该对象的锁，并且对象 Mark Word 的锁标志位（Mark Word 的最后2bit）将转变为“00”，即表示此对象处于轻量级锁定状态：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190125232008.png" alt></p>
+<p>如果只线程已经拥有了这个对象的锁，那就可以直接进入同步块继续执行，否则说明这个锁对象已经被其他线程抢占了。如果有两条以上的线程争用同一个锁，那轻量级锁就不再有效，要膨胀为重量级锁，锁标志的状态值变为“10”，Mark Word 中存储的就是指向重量级锁（互斥量）的指针，后面等待锁的线程也要进入阻塞状态。</p>
+<blockquote>
+<p>首先，多个线程运行到同步块以后，会检查锁对象状态值标志是否加锁，如果没有锁就把锁对象的 Mark Word 的信息拷贝到自己线程存起来，然后通过 cas 尝试把对象的 Mark 的值改变成一个指向自己线程的指针，一旦成功其他线程的 cas 就会失败，因为锁对象的 Mark 已经变成一个新的指针了，必须等待线程释放锁，其他线程才能继续获取。</p>
+<p>其他线程通过自旋竞争锁，当自旋次数超过 jvm 预期上限，就会影响性能，所以竞争的线程就会把锁的对象 Mark 指向重锁，然后所有的竞争线程放弃自旋，进入阻塞状态。</p>
+<p>当成功获取锁的线程执行完毕，尝试通过 cas 释放锁时，因为 Mark 已经指向重锁，也会解锁失败，这时线程就会知道锁已经升级为重量级锁， 它不仅要释放当前锁，还要唤醒其他阻塞的线程。</p>
+</blockquote>
+<p>轻量级锁能提升程序同步性能的依据是“对于绝大部分的锁，在整个同步周期内都是不存在竞争的”，这是一个经验数据。如果没有竞争，轻量级锁使用 CAS 操作避免了使用互斥量的开销，但如果存在锁竞争，除了互斥量的开销外，还额外发生了 CAS 操作，因此在有竞争的情况下，轻量级锁会比传统的重量级锁更慢。</p>
+<h3 id="2-5-偏向锁"><a href="#2-5-偏向锁" class="headerlink" title="2.5 偏向锁"></a>2.5 偏向锁</h3><p>偏向锁也是 Jdk1.6 中引入的一项锁优化，它的目的是消除数据在无竞争情况下的同步原语，进一步提高程序的运行性能。如果说轻量级锁是在无竞争的情况下使用 CAS 操作去消除同步使用的互斥量，那偏向锁就是在无竞争的情况下把整个同步都消除掉，<strong>连 CAS 操作都不做了</strong>。</p>
+<p>假设当前虚拟机启用了偏向锁（启用参数-XX:+UseBiasedLocking，这是 Jdk1.6 的默认值），那么，当锁对象第一次被线程获取的时候，虚拟机将会把对象头中的标志位设为“01”，即偏向模式。同时使用 CAS 操作把获取到这个锁的线程的 ID 记录在对象的 Mark Word 之中，如果 CAS 操作成功，持有偏向锁的线程以后每次进入这个锁相关的同步块时，虚拟机都可以不再进行任何同步操作（例如 Locking 、 Unlocking 及对 Mark Word 的 Update 等）。</p>
+<p>当有另外一个线程去尝试获取这个锁时，偏向模式就宣告结束。根据锁对象目前是否处于被锁定的状态，撤销偏向（Revoke Bias）后恢复到未锁定（标志位为“01”）或轻量级锁定（标志位为“00”）的状态，后续的同步操作就如上面介绍的轻量级锁那样执行。偏向锁、轻量级锁的状态转化及对象 Mark Word 的关系如图所示。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190125234043.png" alt></p>
+<p>偏向锁可以提高带有同步但无竞争的程序性能。它同样是一个带有效益权衡（Trade Off）性质的优化，也就是说，它并不一定总是对程序运行有利，如果程序中大多数的锁总是被多个不同的线程访问，那偏向模式就是多余的。在具体问题具体分析的前提下，有时候使用参数 -XX:-UseBiasedLocking 来禁止偏向锁优化反而可以提升性能。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-线程安全"><span class="toc-number">1.</span> <span class="toc-text">1. 线程安全</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-Java-语言中的线程安全"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 Java 语言中的线程安全</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-线程安全的实现方法"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 线程安全的实现方法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-锁优化"><span class="toc-number">2.</span> <span class="toc-text">2. 锁优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-自旋锁与自适应自旋"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 自旋锁与自适应自旋</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-锁消除"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 锁消除</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-锁粗化"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 锁粗化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-轻量级锁"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 轻量级锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-偏向锁"><span class="toc-number">2.5.</span> <span class="toc-text">2.5 偏向锁</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&text=线程安全与锁优化"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&title=线程安全与锁优化"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&is_video=false&description=线程安全与锁优化"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=线程安全与锁优化&body=Check out this article: http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&title=线程安全与锁优化"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&title=线程安全与锁优化"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&title=线程安全与锁优化"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&title=线程安全与锁优化"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-12-29-jvm-understanding-chapter13/&name=线程安全与锁优化&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="非常有必要记录一下。🧐 手机 table 宽度无法用百分比指定 table 是一个整体，每一列td的宽度是由一个其中一个最长td的宽度决定的。word-wrap: break-word; 无效就要用到 table-layout: fixed; 了。  在 table 标签加入如下 css : 123456/*使用浏览器默认的换行规则。*/word-break: normal;/*使用浏览器默认的">
+<meta name="keywords" content="css">
+<meta property="og:type" content="article">
+<meta property="og:title" content="css 各种情况记录">
+<meta property="og:url" content="http://koon.cool/note/2018-05-27-css-notes/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="非常有必要记录一下。🧐 手机 table 宽度无法用百分比指定 table 是一个整体，每一列td的宽度是由一个其中一个最长td的宽度决定的。word-wrap: break-word; 无效就要用到 table-layout: fixed; 了。  在 table 标签加入如下 css : 123456/*使用浏览器默认的换行规则。*/word-break: normal;/*使用浏览器默认的">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/dudu.jpg">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="css 各种情况记录">
+<meta name="twitter:description" content="非常有必要记录一下。🧐 手机 table 宽度无法用百分比指定 table 是一个整体，每一列td的宽度是由一个其中一个最长td的宽度决定的。word-wrap: break-word; 无效就要用到 table-layout: fixed; 了。  在 table 标签加入如下 css : 123456/*使用浏览器默认的换行规则。*/word-break: normal;/*使用浏览器默认的">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/dudu.jpg">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>css 各种情况记录</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2018-05-29-wsgi-and-asgi/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/note/2018-05-26-ssm-build-notes/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/note/2018-05-27-css-notes/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/note/2018-05-27-css-notes/&text=css 各种情况记录"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/note/2018-05-27-css-notes/&title=css 各种情况记录"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/note/2018-05-27-css-notes/&is_video=false&description=css 各种情况记录"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=css 各种情况记录&body=Check out this article: http://koon.cool/note/2018-05-27-css-notes/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/note/2018-05-27-css-notes/&title=css 各种情况记录"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/note/2018-05-27-css-notes/&title=css 各种情况记录"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/note/2018-05-27-css-notes/&title=css 各种情况记录"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/note/2018-05-27-css-notes/&title=css 各种情况记录"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/note/2018-05-27-css-notes/&name=css 各种情况记录&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#手机-table-宽度无法用百分比指定"><span class="toc-number">1.</span> <span class="toc-text">手机 table 宽度无法用百分比指定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#手机样式适配"><span class="toc-number">2.</span> <span class="toc-text">手机样式适配</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#mediatype-值"><span class="toc-number">2.1.</span> <span class="toc-text">mediatype 值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#media-值"><span class="toc-number">2.2.</span> <span class="toc-text">media 值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#手机-div-overflow-滚动失效"><span class="toc-number">3.</span> <span class="toc-text">手机 div overflow 滚动失效</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        css 各种情况记录
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-05-26T16:00:00.000Z" itemprop="datePublished">2018-05-27</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/note/">note</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/css/">css</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <p>非常有必要记录一下。🧐</p>
+<h2 id="手机-table-宽度无法用百分比指定"><a href="#手机-table-宽度无法用百分比指定" class="headerlink" title="手机 table 宽度无法用百分比指定"></a>手机 table 宽度无法用百分比指定</h2><blockquote>
+<p>table 是一个整体，每一列td的宽度是由一个其中一个最长td的宽度决定的。<br><code>word-wrap: break-word;</code> 无效就要用到 <code>table-layout: fixed;</code> 了。</p>
+</blockquote>
+<p>在 table 标签加入如下 css :</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*使用浏览器默认的换行规则。*/</span></span><br><span class="line"><span class="selector-tag">word-break</span>: <span class="selector-tag">normal</span>;</span><br><span class="line"><span class="comment">/*使用浏览器默认的换行规则。*/</span></span><br><span class="line"><span class="selector-tag">word-wrap</span>: <span class="selector-tag">break-word</span>;</span><br><span class="line"><span class="comment">/*使用浏览器默认的换行规则。*/</span></span><br><span class="line"><span class="selector-tag">table-layout</span>: <span class="selector-tag">fixed</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="手机样式适配"><a href="#手机样式适配" class="headerlink" title="手机样式适配"></a>手机样式适配</h2><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@<span class="keyword">media</span> mediatype and|not|only (media feature) &#123;</span><br><span class="line">    <span class="selector-tag">CSS-Code</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="mediatype-值"><a href="#mediatype-值" class="headerlink" title="mediatype 值"></a>mediatype 值</h3><div class="table-container">
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>all</td>
+<td>用于所有设备</td>
+</tr>
+<tr>
+<td>aural</td>
+<td>已废弃。用于语音和声音合成器</td>
+</tr>
+<tr>
+<td>braille</td>
+<td>已废弃。 应用于盲文触摸式反馈设备</td>
+</tr>
+<tr>
+<td>embossed</td>
+<td>已废弃。 用于打印的盲人印刷设备</td>
+</tr>
+<tr>
+<td>handheld</td>
+<td>已废弃。 用于掌上设备或更小的装置，如PDA和小型电话</td>
+</tr>
+<tr>
+<td>print</td>
+<td>用于打印机和打印预览</td>
+</tr>
+<tr>
+<td>projection</td>
+<td>已废弃。 用于投影设备</td>
+</tr>
+<tr>
+<td>screen</td>
+<td>用于电脑屏幕，平板电脑，智能手机等。</td>
+</tr>
+<tr>
+<td>speech</td>
+<td>应用于屏幕阅读器等发声设备</td>
+</tr>
+<tr>
+<td>tty</td>
+<td>已废弃。 用于固定的字符网格，如电报、终端设备和对字符有限制的便携设备</td>
+</tr>
+<tr>
+<td>tv</td>
+<td>已废弃。 用于电视和网络电视</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="media-值"><a href="#media-值" class="headerlink" title="media 值"></a>media 值</h3><div class="table-container">
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>aspect-ratio</td>
+<td>定义输出设备中的页面可见区域宽度与高度的比率</td>
+</tr>
+<tr>
+<td>color</td>
+<td>定义输出设备每一组彩色原件的个数。如果不是彩色设备，则值等于0</td>
+</tr>
+<tr>
+<td>color-index</td>
+<td>定义在输出设备的彩色查询表中的条目数。如果没有使用彩色查询表，则值等于0</td>
+</tr>
+<tr>
+<td>device-aspect-ratio</td>
+<td>定义输出设备的屏幕可见宽度与高度的比率。</td>
+</tr>
+<tr>
+<td>device-height</td>
+<td>定义输出设备的屏幕可见高度。</td>
+</tr>
+<tr>
+<td>device-width</td>
+<td>定义输出设备的屏幕可见宽度。</td>
+</tr>
+<tr>
+<td>grid</td>
+<td>用来查询输出设备是否使用栅格或点阵。</td>
+</tr>
+<tr>
+<td>height</td>
+<td>定义输出设备中的页面可见区域高度。</td>
+</tr>
+<tr>
+<td>max-aspect-ratio</td>
+<td>定义输出设备的屏幕可见宽度与高度的最大比率。</td>
+</tr>
+<tr>
+<td>max-color</td>
+<td>定义输出设备每一组彩色原件的最大个数。</td>
+</tr>
+<tr>
+<td>max-color-index</td>
+<td>定义在输出设备的彩色查询表中的最大条目数。</td>
+</tr>
+<tr>
+<td>max-device-aspect-ratio</td>
+<td>定义输出设备的屏幕可见宽度与高度的最大比率。</td>
+</tr>
+<tr>
+<td>max-device-height</td>
+<td>定义输出设备的屏幕可见的最大高度。</td>
+</tr>
+<tr>
+<td>max-device-width</td>
+<td>定义输出设备的屏幕最大可见宽度。</td>
+</tr>
+<tr>
+<td>max-height</td>
+<td>定义输出设备中的页面最大可见区域高度。</td>
+</tr>
+<tr>
+<td>max-monochrome</td>
+<td>定义在一个单色框架缓冲区中每像素包含的最大单色原件个数。</td>
+</tr>
+<tr>
+<td>max-resolution</td>
+<td>定义设备的最大分辨率。</td>
+</tr>
+<tr>
+<td>max-width</td>
+<td>定义输出设备中的页面最大可见区域宽度。</td>
+</tr>
+<tr>
+<td>min-aspect-ratio</td>
+<td>定义输出设备中的页面可见区域宽度与高度的最小比率。</td>
+</tr>
+<tr>
+<td>min-color</td>
+<td>定义输出设备每一组彩色原件的最小个数。</td>
+</tr>
+<tr>
+<td>min-color-index</td>
+<td>定义在输出设备的彩色查询表中的最小条目数。</td>
+</tr>
+<tr>
+<td>min-device-aspect-ratio</td>
+<td>定义输出设备的屏幕可见宽度与高度的最小比率。</td>
+</tr>
+<tr>
+<td>min-device-width</td>
+<td>定义输出设备的屏幕最小可见宽度。</td>
+</tr>
+<tr>
+<td>min-device-height</td>
+<td>定义输出设备的屏幕的最小可见高度。</td>
+</tr>
+<tr>
+<td>min-height</td>
+<td>定义输出设备中的页面最小可见区域高度。</td>
+</tr>
+<tr>
+<td>min-monochrome</td>
+<td>定义在一个单色框架缓冲区中每像素包含的最小单色原件个数</td>
+</tr>
+<tr>
+<td>min-resolution</td>
+<td>定义设备的最小分辨率。</td>
+</tr>
+<tr>
+<td>min-width</td>
+<td>定义输出设备中的页面最小可见区域宽度。</td>
+</tr>
+<tr>
+<td>monochrome</td>
+<td>定义在一个单色框架缓冲区中每像素包含的单色原件个数。如果不是单色设备，则值等于0</td>
+</tr>
+<tr>
+<td>orientation</td>
+<td>定义输出设备中的页面可见区域高度是否大于或等于宽度。</td>
+</tr>
+<tr>
+<td>resolution</td>
+<td>定义设备的分辨率。如：96dpi, 300dpi, 118dpcm</td>
+</tr>
+<tr>
+<td>scan</td>
+<td>定义电视类设备的扫描工序。</td>
+</tr>
+<tr>
+<td>width</td>
+<td>定义输出设备中的页面可见区域宽度。</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="手机-div-overflow-滚动失效"><a href="#手机-div-overflow-滚动失效" class="headerlink" title="手机 div overflow 滚动失效"></a>手机 div overflow 滚动失效</h2><ul>
+<li>[x] 父级设置  <code>relative</code> 或  <code>absolute</code> </li>
+<li>[x] 设置 <code>-webkit-overflow-scrolling: touch</code></li>
+</ul>
+<p>全部失败，情况是有时候双击才能滚动…很迷</p>
+<p>最后发现是这段 <code>css</code> 惹的祸：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-class">.post</span> <span class="selector-class">.highlight</span> <span class="selector-tag">pre</span>,</span><br><span class="line"><span class="selector-class">.post</span> <span class="selector-tag">pre</span> &#123;</span><br><span class="line">  <span class="attribute">padding</span>: <span class="number">16px</span>;</span><br><span class="line">  <span class="attribute">font-size</span>: <span class="number">85%</span>;</span><br><span class="line">  <span class="attribute">line-height</span>: <span class="number">1.45</span>;</span><br><span class="line">  <span class="attribute">background-color</span>: <span class="number">#282a36</span>;</span><br><span class="line">  <span class="attribute">border-radius</span>: <span class="number">3px</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>更准确地讲是这句不行：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">border-radius</span>: 3<span class="selector-tag">px</span>;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>我嘟嘟他的圆角嘟嘟。</p>
+</blockquote>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/dudu.jpg" alt="cover"></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#手机-table-宽度无法用百分比指定"><span class="toc-number">1.</span> <span class="toc-text">手机 table 宽度无法用百分比指定</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#手机样式适配"><span class="toc-number">2.</span> <span class="toc-text">手机样式适配</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#mediatype-值"><span class="toc-number">2.1.</span> <span class="toc-text">mediatype 值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#media-值"><span class="toc-number">2.2.</span> <span class="toc-text">media 值</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#手机-div-overflow-滚动失效"><span class="toc-number">3.</span> <span class="toc-text">手机 div overflow 滚动失效</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/note/2018-05-27-css-notes/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/note/2018-05-27-css-notes/&text=css 各种情况记录"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/note/2018-05-27-css-notes/&title=css 各种情况记录"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/note/2018-05-27-css-notes/&is_video=false&description=css 各种情况记录"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=css 各种情况记录&body=Check out this article: http://koon.cool/note/2018-05-27-css-notes/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/note/2018-05-27-css-notes/&title=css 各种情况记录"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/note/2018-05-27-css-notes/&title=css 各种情况记录"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/note/2018-05-27-css-notes/&title=css 各种情况记录"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/note/2018-05-27-css-notes/&title=css 各种情况记录"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/note/2018-05-27-css-notes/&name=css 各种情况记录&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

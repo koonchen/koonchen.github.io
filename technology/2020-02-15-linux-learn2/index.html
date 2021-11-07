@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="系统初始化从 BIOS 到 bootloader在主板上，有一个东西叫 ROM（Read Only Memory，只读存储器）。这和咱们平常说的内存 RAM（Random Access Memory，随机存取存储器）不同。ROM 是只读的，上面早就固化了一些初始化的程序，也就是 BIOS（Basic Input and Output System，基本输入输出系统）。 在 Linux 里面有一个工">
+<meta name="keywords" content="linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="系统初始化">
+<meta property="og:url" content="http://koon.cool/technology/2020-02-15-linux-learn2/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="系统初始化从 BIOS 到 bootloader在主板上，有一个东西叫 ROM（Read Only Memory，只读存储器）。这和咱们平常说的内存 RAM（Random Access Memory，随机存取存储器）不同。ROM 是只读的，上面早就固化了一些初始化的程序，也就是 BIOS（Basic Input and Output System，基本输入输出系统）。 在 Linux 里面有一个工">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200521134858.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200521162025.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200521162010.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200521175102.png">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.401Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="系统初始化">
+<meta name="twitter:description" content="系统初始化从 BIOS 到 bootloader在主板上，有一个东西叫 ROM（Read Only Memory，只读存储器）。这和咱们平常说的内存 RAM（Random Access Memory，随机存取存储器）不同。ROM 是只读的，上面早就固化了一些初始化的程序，也就是 BIOS（Basic Input and Output System，基本输入输出系统）。 在 Linux 里面有一个工">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200521134858.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>系统初始化</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2020-04-01-elasticsearch-learn1/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/technology/2020-02-01-linux-learn1/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2020-02-15-linux-learn2/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2020-02-15-linux-learn2/&text=系统初始化"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2020-02-15-linux-learn2/&title=系统初始化"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2020-02-15-linux-learn2/&is_video=false&description=系统初始化"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=系统初始化&body=Check out this article: http://koon.cool/technology/2020-02-15-linux-learn2/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2020-02-15-linux-learn2/&title=系统初始化"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2020-02-15-linux-learn2/&title=系统初始化"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2020-02-15-linux-learn2/&title=系统初始化"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2020-02-15-linux-learn2/&title=系统初始化"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2020-02-15-linux-learn2/&name=系统初始化&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#系统初始化"><span class="toc-number">1.</span> <span class="toc-text">系统初始化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#从-BIOS-到-bootloader"><span class="toc-number">1.1.</span> <span class="toc-text">从 BIOS 到 bootloader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#从实模式到保护模式"><span class="toc-number">1.2.</span> <span class="toc-text">从实模式到保护模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内核初始化"><span class="toc-number">1.3.</span> <span class="toc-text">内核初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#系统调用"><span class="toc-number">1.4.</span> <span class="toc-text">系统调用</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        系统初始化
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-02-14T16:00:00.000Z" itemprop="datePublished">2020-02-15</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/linux/">linux</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="系统初始化"><a href="#系统初始化" class="headerlink" title="系统初始化"></a>系统初始化</h2><h3 id="从-BIOS-到-bootloader"><a href="#从-BIOS-到-bootloader" class="headerlink" title="从 BIOS 到 bootloader"></a>从 BIOS 到 bootloader</h3><p>在主板上，有一个东西叫 ROM（Read Only Memory，只读存储器）。这和咱们平常说的内存 RAM（Random Access Memory，随机存取存储器）不同。ROM 是只读的，上面早就固化了一些初始化的程序，也就是 BIOS（Basic Input and Output System，基本输入输出系统）。</p>
+<p>在 Linux 里面有一个工具，叫 Grub2，全称 Grand Unified Bootloader Version 2。顾名思义，就是搞系统启动的。可以通过 <code>grub2-mkconfig -o /boot/grub2/grub.cfg</code> 来配置系统启动的选项。</p>
+<p>grub2 第一个要安装的就是 boot.img。boot.img 做不了太多的事情。它能做的最重要的一个事情就是加载 grub2 的另一个镜像 core.img。diskboot.img 的任务就是将 core.img 的其他部分加载进来。先是解压缩程序 lzma_decompress.img，再往下是 kernel.img，最后是各个模块 module 对应的映像。</p>
+<blockquote>
+<p>  注意这里加载的是 grub 内核，不是 Linux 内核。</p>
+</blockquote>
+<p>在这之前，我们所有遇到过的程序都非常非常小，完全可以在实模式下运行，但是随着我们加载的东西越来越大，实模式这 1M 的地址空间实在放不下了，所以在真正的解压缩之前，lzma_decompress.img 做了一个重要的决定，就是调用 <code>real_to_prot</code>，切换到保护模式，这样就能在更大的寻址空间里面，加载更多的东西。</p>
+<h3 id="从实模式到保护模式"><a href="#从实模式到保护模式" class="headerlink" title="从实模式到保护模式"></a>从实模式到保护模式</h3><p>实模式，只能寻址 1M，每个段最多 64K；保护模式，对于 32 位系统，能够寻址 4G。</p>
+<p>从实模式到保护模式，将启用分段, 辅助进程管理；启动分页, 辅助内存管理；打开其他地址线。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200521134858.png" alt></p>
+<h3 id="内核初始化"><a href="#内核初始化" class="headerlink" title="内核初始化"></a>内核初始化</h3><p>运行 <code>start_kernel()</code> 函数(位于 init/main.c), 初始化做三件事：</p>
+<ul>
+<li>创建样板进程及各个模块初始化；<ul>
+<li>创建第一个进程， 0 号进程， <code>set_task_stack_end_magic(&amp;init_task)</code> and <code>struct task_struct init_task = INIT_TASK(init_task)</code></li>
+<li>初始化中断， <code>trap_init()</code>，系统调用也是通过发送中断进行，由 <code>set_system_intr_gate()</code> 完成</li>
+<li>初始化内存管理模块， <code>mm_init()</code></li>
+<li>初始化进程调度模块， <code>sched_init()</code></li>
+<li>初始化基于内存的文件系统 rootfs， <code>vfs_caches_init()</code> ，VFS(虚拟文件系统)将各种文件系统抽象成统一接口</li>
+<li>调用 <code>rest_init()</code> 完成其他初始化工作</li>
+</ul>
+</li>
+<li>创建管理/创建用户态进程的进程，1 号进程；<ul>
+<li><code>rest_init()</code> 通过 <code>kernel_thread(kernel_init,...)</code> 创建 1号进程(工作在用户态)。</li>
+<li>权限管理<ul>
+<li>x86 提供 4个 Ring 分层权限</li>
+<li>操作系统利用: Ring0-内核态(访问核心资源); Ring3-用户态(普通程序)</li>
+</ul>
+</li>
+<li>用户态调用系统调用: 用户态-系统调用-保存寄存器-内核态执行系统调用-恢复寄存器-返回用户态</li>
+<li>新进程执行 kernel_init 函数，先运行 ramdisk 的 /init 程序(位于内存中)<ul>
+<li>首先加载 ELF 文件</li>
+<li>设置用于保存用户态寄存器的结构体</li>
+<li>返回进入用户态</li>
+<li>/init 加载存储设备的驱动</li>
+</ul>
+</li>
+<li>kernel_init 函数启动存储设备文件系统上的 init</li>
+</ul>
+</li>
+<li>创建管理/创建内核态进程的进程，2 号进程；<ul>
+<li><code>rest_init()</code> 通过 <code>kernel_thread(kthreadd,...)</code> 创建 2号进程(工作在内核态).</li>
+<li><code>kthreadd</code> 负责所有内核态线程的调度和管理</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200521162025.png" alt></p>
+<p>0 号进程是唯一一个没有通过 fork 或者 kernel_thread 产生的进程，是进程列表的第一个。1 号进程管所有用户态，2 号进程管所有内核态。</p>
+<p>当处于用户态的代码想要执行更高权限的指令，这种行为是被禁止的，要防止他们为所欲为。因此程序的执行是：<strong>用户态 - 系统调用 - 保存寄存器 - 内核态执行系统调用 - 恢复寄存器 - 返回用户态，然后接着运行</strong>。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200521162010.png" alt></p>
+<h3 id="系统调用"><a href="#系统调用" class="headerlink" title="系统调用"></a>系统调用</h3><p>用户进程调用 open 函数：</p>
+<ul>
+<li>glibc 的 syscal.list 列出 glibc 函数对应的系统调用；</li>
+<li>glibc 的脚本 make_syscall.sh 根据 syscal.list 生成对应的宏定义(函数映射到系统调用)；</li>
+<li>glibc 的 syscal-template.S 使用这些宏, 定义了系统调用的调用方式(也是通过宏)；</li>
+<li>其中会调用 DO_CALL (也是一个宏), 32位与 64位实现不同；</li>
+</ul>
+<p>32 位系统调用：</p>
+<ul>
+<li>用户态下：<ul>
+<li>将请求参数保存到寄存器；</li>
+<li>将系统调用名称转为系统调用号保存到寄存器 eax 中；</li>
+<li>通过软中断 ENTER_KERNEL 进入内核态；</li>
+</ul>
+</li>
+<li>内核态下：<ul>
+<li>将用户态的寄存器保存到 pt_regs 中；</li>
+<li>在系统调用函数表 sys_call_table 中根据调用号找到对应的函数；</li>
+<li>执行函数实现, 将返回值写入 pt_regs 的 ax 位置；</li>
+<li>通过 INTERRUPT_RETURN 根据 pt_regs 恢复用户态进程；</li>
+</ul>
+</li>
+</ul>
+<p>64 位系统调用：</p>
+<ul>
+<li>用户态下：<ul>
+<li>将请求参数保存到寄存器；</li>
+<li>将系统调用名称转为系统调用号保存到寄存器 rax 中；</li>
+<li><strong>通过 syscall 进入内核态</strong>；</li>
+</ul>
+</li>
+<li>内核态下：<ul>
+<li>将用户态的寄存器保存到 pt_regs 中；</li>
+<li>在系统调用函数表 sys_call_table 中根据调用号找到对应的函数；</li>
+<li>执行函数实现, 将返回值写入 pt_regs 的 ax 位置；</li>
+<li><strong>通过 sysretq 返回用户态</strong>；</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200521175102.png" alt></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#系统初始化"><span class="toc-number">1.</span> <span class="toc-text">系统初始化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#从-BIOS-到-bootloader"><span class="toc-number">1.1.</span> <span class="toc-text">从 BIOS 到 bootloader</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#从实模式到保护模式"><span class="toc-number">1.2.</span> <span class="toc-text">从实模式到保护模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内核初始化"><span class="toc-number">1.3.</span> <span class="toc-text">内核初始化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#系统调用"><span class="toc-number">1.4.</span> <span class="toc-text">系统调用</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2020-02-15-linux-learn2/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2020-02-15-linux-learn2/&text=系统初始化"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2020-02-15-linux-learn2/&title=系统初始化"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2020-02-15-linux-learn2/&is_video=false&description=系统初始化"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=系统初始化&body=Check out this article: http://koon.cool/technology/2020-02-15-linux-learn2/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2020-02-15-linux-learn2/&title=系统初始化"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2020-02-15-linux-learn2/&title=系统初始化"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2020-02-15-linux-learn2/&title=系统初始化"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2020-02-15-linux-learn2/&title=系统初始化"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2020-02-15-linux-learn2/&name=系统初始化&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="1. 运行时数据区域 1.1 程序计数器Program Counter Register 是一块较小的内存空间，它可以看作是当前线程所执行的字节码的行号指示器。 字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖于这个计数器来完成。  线程的中断以及中断优先级，就是 Java 中线程由 wait 状态到 runni">
+<meta name="keywords" content="java,深入理解 JVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="内存区域与内存溢出">
+<meta property="og:url" content="http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="1. 运行时数据区域 1.1 程序计数器Program Counter Register 是一块较小的内存空间，它可以看作是当前线程所执行的字节码的行号指示器。 字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖于这个计数器来完成。  线程的中断以及中断优先级，就是 Java 中线程由 wait 状态到 runni">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/运行时数据区.jpg">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190112135842.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190112142245.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190112142423.png">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="内存区域与内存溢出">
+<meta name="twitter:description" content="1. 运行时数据区域 1.1 程序计数器Program Counter Register 是一块较小的内存空间，它可以看作是当前线程所执行的字节码的行号指示器。 字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖于这个计数器来完成。  线程的中断以及中断优先级，就是 Java 中线程由 wait 状态到 runni">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/运行时数据区.jpg">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>内存区域与内存溢出</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2018-12-15-jvm-understanding-chapter2/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/design-pattern/2018-11-29-visitor/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&text=内存区域与内存溢出"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&is_video=false&description=内存区域与内存溢出"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=内存区域与内存溢出&body=Check out this article: http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&name=内存区域与内存溢出&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-运行时数据区域"><span class="toc-number">1.</span> <span class="toc-text">1. 运行时数据区域</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-程序计数器"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 程序计数器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-Java-虚拟机栈"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 Java 虚拟机栈</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-本地方法栈"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 本地方法栈</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-Java-堆"><span class="toc-number">1.4.</span> <span class="toc-text">1.4 Java 堆</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-方法区"><span class="toc-number">1.5.</span> <span class="toc-text">1.5 方法区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-运行时常量池"><span class="toc-number">1.6.</span> <span class="toc-text">1.6 运行时常量池</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-直接内存"><span class="toc-number">1.7.</span> <span class="toc-text">1.7 直接内存</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-HotSpot-虚拟机对象"><span class="toc-number">2.</span> <span class="toc-text">2. HotSpot 虚拟机对象</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-对象的创建"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 对象的创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-对象的内存布局"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 对象的内存布局</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-对象的访问定位"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 对象的访问定位</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-OOM-实战"><span class="toc-number">3.</span> <span class="toc-text">3. OOM 实战</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-Java-堆溢出"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 Java 堆溢出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-虚拟机栈和本地方法栈溢出"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 虚拟机栈和本地方法栈溢出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-方法区和运行时常量池溢出"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 方法区和运行时常量池溢出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-本机直接内存溢出"><span class="toc-number">3.4.</span> <span class="toc-text">3.4 本机直接内存溢出</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        内存区域与内存溢出
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-12-07T16:00:00.000Z" itemprop="datePublished">2018-12-08</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/java/">java</a>, <a class="tag-link" href="/tags/深入理解-JVM/">深入理解 JVM</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-运行时数据区域"><a href="#1-运行时数据区域" class="headerlink" title="1. 运行时数据区域"></a>1. 运行时数据区域</h2><p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/运行时数据区.jpg" alt></p>
+<h3 id="1-1-程序计数器"><a href="#1-1-程序计数器" class="headerlink" title="1.1 程序计数器"></a>1.1 程序计数器</h3><p>Program Counter Register 是一块较小的<strong>内存空间</strong>，它可以看作是当前线程所执行的<strong>字节码的行号指示器</strong>。</p>
+<p>字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖于这个计数器来完成。</p>
+<blockquote>
+<p>线程的中断以及中断优先级，就是 Java 中线程由 wait 状态到 running 状态恢复过程，程序计数器的线程独有的，它能记住上次执行到哪儿，下次继续执行。</p>
+</blockquote>
+<p>在任何一个确定的时刻，一个处理器都只会执行一条线程中指令。因此，为了线程切换后能恢复到正确的执行位置，<strong>每条线程都需要有一个独立的程序计数器，各条线程之间计数器互不影响，独立存储</strong>。</p>
+<p>如果线程执行的是一个 Java 方法，这个计数器记录的是正在执行的虚拟机字节码指令的地址；</p>
+<p>如果正在执行的是一个 Native 方法，这个计数器的值为 Undefined。</p>
+<blockquote>
+<p>Native method is a java method which implemented by non java code.</p>
+</blockquote>
+<p>这里是 Java 虚拟机中<strong>唯一一个没有规定任何 <code>OutOfMemoryError</code> 情况</strong>的区域。</p>
+<h3 id="1-2-Java-虚拟机栈"><a href="#1-2-Java-虚拟机栈" class="headerlink" title="1.2 Java 虚拟机栈"></a>1.2 Java 虚拟机栈</h3><p>Java Virtual Machine Stacks 也是线程私有的，它的生命周期和线程相同。</p>
+<p>它描述了 Java 方法执行的内存模型：<strong>每个方法在执行的同时都会创建一个栈帧用于存储局部变量表、操作数栈、动态链接、方法出口等信息</strong>。</p>
+<p>每个方法从调用直至执行完成的过程，就对应着一个栈帧从虚拟机栈中入栈到出栈的过程。</p>
+<p>人们经常说的堆栈中的栈，在 Java 里就是这里的虚拟机栈，或者更加准确一点，是虚拟机中中的<strong>局部变量表</strong>。</p>
+<blockquote>
+<p>所以说有多少个线程就有多少个栈，所有栈指向同一个堆里的对象，当多个线程想同时改变堆内存中的一个引用时，就会出现线程同步的问题。</p>
+</blockquote>
+<p>局部变量表存放了编译期可知的基本数据类型（八种）、引用类型、returnAddress 类型（指向了一条字节码指令的地址）。其中 64 位长度的 long 和 double 类型的数据占用两个局部变量空间，其余都是一个。</p>
+<p><strong>局部变量表所需的内存空间在编译器就分配完成</strong>，进入一个方法这个方法需要在栈中分配多大的局部变量空间是完全确定的，<strong>在方法运行期间不会改变局部变量表的大小</strong>。</p>
+<blockquote>
+<p>编译生成 .class 文件时就会把这个方法所需要的内存空间定义好，所以 Java 是一门静态语言。</p>
+</blockquote>
+<p>该区域有两种异常状况：如果线程请求的栈深度大于与你及所允许的深度，将抛出 <code>StackOverFlowError</code> 异常；如果虚拟机栈可以动态扩展，如果扩展时无法申请到足够的内存，将会抛出 <code>OutOfMemoryError</code> 异常。</p>
+<blockquote>
+<p>局部变量表长度是在编译期确定的，不会发生内存溢出，而虚拟机栈会溢出。</p>
+</blockquote>
+<h3 id="1-3-本地方法栈"><a href="#1-3-本地方法栈" class="headerlink" title="1.3 本地方法栈"></a>1.3 本地方法栈</h3><p>Native Method Stack 与虚拟机栈发挥的作用是相似的，它们之间的区别在于虚拟机栈为执行 Java 方法（字节码）服务，而本地方法栈则为虚拟机使用 Native 方法服务。</p>
+<blockquote>
+<p>Native 方法其实现为非 Java 语言，编写的规则遵循 Java 本地接口的规范（ JNI ）。</p>
+</blockquote>
+<p>虚拟机规范没有强制对该区域规范，具体的虚拟机可以自由实现它，譬如 Sun HotSpot 虚拟机将本地方法栈和虚拟机栈合二为一。</p>
+<p>这里也有虚拟机栈栈提及的两种异常。</p>
+<h3 id="1-4-Java-堆"><a href="#1-4-Java-堆" class="headerlink" title="1.4 Java 堆"></a>1.4 Java 堆</h3><p>在大多数应用中，Java Heap 是虚拟机所管理的内存中最大的一块。内存共享。</p>
+<blockquote>
+<p>Java 堆是所有线程共享的，物理上不一定连续，而逻辑上连续。</p>
+</blockquote>
+<p>此区域的唯一目的是<strong>存放对象实例</strong>，几乎所有对象实例都在这里分配内存。</p>
+<blockquote>
+<p>随着 JIT 的发展，栈上分配内存，标量替换等优化技术，让对象都在堆上创建变得不再绝对。</p>
+</blockquote>
+<p>所有对象实例以及数据都在堆上分配，堆分为新生代和老年代，新生代又细分为 eden 区和两个 survivor 区。</p>
+<blockquote>
+<p>新生代占有 1/3 ，老年代占有 2/3 。</p>
+</blockquote>
+<p>从内存分配的角度来看，线程共享的 Java 堆中可能划分出多个<strong>线程私有的分配缓冲区</strong>，Thread Local Allocation Buffer ， TLAB 。</p>
+<p>Java 堆可以控制内存大小。</p>
+<blockquote>
+<p>Xmx — 堆最大值</p>
+<p>Xms — 堆最小值/初始化堆大小</p>
+<p>Xmn — 年轻代堆大小</p>
+<p>Xss 每个线程的栈大小</p>
+<p>-XX:MaxTenuringThreshould — 来设定到达某个年龄可以成为老年代，默认是 15 。</p>
+<p>-XX:NewRatio — 指定新生代和老年代的比例，默认是 1:2 。</p>
+</blockquote>
+<p>如果在堆中没有内存完成实例分配，并且堆也无法再扩展时，将会抛出 <code>OutOfMemoryError</code> 异常。</p>
+<h3 id="1-5-方法区"><a href="#1-5-方法区" class="headerlink" title="1.5 方法区"></a>1.5 方法区</h3><p>Method Area 也是线程共享的。它用于存放已经被虚拟机加载的类信息、常量、静态变量、即时编译器（ JIT ）编译后的代码等数据。</p>
+<blockquote>
+<p>之所以叫方法区，而不是常量、静态变量、热点代码区，是因为这一块是各个方法共享的区域，不属于某个方法，所有方法都可以访问这个区域。</p>
+</blockquote>
+<p>它还有一个名字， Non-Heap ，与堆进行区分。</p>
+<p>HotSpot 虚拟机早期把这里称为 Permanenet Generation ，把 GC 分代扩展到了方法区，或者说使用永久代来实现方法区而已。这样 HotSpot 的 GC 就可以像管理 Java 堆一样管理这部分内存。其它虚拟机不存在永久代概念。</p>
+<blockquote>
+<p>因为 <code>String.intern()</code> 这样的方法存在，会产生内存溢出问题，在 jdk1.7 的时候，HotSpot 已经将原本放在永久代的字符串常量池移出，而这个该方法的实现在 jdk1.7 也改变了。</p>
+<p>永久代在 jdk1.8 中完全移除，使用 metaspace 代替，元空间可以在本地内存之外分配，所以其最大可利用空间是整个系统可用的内存空间。</p>
+</blockquote>
+<p>垃圾收集在这个区域很小出现，因为这个区域的回收条件非常苛刻，但是却是必要的。</p>
+<blockquote>
+<p>这里可以回收：废弃常量，无用的类。苛刻的应该说是无用的类：</p>
+<ol>
+<li>该类所有的实例都已经被回收，即 Java 堆中不存在该类的任何实例；</li>
+<li>加载该类的 ClassLoader 已经被回收；</li>
+<li>该类对应的 java.lang.Class 对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法。</li>
+</ol>
+<p>满足上面三个条件也仅仅是“可以”删除，而不是必然回收。</p>
+</blockquote>
+<p>当方法区无法满足内存分配要求的时候，将抛出 <code>OutOfMemoryError</code> 异常。</p>
+<h3 id="1-6-运行时常量池"><a href="#1-6-运行时常量池" class="headerlink" title="1.6 运行时常量池"></a>1.6 运行时常量池</h3><p>Runtime Constant Pool 是方法区的一部分，Class 文件中除了有类的版本、字段、方法、接口等描述信息外，还有一项信息是常量池，用于存放编译期间生成的各种字面量和符号引用，这部分内容将在类加载后进入方法区的<strong>运行时常量池</strong>中存放。</p>
+<blockquote>
+<p>字面量就比如： int a = 1; 这里的 1 就是字面量。再比如： String a = “abc”; 这里的 abc 就是字面量。</p>
+<p>符号引用包括：</p>
+<ol>
+<li>类和接口的全限定名 </li>
+<li>字段名字和描述符</li>
+<li>方法名称和描述符</li>
+</ol>
+<p>符号引用和直接引用：直接引用存的是地址值，而符号引用存放的是一个路径，包路径。两者替换发生在类解析的时候。</p>
+<p>运行时常量池：</p>
+<ol>
+<li><p>全局常量池在每个 VM 中只有一个，存放常量的引用值。</p>
+</li>
+<li><p>class 常量池是在编译的时候每个 class 都有的，在编译阶段，存放的是常量的符号引用。</p>
+</li>
+<li><p>运行时常量池是在类加载完成后，将每个 class 常量池中的符号引用值转存到运行时常量池中，也就是说，每个 class 都有一个运行时常量池，类在解析后，将符号引用替换成直接引用，与全局常量池中的引用值保持一致。</p>
+</li>
+<li>运行时也可能将新的常量放入池中。</li>
+</ol>
+</blockquote>
+<p>一般来说，除了保存 Class 文件中描述的符号引用外，还会把翻译出来的直接引用也存储到运行时常量池中。</p>
+<p>关于运行时将常量放入池中，书上说 String 的 intern() 方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String str1 = <span class="keyword">new</span> String(<span class="string">"a"</span>) + <span class="keyword">new</span> String(<span class="string">"bc"</span>); <span class="comment">// 此时 new 关键字在堆中创建了 abc 字符串对象。</span></span><br><span class="line">String str = str1.intern(); <span class="comment">// 从池中返回字符串对象，如果没有则先添加到池中再返回。</span></span><br><span class="line"><span class="comment">// jdk1.6 的做法是直接在常量池中生成一个 abc 对象。</span></span><br><span class="line"><span class="comment">// jdk1.7 及以上版本不再存储一个对象了，可以直接存储堆中的引用。</span></span><br><span class="line">String str2 = <span class="string">"abc"</span>;</span><br><span class="line"><span class="comment">// 因此，str == str2 的结果是 true</span></span><br><span class="line"><span class="comment">// 所以，我们反复调用这个方法也不会出现 OutOfMemoryError 异常！</span></span><br></pre></td></tr></table></figure>
+<p>既然运行时常量池是方法区的一部分，自然受到方法区内存的限制，当常量池无法申请内存时，将抛出 <code>OutOfMemoryError</code> 异常。</p>
+<h3 id="1-7-直接内存"><a href="#1-7-直接内存" class="headerlink" title="1.7 直接内存"></a>1.7 直接内存</h3><p><strong>Direct Memory 并不是虚拟机运行时数据区的一部分，也不是 Java 虚拟机规范中定义的内存区域</strong>。但是这部分的内存也被频繁使用，而且可能导致 <code>OutOfMemoryError</code> 异常，值得探讨。</p>
+<p>Jdk1.4 引入的 NIO 类，引入了基于 Channel 和 Buffer 的 I/O 方式，然后通过存储在 Java 堆上的 <code>DirectByteBuffer</code> 对象作为这块内存的引用进行操作。这样可以在一些场景中显著提高性能，避免了在 Java 堆和 Native 堆中来回复制数据。</p>
+<p>显然，本地的直接内存的分配不会受 Java 堆的大小而限制，但是会收到本机总内存大小和处理器寻址空间的限制。<strong>服务器管理员在配置时，可能忽略直接内存，使得各内存区域综合大于物理内存限制，产生异常</strong>。</p>
+<h2 id="2-HotSpot-虚拟机对象"><a href="#2-HotSpot-虚拟机对象" class="headerlink" title="2. HotSpot 虚拟机对象"></a>2. HotSpot 虚拟机对象</h2><h3 id="2-1-对象的创建"><a href="#2-1-对象的创建" class="headerlink" title="2.1 对象的创建"></a>2.1 对象的创建</h3><p>虚拟机遇到一条 new 指令时，首先将去检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否已被加载、解析和初始化过。</p>
+<blockquote>
+<p>为什么要去常量池寻找该指令的参数？因为前面提到过一个类的符号引用将在运行时放入到常量池中。</p>
+<p>如果没有加载进来，将使用类加载器，使用双亲委派机制进行类加载。</p>
+</blockquote>
+<p>在类加载检查通过后，接下来虚拟机将<strong>为新生对象分配内存</strong>，对象需要的内存的大小在类加载完成后便完全确定了，分配内存的方式有两种，<strong>选择哪一种分配方式取决于 Java Heap 是否规整，而是否规整，取决于垃圾回收器是否具有压缩整理功能。</strong>：</p>
+<ol>
+<li>垃圾回收器使用 <code>Serial</code> 、 <code>ParNew</code> 等带有 Compact 过程的垃圾回收器将使用<strong>指针碰撞</strong>的方式分配内存；<blockquote>
+<p>Java Heap 绝对规整，一边是空闲的内存，一边是用过的内存，我们使用一个指针作为分界，挪动指针来分配内存。</p>
+</blockquote>
+</li>
+<li>使用 <code>CMS</code> 这种基于 <code>Mark-Sweep</code> 算法的收集器将使用<strong>空闲列表</strong>的方式分配内存。<blockquote>
+<p>Java Heap 并不是规整的，使用和没有使用的内存交错，我们维护一个列表，记录哪些块可用，实时更新这张表。</p>
+</blockquote>
+</li>
+</ol>
+<p>除了划分空间，<strong>我们还需要考虑的一点是线程安全</strong>。为了保证线程安全，我们有两种方案：</p>
+<ol>
+<li>对分配内存空间的操作进行同步处理——实际虚拟机中使用 CAS 配上失败重试的方式来保证更新操作的原子性。<blockquote>
+<p>Compare And Swap 通过版本号，先比较，再提交。假如版本号不是最新的则认定本次 CAS  操作失败。</p>
+</blockquote>
+</li>
+<li>前面我们也提起过 TLAB Thread Local Allocation Buffer ，每个线程在 Heap 中预先分配一小块内存，称为本地线程分配缓存。只有在 TLAB 分配完，才进行同步锁定，分配新的 TLAB 。</li>
+</ol>
+<p>现在内存分配完成了，<strong>虚拟机将分配到的内存空间都初始化为零值</strong>，甚至 TLAB 可以将这一步提前到 TLAB 分配时进行，因此保证了 Java 代码可以不赋初始值直接使用。</p>
+<blockquote>
+<p>解释了为什么对象的属性可以不初始化就可以访问，而局部变量需要初始化，因为需要看栈帧的初始化方式。</p>
+</blockquote>
+<p>然后虚拟机对对象进行必要的设置，<strong>将一些必要的信息放到对象头中</strong>。</p>
+<p>现在对于虚拟机而言一个对象已经产生了，而对我们而言，才刚刚开始。</p>
+<blockquote>
+<p>虚拟机创建对象：</p>
+<ol>
+<li>检查 new 参数是否在常量池中有一个类的引用，检查类是否被加载解析过。</li>
+<li>没有则加载，通过后，虚拟机为新对象分配内存，在类加载完成就决定了内存大小，根据 GC 方式，看是否具有压缩整理功能，于是有<strong>指针碰撞</strong>和<strong>空闲列表</strong>两种分配方式。</li>
+<li>分配可能出错，我们需要使用 <strong>CAS+错误重试</strong> 和 <strong>TLAB</strong> 两种方式保证线程安全。</li>
+<li>内存分配完成，虚拟机将分配到的内存空间都初始化零值。</li>
+<li>配置对象头，存放类的元数据信息、对象的哈希码、对象的 GC 年龄等信息。</li>
+<li>从虚拟机角度看，现在，一个新的对象已经创建完成。</li>
+<li>从我们的角度看，对象的创建刚刚开始， <code>init</code> 方法还没有执行，执行 <code>new</code> 以后执行 <code>init</code> 方法，这样一个真正的对新创建完成。</li>
+</ol>
+</blockquote>
+<h3 id="2-2-对象的内存布局"><a href="#2-2-对象的内存布局" class="headerlink" title="2.2 对象的内存布局"></a>2.2 对象的内存布局</h3><p><strong>对象内存布局包括</strong>：</p>
+<ol>
+<li>对象头——保存状态信息以及类型信息</li>
+<li>实例数据——保存对象中定义的变量信息</li>
+<li>对齐填充——在对象有用信息不到八字节整数倍的时候进行对其</li>
+</ol>
+<p><strong>对象头中包括</strong>：</p>
+<ul>
+<li>a. 运行时数据<ul>
+<li>哈希值</li>
+<li>GC 信息</li>
+<li>锁信息</li>
+<li>线程 id</li>
+<li>时间戳</li>
+</ul>
+</li>
+<li>b. 类型指针</li>
+</ul>
+<p>官方称对象头为<strong>Mark Word</strong>，对象需要存储的运行时数据很多，其实已经超过了32位、64位 Bitmap 结构能记录的限度，但是<strong>对象头信息是与对象自身定义的数据无关的额外存储成本</strong>。</p>
+<blockquote>
+<p>所以一个对象所占有的空间大小，是比这个对象所存储的大小要大一点。</p>
+</blockquote>
+<p>如在 32bit 的虚拟机中，对象未被锁定，Mark Word 的 32bit 中有 25bit 用于存储对象哈希码，4bit 用于存储对象分代年龄，2bit 用于存储锁标志位，1bit 固定为0。其他状态（轻量级锁、重量级锁、GC 标记、可偏向）下的对象的内容见表：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190112135842.png" alt></p>
+<p><strong>对象的另外一部分信息是类型指针</strong>，即对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。</p>
+<blockquote>
+<p>所谓元数据类型，即方法区中加载的类信息。</p>
+</blockquote>
+<p>查找对象的元数据信息并不一定要通过对象本身，因为我们可以用<strong>直接指针</strong>和<strong>句柄</strong>，直接指针需要根据对象头的类型指针来定位该对象的具体类型，但是通过句柄的时候，句柄池中存储了实例指针和类型指针，就不需要对象头中设置类型指针了。</p>
+<p>值得注意的是，如果对象是 Java 数组，那么对象头中还必须有一块专门记录数组长度的数据，因为普通的 Java 对象的元数据信息中确定了 Java 对象的大小，而数组的元数据中却无法确定数组的大小。</p>
+<blockquote>
+<p>我们可以通过 .length 属性来直接获取长度，其他对象则是 length() 方法。</p>
+</blockquote>
+<p><strong>实例数据</strong>是对象真正存储的有效信息，也是对象代码中所定义的各种类型的字段内容，无论是父类继承的还是子类中定义的，都要记录，HotSpot 虚拟机默认分配策略为——longs/doubles, ints, shorts/chars, bytes/booleans, oops（普通对象指针 Ordinary Object Pointers），可以看出<strong>相同宽度的字段总被分配到一起</strong>，满足这个前提下，父类中定义的变量出现在子类之前，如果 CompactFields 参数值为 true（默认为 true），子类中较窄的遍历也可能插入到父类变量的空隙中。</p>
+<p><strong>对齐填充</strong>并不是必然存在的，也没有特别的含义，它仅仅起着占位符的作用。由于 Hotspot VM的自动内存管理系统要求对象起始地址必须是 8 字节的整数倍，换句话说，就是对象的大小必须是8字节的整数倍。而对象头部分正好是8字节的倍数（1倍或者2倍），因此，当对象实例数据部分没有对齐时，就需要通过对齐填充来补全。</p>
+<h3 id="2-3-对象的访问定位"><a href="#2-3-对象的访问定位" class="headerlink" title="2.3 对象的访问定位"></a>2.3 对象的访问定位</h3><p>建立对象是为了使用对象，我们的程序需要通过栈上的 reference 数据来操作操作栈上的具体对象。由于 reference 类型在虚拟机中只规定了一个指向对象的引用，并没有定义这个引用应该通过什么方式去定位，访问堆中对象的具体位置，访问方式由 JVM 实现而决定。</p>
+<p>我们可以使用<strong>句柄</strong>和<strong>直接指针</strong>两种方式。</p>
+<blockquote>
+<p>句柄是一个指向对象实例数据的指针，Reference 是指向句柄的指针。</p>
+</blockquote>
+<p>如果我们使用句柄访问，那么 Heap 中将有一块内存来作为句柄池，Reference 将存储的是对象的句柄地址，句柄中包含了对象的<strong>实例数据</strong>和<strong>类型数据</strong>各自具体的地址信息。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190112142245.png" alt></p>
+<p>如果使用直接指针访问，那么 Heap 堆对象的布局就必须考虑如何防止访问类型数据的相关信息，而 Reference 中存储的直接就是对象地址。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190112142423.png" alt></p>
+<blockquote>
+<p>这两种方式各有优势，Reference 存储就是稳定的句柄地址，对象对移动时改变句柄中的实例数据指针，而 Reference 本身不需要修改。<br>使用直接指针最大的好处就是速度更快，它节省了一次指针定位的时间开销，Sun HotSpot 使用的是第二种方式。</p>
+</blockquote>
+<h2 id="3-OOM-实战"><a href="#3-OOM-实战" class="headerlink" title="3. OOM 实战"></a>3. OOM 实战</h2><p>确定内存对象很有必要，分析是内存泄露还是内存溢出：</p>
+<ol>
+<li>内存泄露：本该释放内存的实例没有释放，根据引用链来确定位置。<strong>内存泄露不一定会内存溢出，但是极少成多，达到上限就会出现内存溢出。</strong></li>
+<li>内存溢出：超出了 Heap 限制，堆内存增大或者分析对象声明周期是否过长。</li>
+</ol>
+<h3 id="3-1-Java-堆溢出"><a href="#3-1-Java-堆溢出" class="headerlink" title="3.1 Java 堆溢出"></a>3.1 Java 堆溢出</h3><p>Java Heap 用于存储对象实例，只要不断创建对象，并且保证 GC Roots 到对象之间有可达路径来避免垃圾回收机制清楚这些对象，那么对象在到达最大堆容量的时候就会产生内存溢出。</p>
+<p>可以将 <code>-Xms</code>（堆最小值）和 <code>-Xmx</code>（堆最大值）设为一样，来避免堆自动扩展。</p>
+<p>通过参数 <code>-XX:+HeapDumpOnOutputMemroyError</code> 可在出现内存溢出异常时 Dump 当前的内存堆转存储快照以便事后分析。</p>
+<p>如果是内存泄露，找到泄露对象是通过怎样的路径与 GC Roots 关联导致无法回收，掌握泄露对象的类型信息以及引用链的信息，就可以找到泄露位置。</p>
+<p>如果不存在泄露，就是对象都需要存活，那么就查看虚拟机的堆参数，查看是否可以调大，并检查某些对象生命周期是否过长，尝试减少程序运行期的内存消耗。</p>
+<h3 id="3-2-虚拟机栈和本地方法栈溢出"><a href="#3-2-虚拟机栈和本地方法栈溢出" class="headerlink" title="3.2 虚拟机栈和本地方法栈溢出"></a>3.2 虚拟机栈和本地方法栈溢出</h3><p>由于在 HotSpot 虚拟机中并不区分虚拟机栈和本地方法栈，因此对于 HotSpot 而言，虽然 <code>Xoss</code> 参数存在，用以设置方法栈大小，但是是无效的，栈容量只和 <code>-Xss</code> 有关。</p>
+<p>我们还记得 JVM 中描述的两种异常：</p>
+<ol>
+<li>如果线程请求的栈深度大于虚拟机允许的最大深度，就会有 <code>StackOverFlowError</code> 异常；</li>
+<li>如果虚拟机在扩展栈时无法申请到足够的内存空间，将会抛出 <code>OutOfMemoryError</code> 异常。</li>
+</ol>
+<blockquote>
+<p>第一种异常，在一个线程中不断调用新的方法压栈帧进去；<br>第二种异常，线程分配 jvm 栈，不断 new Thread();</p>
+</blockquote>
+<p>这里有两种异常，看似严谨，但是有重叠的地方：当栈空间无法分配时，到底是内存太小还是已使用的栈空间太大？</p>
+<p>在单线程下，无论栈帧太大还是虚拟机容量太小都是抛出 <code>StackOverFlowError</code> ；</p>
+<p>如果不限于单线程，不断简历线程可以产生 OOM ，但是这样产生内存溢出和栈空间没有任何联系，为每个线程的栈分配的内存越大，反而越容易产生 OOM 。</p>
+<blockquote>
+<p>在多线程的情况下，每个线程分配到的栈容量越大，可以建立的线程数量自然越少，建立线程时就越容易把剩下的内存耗尽。</p>
+</blockquote>
+<p>JVM 提供了参数来控制 Java Heap 和方法区这两部分的最大值，剩余的内存是进程内存上限减去线程共有的 Xmx (最大堆容量)，再减去 MaxPermSize (最大方法区容量)，然后是线程私有的，程序计数器内存消耗很小，可以忽略，剩下的内存就是虚拟机栈和本地方法栈瓜分了。</p>
+<p>如果是建立过多线程导致的内存溢出，在不能减少线程数或替换64位虚拟机的情况下，只能通过减少最大堆和减少栈容量来换取更多的线程。</p>
+<h3 id="3-3-方法区和运行时常量池溢出"><a href="#3-3-方法区和运行时常量池溢出" class="headerlink" title="3.3 方法区和运行时常量池溢出"></a>3.3 方法区和运行时常量池溢出</h3><p>线程公有的方法区，<code>String.intern()</code> 是个 Native 方法：如果字符串常量池中包括一个等于此 String 对象的字符串，则返回代表这个字符串的 String 对象，否则，将此 String 对象包含的字符添加到常量池中，并返回此 String 对象的引用。</p>
+<blockquote>
+<p>在 Jdk1.7 前， <code>String.intern()</code> 方法单纯将首次遇到的字符串实例复制到永久代中，返回的也是永久带中这个字符串实例的引用。</p>
+</blockquote>
+<p>在 Jdk1.6 前，由于常量池在永久代里，现在已经不是这样了，现在在元空间里，如果是以前，我们可以通过 -XX:PermSize 和 -XX:MaxPermSize 限制方法区方法，间接控制常量池。</p>
+<p>方法区用于存放 Class 的相关信息，如类名、访问修饰符、常量池、字段描述、方法描述等。对于这些区域的测试，基本的思路是运行时产生大量的类去填满方法区，直到溢出。</p>
+<p>我们可以借助 CGLib 直接操作字节码运行时生成大量的动态类，当前很多主流的框架，比如 Spring 、 Hibernate 在对类进行增强的时候，都会用到这个技术。</p>
+<p>方法区溢出也是一种常见的内存溢出异常，一个类要被垃圾收集器回收掉，判定条件是比较苛刻的。在经常动态生成大量 Class 的应用中，需要特别注意类的回收状况。<strong>这类场景除了上面提到的程序使用了 CGLib 字节码增强和动态语言之外</strong>，常见的还有：大量 JSP 或动态产生 JSP 文件的应用（ JSP 第一次运行时需要编译为 Java 类）、基于 OSGi 的应用（即使是同一个类文件，被不同的加载器加载也会视为不同的类）等。</p>
+<blockquote>
+<p>在 Jdk1.8 前，本地部署 Tomcat 经常会 OOM ，可能就是因为项目中存在大量的 JSP 文件编译后加载的 JVM 中方法区内存溢出了。</p>
+</blockquote>
+<h3 id="3-4-本机直接内存溢出"><a href="#3-4-本机直接内存溢出" class="headerlink" title="3.4 本机直接内存溢出"></a>3.4 本机直接内存溢出</h3><p>DirectMemory 容量可以通过 <code>-XX:MaxDirectMemorySize</code> 指定，默认和 Java Heap 最大值一样。</p>
+<p>由 DirectMemory 导致的内存溢出，一个明显的特征是 Heap Dump 文件不会看见明显的异常，如果我们发现 OOM 之后 Dump 文件很小，而且程序中又直接或间接使用了 NIO ，那么可以考虑这方面的问题。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-运行时数据区域"><span class="toc-number">1.</span> <span class="toc-text">1. 运行时数据区域</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-程序计数器"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 程序计数器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-Java-虚拟机栈"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 Java 虚拟机栈</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-本地方法栈"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 本地方法栈</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-Java-堆"><span class="toc-number">1.4.</span> <span class="toc-text">1.4 Java 堆</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-方法区"><span class="toc-number">1.5.</span> <span class="toc-text">1.5 方法区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-运行时常量池"><span class="toc-number">1.6.</span> <span class="toc-text">1.6 运行时常量池</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-7-直接内存"><span class="toc-number">1.7.</span> <span class="toc-text">1.7 直接内存</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-HotSpot-虚拟机对象"><span class="toc-number">2.</span> <span class="toc-text">2. HotSpot 虚拟机对象</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-对象的创建"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 对象的创建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-对象的内存布局"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 对象的内存布局</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-对象的访问定位"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 对象的访问定位</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-OOM-实战"><span class="toc-number">3.</span> <span class="toc-text">3. OOM 实战</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-Java-堆溢出"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 Java 堆溢出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-虚拟机栈和本地方法栈溢出"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 虚拟机栈和本地方法栈溢出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-方法区和运行时常量池溢出"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 方法区和运行时常量池溢出</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-本机直接内存溢出"><span class="toc-number">3.4.</span> <span class="toc-text">3.4 本机直接内存溢出</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&text=内存区域与内存溢出"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&is_video=false&description=内存区域与内存溢出"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=内存区域与内存溢出&body=Check out this article: http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&name=内存区域与内存溢出&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

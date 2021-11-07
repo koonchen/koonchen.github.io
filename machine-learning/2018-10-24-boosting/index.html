@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="&amp;lt;&amp;lt; python 机器学习基础教程&amp;gt;&amp;gt;：第二章——监督学习算法。介绍了梯度提升决策树（GBDT）。 &amp;lt;&amp;lt; sklearn 与 tf 机器学习实用指南&amp;gt;&amp;gt;：第七章——集成学习。介绍了适应性增强（Adaboost）和 GBDT。 &amp;lt;&amp;lt; python 机器学习经典实例&amp;gt;&amp;gt;：第一章——监督学习。介绍了 Adaboost。 &amp;lt;&amp;">
+<meta name="keywords" content="机器学习,boosting">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Boosting 推导">
+<meta property="og:url" content="http://koon.cool/machine-learning/2018-10-24-boosting/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="&amp;lt;&amp;lt; python 机器学习基础教程&amp;gt;&amp;gt;：第二章——监督学习算法。介绍了梯度提升决策树（GBDT）。 &amp;lt;&amp;lt; sklearn 与 tf 机器学习实用指南&amp;gt;&amp;gt;：第七章——集成学习。介绍了适应性增强（Adaboost）和 GBDT。 &amp;lt;&amp;lt; python 机器学习经典实例&amp;gt;&amp;gt;：第一章——监督学习。介绍了 Adaboost。 &amp;lt;&amp;">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Boosting 推导">
+<meta name="twitter:description" content="&amp;lt;&amp;lt; python 机器学习基础教程&amp;gt;&amp;gt;：第二章——监督学习算法。介绍了梯度提升决策树（GBDT）。 &amp;lt;&amp;lt; sklearn 与 tf 机器学习实用指南&amp;gt;&amp;gt;：第七章——集成学习。介绍了适应性增强（Adaboost）和 GBDT。 &amp;lt;&amp;lt; python 机器学习经典实例&amp;gt;&amp;gt;：第一章——监督学习。介绍了 Adaboost。 &amp;lt;&amp;">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>Boosting 推导</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2018-10-29-mybatis-summary/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/machine-learning/2018-10-12-batch-normalization/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/machine-learning/2018-10-24-boosting/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/machine-learning/2018-10-24-boosting/&text=Boosting 推导"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/machine-learning/2018-10-24-boosting/&title=Boosting 推导"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/machine-learning/2018-10-24-boosting/&is_video=false&description=Boosting 推导"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Boosting 推导&body=Check out this article: http://koon.cool/machine-learning/2018-10-24-boosting/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/machine-learning/2018-10-24-boosting/&title=Boosting 推导"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/machine-learning/2018-10-24-boosting/&title=Boosting 推导"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/machine-learning/2018-10-24-boosting/&title=Boosting 推导"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/machine-learning/2018-10-24-boosting/&title=Boosting 推导"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/machine-learning/2018-10-24-boosting/&name=Boosting 推导&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#迭代过程"><span class="toc-number">1.</span> <span class="toc-text">迭代过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#理论基础"><span class="toc-number">2.</span> <span class="toc-text">理论基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#名词解释"><span class="toc-number">2.1.</span> <span class="toc-text">名词解释</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#集成学习的可行性证明"><span class="toc-number">2.2.</span> <span class="toc-text">集成学习的可行性证明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Boosting"><span class="toc-number">3.</span> <span class="toc-text">Boosting</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost"><span class="toc-number">3.1.</span> <span class="toc-text">AdaBoost</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost-算法的误差分析"><span class="toc-number">3.2.</span> <span class="toc-text">AdaBoost 算法的误差分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost-算法的解释"><span class="toc-number">3.3.</span> <span class="toc-text">AdaBoost 算法的解释</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost-小结"><span class="toc-number">3.4.</span> <span class="toc-text">AdaBoost 小结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#提升树"><span class="toc-number">3.5.</span> <span class="toc-text">提升树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#梯度提升"><span class="toc-number">3.6.</span> <span class="toc-text">梯度提升</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XGBoost"><span class="toc-number">3.7.</span> <span class="toc-text">XGBoost</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XGBoost-的调参"><span class="toc-number">3.8.</span> <span class="toc-text">XGBoost 的调参</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bagging"><span class="toc-number">4.</span> <span class="toc-text">Bagging</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#随机森林"><span class="toc-number">4.1.</span> <span class="toc-text">随机森林</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#算法实现"><span class="toc-number">5.</span> <span class="toc-text">算法实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost-伪码"><span class="toc-number">5.1.</span> <span class="toc-text">AdaBoost 伪码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bagging-伪码"><span class="toc-number">5.2.</span> <span class="toc-text">Bagging 伪码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stacking-伪码"><span class="toc-number">5.3.</span> <span class="toc-text">Stacking 伪码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#算法例子"><span class="toc-number">6.</span> <span class="toc-text">算法例子</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost-例子"><span class="toc-number">6.1.</span> <span class="toc-text">AdaBoost 例子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#经典题目"><span class="toc-number">7.</span> <span class="toc-text">经典题目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#算法总结"><span class="toc-number">8.</span> <span class="toc-text">算法总结</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Boosting 推导
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-10-23T16:00:00.000Z" itemprop="datePublished">2018-10-24</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/machine-learning/">machine learning</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/boosting/">boosting</a>, <a class="tag-link" href="/tags/机器学习/">机器学习</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <p>&lt;&lt; python 机器学习基础教程&gt;&gt;：第二章——监督学习算法。介绍了梯度提升决策树（GBDT）。</p>
+<p>&lt;&lt; sklearn 与 tf 机器学习实用指南&gt;&gt;：第七章——集成学习。介绍了适应性增强（Adaboost）和 GBDT。</p>
+<p>&lt;&lt; python 机器学习经典实例&gt;&gt;：第一章——监督学习。介绍了 Adaboost。</p>
+<p>&lt;&lt;统计学习方法&gt;&gt;：第八章——提升方法。介绍了 Adaboost 和 GBDT。</p>
+<p>&lt;&lt;机器学习&gt;&gt;：第八章——集成学习。介绍了 Adaboost。</p>
+<p>&lt;&lt;深度学习&gt;&gt;：第七章——深度学习中的正则化。介绍了 Dropout Boosting 的方法。</p>
+<hr>
+<h2 id="迭代过程"><a href="#迭代过程" class="headerlink" title="迭代过程"></a>迭代过程</h2><p>机器学习 -&gt; 统计学习方法 -&gt; 实践补充</p>
+<h2 id="理论基础"><a href="#理论基础" class="headerlink" title="理论基础"></a>理论基础</h2><h3 id="名词解释"><a href="#名词解释" class="headerlink" title="名词解释"></a>名词解释</h3><p>集成学习：通过构建并结合多个学习器来完成学习任务。</p>
+<p>同质 homogeneous：决策树集成中全是决策树，神经网络集成中全是神经网络。</p>
+<p>基学习器 base learner：同质集成中的个体学习器。</p>
+<p>基学习算法 base learning algorithm：基学习器所使用的学习算法。</p>
+<p>异质 heterogenous：集成包含不同类型的个体学习器。</p>
+<p>组件学习器 component learner：和基学习器对应，它们统称为个体学习器。</p>
+<h3 id="集成学习的可行性证明"><a href="#集成学习的可行性证明" class="headerlink" title="集成学习的可行性证明"></a>集成学习的可行性证明</h3><p>假设二分类问题 $y \in \{ - 1 , + 1 \}$ 和真实函数 $f$ ，假定基分类器的错误率是 $\epsilon$ ，即对每个<strong>基分类器 $h_{i}$ </strong>有：</p>
+<script type="math/tex; mode=display">
+P \left( h _ { i } ( \boldsymbol { x } ) \neq f ( \boldsymbol { x } ) \right) = \epsilon</script><p>假设集成通过投票结合 $T$ 个基分类器，若有超过半数的基分类器正确，则集成分类就正确：</p>
+<script type="math/tex; mode=display">
+H ( \boldsymbol { x } ) = \operatorname { sign } \left( \sum _ { i = 1 } ^ { T } h _ { i } ( \boldsymbol { x } ) \right)</script><p>根据 Hoeffding 不等式，得到集成后的错误率：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} P ( H ( \boldsymbol { x } ) \neq f ( \boldsymbol { x } ) ) & = \sum _ { k = 0 } ^ { \lfloor T / 2 \rfloor } \left( \begin{array} { l } { T } \\ { k } \end{array} \right) ( 1 - \epsilon ) ^ { k } \epsilon ^ { T - k } \\ & \leqslant \exp \left( - \frac { 1 } { 2 } T ( 1 - 2 \epsilon ) ^ { 2 } \right) \end{aligned} \right.</script><blockquote>
+<p>$P ( H ( n ) \leqslant k )$ 是另一种写法，含义相同。</p>
+<p>由这条表达式，我们有：</p>
+<script type="math/tex; mode=display">
+h _ { i } ( x ) = \left\{ \begin{array} { c c } { 1 } & { C _ { n } ^ { x } p ^ { x } ( 1 - p ) ^ { n - x } > = 0.5 } \\ { - 1 } & { C _ { n } ^ { x } p ^ { x } ( 1 - p ) ^ { n - x } < 0.5 } \end{array} \right.</script></blockquote>
+<p>第一个等号表示 $n$ 个基学习器中分类正确的个数小于 $k$ 的概率。若假定集成通过简单投票法结合 $n$ 个分类器，超过半数的基学习器正确，则集成分类就正确，即临界值 $k=0.5*n=(1−ϵ−\delta)n$ 。</p>
+<p>第二个等号的 Hoeffding 不等式的定义，$δ &gt; 0$ ：</p>
+<script type="math/tex; mode=display">
+P ( H ( n ) \leqslant ( p - \delta ) n ) \leqslant e ^ { - 2 \delta ^ { 2 } n }</script><p>其中 $\left( \begin{array} { l } { T } \\ { k } \end{array} \right)$ 表示 $C_{T} ^{k}$ ，$\delta = 0.5-\epsilon$ 。</p>
+<blockquote>
+<p>Ps: n 和 T 等价。</p>
+</blockquote>
+<p>当 $\epsilon &gt;=0.5$ 时，上式不成立。随着集成中个体分类器数目 $T$ 的增大，集成的错误率将指数级下降，最终趋向于零。</p>
+<blockquote>
+<p>在现实中，个体学习器是解决同一个问题训练出来的，它们不可能相互独立，如何生成不同的个体学习器，是集成学习研究的核心。</p>
+</blockquote>
+<p>根据个体学习器的生成方式，目前集成学习方法大致分为两大类：<strong>个体学习期之间存在强依赖关系、必须串行生成的序列化方法—— Boosting</strong>；<strong>个体学习器之间不能存在强依赖关系、可同时生成的并行化方法—— Bagging</strong>。</p>
+<h2 id="Boosting"><a href="#Boosting" class="headerlink" title="Boosting"></a>Boosting</h2><blockquote>
+<p>先从初始训练集训练出一个基学习器，再根据基学习器的表现对训练样本进行调整，使得先前基学习器出错的训练样本在后续受到更多关注，然后基于调整后的样本分布来训练下一个基学习器。</p>
+</blockquote>
+<h3 id="AdaBoost"><a href="#AdaBoost" class="headerlink" title="AdaBoost"></a>AdaBoost</h3><p>只适用二分类任务，比较容易理解的是基于“加性模型” additive model ，即基学习器的线性组合：</p>
+<script type="math/tex; mode=display">
+H ( \boldsymbol { x } ) = \sum _ { t = 1 } ^ { T } \alpha _ { t } h _ { t } ( \boldsymbol { x } )</script><p>最小化指数损失函数：</p>
+<script type="math/tex; mode=display">
+\ell _ { \mathrm { exp } } ( H | \mathcal { D } ) = \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H ( \boldsymbol { x } ) } \right]</script><p>$f(x)$ 只有两个结果，1 或 -1 ：</p>
+<script type="math/tex; mode=display">
+\ell _ { \mathrm { exp } } ( H | \mathcal { D } ) = e^{-H(x)}P(f(x)=1)+e^{H(x)}P(f(x)=-1)</script><p>若 $H(x)$ 可以将损失函数最小化，那么对它求偏导：</p>
+<script type="math/tex; mode=display">
+\frac { \partial \ell _ { \operatorname { exp } } ( H | \mathcal { D } ) } { \partial H ( \boldsymbol { x } ) } = - e ^ { - H ( \boldsymbol { x } ) } P ( f ( \boldsymbol { x } ) = 1 | \boldsymbol { x } ) + e ^ { H ( \boldsymbol { x } ) } P ( f ( \boldsymbol { x } ) = - 1 | \boldsymbol { x } )</script><p>显然，令上式为0，可以解出：</p>
+<script type="math/tex; mode=display">
+H ( \boldsymbol { x } ) = \frac { 1 } { 2 } \ln \frac { P ( f ( x ) = 1 | \boldsymbol { x } ) } { P ( f ( x ) = - 1 | \boldsymbol { x } ) }</script><p>因此：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}\operatorname { sign } ( H ( \boldsymbol { x } ) ) &= \operatorname { sign } \left( \frac { 1 } { 2 } \ln \frac { P ( f ( x ) = 1 | \boldsymbol { x } ) } { P ( f ( x ) = - 1 | \boldsymbol { x } ) } \right)\\&=\left\{ \begin{array} { l l } { 1 , } & { P ( f ( x ) = 1 | \boldsymbol { x } ) > P ( f ( x ) = - 1 | \boldsymbol { x } ) } \\ { - 1 , } & { P ( f ( x ) = 1 | \boldsymbol { x } ) < P ( f ( x ) = - 1 | \boldsymbol { x } ) } \end{array} \right.\\&=\underset { y \in \{ - 1,1 \} } { \arg \max } P ( f ( x ) = y | \boldsymbol { x } )\end{aligned}</script><p>我们发现，因为本身是二分类问题，特性非常优秀，指数损失函数最小化，则分类错误率也将最小，即达到了贝叶斯最优错误率。</p>
+<p>因为我们的基分类器前面还有参数，当基分类器得到以后，该基分类器的权重 $a_{t}$ 应该使得 $a_{t}h_{t}$ 最小化指数损失函数:</p>
+<script type="math/tex; mode=display">
+\begin{aligned}\ell _ { \exp } \left( \alpha _ { t } h _ { t } | \mathcal { D } _ { t } \right)&= \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } _ { t } } \left[ e ^ { - f ( \boldsymbol { x } ) \alpha _ { t } h _ { t } ( \boldsymbol { x } ) } \right] \\ &= \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } _ { t } } \left[ e ^ { - \alpha _ { t } } \mathbb { I } \left( f ( \boldsymbol { x } ) = h _ { t } ( \boldsymbol { x } ) \right) + e ^ { \alpha _ { t } } \mathbb { I } \left( f ( \boldsymbol { x } ) \neq h _ { t } ( \boldsymbol { x } ) \right) \right] \\ &= e ^ { - \alpha _ { i } } P _ { \boldsymbol { x } \sim \mathcal { D } _ { t } } \left( f ( \boldsymbol { x } ) = h _ { t } ( \boldsymbol { x } ) \right) + e ^ { \alpha _ { i } } P _ { \boldsymbol { x } \sim \mathcal { D } _ { t } } \left( f ( \boldsymbol { x } ) \neq h _ { t } ( \boldsymbol { x } ) \right) \\&=e ^ { - \alpha _ { t } } \left( 1 - \epsilon _ { t } \right) + e ^ { \alpha _ { t } } \epsilon _ { t }\end{aligned}</script><p>其中 $\epsilon _ { t } = P _ { x \sim \mathcal { D } _ { t } } \left( h _ { t } ( \boldsymbol { x } ) \neq f ( \boldsymbol { x } ) \right)$ ，考虑指数损失函数的导数：</p>
+<script type="math/tex; mode=display">
+\frac { \partial \ell _ { \exp } \left( \alpha _ { t } h _ { t } | \mathcal { D } _ { t } \right) } { \partial \alpha _ { t } } = - e ^ { - \alpha _ { t } } \left( 1 - \epsilon _ { t } \right) + e ^ { \alpha _ { t } } \epsilon _ { t }</script><p>上式为0，可以得到<strong>权重更新公式</strong>：</p>
+<script type="math/tex; mode=display">
+\alpha _ { t } = \frac { 1 } { 2 } \ln \left( \frac { 1 - \epsilon _ { t } } { \epsilon _ { t } } \right)</script><hr>
+<p>AdaBoost 算法在下一轮基学习中纠正错误，那么：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}\ell _ { \exp } \left( H _ { t - 1 } + h _ { t } | \mathcal { D } \right) &= \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) \left( H _ { t - 1 } ( \boldsymbol { x } ) + h _ { t } ( \boldsymbol { x } ) \right) } \right]\\&=\mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } ) } e ^ { - f ( \boldsymbol { x } ) h _ { t } ( \boldsymbol { x } ) } \right]\end{aligned}</script><p>它可以进行泰勒展开，同时注意到 $f ^ { 2 } ( x ) = h _ { t } ^ { 2 } ( x ) = 1$ ：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}\ell _ { \exp } \left( H _ { t - 1 } + h _ { t } | \mathcal { D } \right) &\simeq \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } ) } \left( 1 - f ( \boldsymbol { x } ) h _ { t } ( \boldsymbol { x } ) + \frac { f ^ { 2 } ( \boldsymbol { x } ) h _ { t } ^ { 2 } ( \boldsymbol { x } ) } { 2 } \right) \right]\\&=\mathbb { E } _ { x \sim \mathcal { D } } \left[ e ^ { - f ( x ) H _ { t - 1 } ( x ) } \left( 1 - f ( x ) h _ { t } ( x ) + \frac { 1 } { 2 } \right) \right]\end{aligned}</script><p>理想的基学习器：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}h _ { t } ( \boldsymbol { x } ) &= \underset { \boldsymbol { h } } { \arg \min } \ell _ { \exp } \left( H _ { t - 1 } + h | \mathcal { D } \right)\\&=\underset { h } { \arg \min } \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } ) } \left( 1 - f ( \boldsymbol { x } ) h ( \boldsymbol { x } ) + \frac { 1 } { 2 } \right) \right]\\&=\underset { h } { \arg \max } \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } ) } f ( \boldsymbol { x } ) h ( \boldsymbol { x } ) \right]\\&=\underset { h } { \arg \max } \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } [ \frac { e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } ) } } { \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } [ e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } )  }] } f ( \boldsymbol { x } ) h ( \boldsymbol { x } ) ]\end{aligned}</script><p>因为 $\mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } ) } \right]$ 是一个常数，令 $\mathcal { D } _ { t }$ 表示一个分布：</p>
+<script type="math/tex; mode=display">
+\mathcal { D } _ { t } ( \boldsymbol { x } ) = \frac { \mathcal { D } ( \boldsymbol { x } ) e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } ) } } { \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { w } ) } \right] }</script><p>这等价于令：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} h _ { t } ( \boldsymbol { x } ) & = \underset { \boldsymbol { h } } { \arg \max } \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ \frac { e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } ) } } { \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } ) } \right] } f ( \boldsymbol { x } ) h ( \boldsymbol { x } ) \right] \\ & = \underset { \boldsymbol { h } } { \arg \max } \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } _ { t } } [ f ( \boldsymbol { x } ) h ( \boldsymbol { x } ) ] \end{aligned} \right.</script><p>由于 $f ( x ) , h ( x ) \in \{ - 1 , + 1 \}$ ，有：</p>
+<script type="math/tex; mode=display">
+f ( \boldsymbol { x } ) h ( \boldsymbol { x } ) = 1 - 2 \mathbb { I } ( f ( \boldsymbol { x } ) \neq h ( \boldsymbol { x } ) )</script><p>那么理想的基学习器：</p>
+<script type="math/tex; mode=display">
+h _ { t } ( \boldsymbol { x } ) = \underset { h } { \arg \min } \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } _ { t } } [ \mathbb { I } ( f ( \boldsymbol { x } ) \neq h ( \boldsymbol { x } ) ) ]</script><p>在分布 $D_{t}$ 下最小化分类误差，<strong>样本分布更新公式</strong>：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}\mathcal { D } _ { t + 1 } ( \boldsymbol { x } ) &= \frac { \mathcal { D } ( \boldsymbol { x } ) e ^ { - f ( \boldsymbol { x } ) H _ { t } ( \boldsymbol { x } ) } } { \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H _ { t } ( \boldsymbol { x } ) } \right] }\\&= \frac { \mathcal { D } ( \boldsymbol { x } ) e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } ) } e ^ { - f ( \boldsymbol { x } ) \alpha _ { t } h _ { t } ( \boldsymbol { x } ) } } { \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H _ { t } ( \boldsymbol { x } ) } \right] }\\&=\mathcal { D } _ { t } ( \boldsymbol { x } ) \cdot e ^ { - f ( \boldsymbol { x } ) \alpha _ { t } h _ { t } ( \boldsymbol { x } ) } \frac { \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H _ { t - 1 } ( \boldsymbol { x } ) } \right] } { \mathbb { E } _ { \boldsymbol { x } \sim \mathcal { D } } \left[ e ^ { - f ( \boldsymbol { x } ) H _ { t } ( \boldsymbol { x } ) } \right] }\end{aligned}</script><blockquote>
+<p>重赋权法：根据样本分布为每个样本重新赋予一个权重。</p>
+<p>重采样法：根据样本分布对训练集重新采样，再用采样样本集对基学习器进行训练。</p>
+<p>Boosting 主要关注降低偏差，因此 Boosting 能基于泛化性能相当弱的学习器构建很强的集成。</p>
+</blockquote>
+<h3 id="AdaBoost-算法的误差分析"><a href="#AdaBoost-算法的误差分析" class="headerlink" title="AdaBoost 算法的误差分析"></a>AdaBoost 算法的误差分析</h3><p>AdaBoost 能够在学习过程中不断减少训练误差，即在训练数据集上的分类误差，所以，有以下定理，AdaBoost 算法最终分类器的训练误差界（<strong>定理1：AdaBoost 的训练误差界</strong>）为：</p>
+<script type="math/tex; mode=display">
+\frac { 1 } { N } \sum _ { i = 1 } ^ { N } I \left( G \left( x _ { i } \right) \neq y _ { i } \right) \leqslant \frac { 1 } { N } \sum _ { i } \exp \left( - y _ { i } f \left( x _ { i } \right) \right) = \prod _ { m } Z _ { m }</script><p>这里的 $G(x)$ 就是我们的 $h_{i}(x)$ ，$f(x)$ 是正确结果，$Z_{m}$ 是规范化因子。</p>
+<hr>
+<p>首先，我们知道：</p>
+<script type="math/tex; mode=display">
+w _ { m + 1 , i } = \frac { w _ { m i } } { Z _ { m } } \exp \left( - \alpha _ { m } y _ { i } G _ { m } \left( x _ { i } \right) \right) , \quad i = 1,2 , \cdots , N</script><p>我们使 $D_{m+1}$ 成为一个概率分布，通过：</p>
+<script type="math/tex; mode=display">
+Z _ { m } = \sum _ { i = 1 } ^ { N } w _ { m i } \exp \left( - \alpha _ { m } y _ { i } G _ { m } \left( x _ { i } \right) \right)</script><p>所以可以推出：</p>
+<script type="math/tex; mode=display">
+w _ { m i } \exp \left( - \alpha _ { m } y _ { i } G _ { m } \left( x _ { i } \right) \right) = Z _ { m } w _ { m + 1 , i }</script><hr>
+<p>上面式子的前半部分是显然的，当 $G(x_{i}) ≠ y_{i}，y_{i}f(x_{i})&lt;0$ 所以后面的结果一定大于 1 。然后的等号推导如下：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} \frac { 1 } { N } \sum _ { i } \exp \left( - y _ { i } f \left( x _ { i } \right) \right) & = \frac { 1 } { N } \sum _ { i } \exp \left( - \sum _ { m = 1 } ^ { M } \alpha _ { m } y _ { i } G _ { m } \left( x _ { i } \right) \right) \\ & = \sum _ { i } w _ { 1 i } \prod _ { m = 1 } ^ { M } \exp \left( - \alpha _ { m } y _ { i } G _ { m } \left( x _ { i } \right) \right) \\ & = Z _ { 1 } \sum _ { i } w _ { 2 i } \prod _ { m = 2 } ^ { M } \exp \left( - \alpha _ { m } y _ { i } G _ { m } \left( x _ { i } \right) \right) \\ & = Z _ { 1 } Z _ { 2 } \sum _ { i } w _ { 3 i } \prod _ { m = 3 } ^ { M } \exp \left( - \alpha _ { m } y _ { i } G _ { m } \left( x _ { i } \right) \right)\\ &=...\\ &=Z _ { 1 } Z _ { 2 } \cdots Z _ { M - 1 } \sum _ { i } w _ { M } \exp \left( - \alpha _ { M } y _ { i } G _ { M } \left( x _ { i } \right) \right)\\ &=\prod _ { m = 1 } ^ { N } z _ { m } \end{aligned} \right.</script><p>现在每一轮选取适当 $G_{m}$ 使得 $Z_{m}$ 最小，从而使训练误差下降最快，对二分类问题，有如下结果（<strong>定理2：二分类问题 AdaBoost 的训练误差界</strong>）：</p>
+<script type="math/tex; mode=display">
+\prod _ { m = 1 } ^ { M } Z _ { m } = \prod _ { m = 1 } ^ { M } \left[ 2 \sqrt { e _ { m } \left( 1 - e _ { m } \right) } \right] = \prod _ { m = 1 } ^ { M } \sqrt { \left( 1 - 4 \gamma _ { m } ^ { 2 } \right) } \leqslant \exp \left( - 2 \sum _ { m = 1 } ^ { M } \gamma _ { m } ^ { 2 } \right)</script><p>这里，$\gamma _ { m } = \frac { 1 } { 2 } - e _ { m }$ 。</p>
+<p>前两个等号：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} Z _ { m } & = \sum _ { i = 1 } ^ { N } w _ { m i } \exp \left( - \alpha _ { m } y _ { i } G _ { m } \left( x _ { i } \right) \right) \\ & = \sum _ { y _ { i } = G _ { m } \left( x _ { i } \right) } w _ { m i } \mathrm { e } ^ { - \alpha _ { m } } + \sum _ { y _ { i } \neq G _ { m } \left( x _ { i } \right) } w _ { m i } \mathrm { e } ^ { \alpha _ { n } } \\ & = \left( 1 - e _ { m } \right) \mathrm { e } ^ { - \alpha _ { m } } + e _ { m } \mathrm { e } ^ { \alpha _ { m } } \\ & = 2 \sqrt { e _ { m } \left( \mathrm { 1 } - e _ { m } \right) } = \sqrt { 1 - 4 \gamma _ { m } ^ { 2 } } \end{aligned} \right.</script><p>然后，对于最后的不等号：</p>
+<script type="math/tex; mode=display">
+\prod _ { m = 1 } ^ { M } \sqrt { \left( 1 - 4 \gamma _ { m } ^ { 2 } \right) } \leqslant \exp \left( - 2 \sum _ { m = 1 } ^ { M } \gamma _ { m } ^ { 2 } \right)</script><p>可以通过 $e^{x}$ 和 $\sqrt { 1 - x }$ 在点 $x=0$ 处泰勒展开得到。</p>
+<p><strong>推论：</strong>如果存在 $ \gamma &gt; 0$ ，对所有 m 有 $\gamma _ { m } \geqslant \gamma$，则：</p>
+<script type="math/tex; mode=display">
+\frac { 1 } { N } \sum _ { i = 1 } ^ { N } I \left( G \left( x _ { i } \right) \neq y _ { i } \right) \leqslant \exp \left( - 2 M \gamma ^ { 2 } \right)</script><p>AdaBoost 的训练误差以指数速率下降。</p>
+<h3 id="AdaBoost-算法的解释"><a href="#AdaBoost-算法的解释" class="headerlink" title="AdaBoost 算法的解释"></a>AdaBoost 算法的解释</h3><p>考虑加法模型：</p>
+<script type="math/tex; mode=display">
+f ( x ) = \sum _ { m = 1 } ^ { M } \beta _ { m } b \left( x ; \gamma _ { m } \right)</script><p>这里，$b(x;\gamma _{m})$ 是基函数， $\gamma_{m}$ 是基函数的参数，$\beta _{m}$ 是基函数的系数，显然，这是一个加法模型。</p>
+<p>在给定训练数据和损失函数 $L(y,f(x))$ 的条件下，学习加法模型 $f(x)$ 成为经验风险极小化即损失函数极小化问题：</p>
+<script type="math/tex; mode=display">
+\min _ { \beta , \gamma } \sum _ { i = 1 } ^ { N } L \left( y _ { i } , \beta b \left( x _ { i } ; \gamma \right) \right)</script><p>给定训练数据集 $T = \left\{ \left( x _ { 1 } , y _ { 1 } \right) , \left( x _ { 2 } , y _ { 2 } \right) , \cdots , \left( x _ { N } , y _ { N } \right) \right\}$ ，学习加法模型 $f(x)$ 的前向分布算法如下：</p>
+<ol>
+<li>初始化 $f _ { 0 } ( x ) = 0$ </li>
+<li>循环开始 $m = 1… M$ </li>
+<li>极小化损失函数：$\left( \beta _ { m } , \gamma _ { m } \right) = \arg \min _ { \beta , \gamma } \sum _ { i = 1 } ^ { N } L \left( y _ { i } , f _ { m - 1 } \left( x _ { i } \right) + \beta b \left( x _ { i } ; \gamma \right) \right)$ </li>
+<li>得到参数 $\beta_{m}$ 和 $\gamma_{m}$ ，更新：$f _ { m } ( x ) = f _ { m - 1 } ( x ) + \beta _ { m } b \left( x ; \gamma _ { m } \right)$ </li>
+<li>最终，得到加法模型： $f ( x ) = f _ { M } ( x ) = \sum _ { m = 1 } ^ { M } \beta _ { m } b \left( x ; \gamma _ { m } \right)$ </li>
+</ol>
+<p>现在，前向分布算法，将问题简化为逐次求解各个参数 $\beta_{m}$ 和 $\gamma_{m}$ 。</p>
+<p><strong>定理</strong>：AdaBoost 算法是前向分布加法算法的特例，这时，模型是由基本分类器组成的加法模型，损失函数是指数函数。</p>
+<h3 id="AdaBoost-小结"><a href="#AdaBoost-小结" class="headerlink" title="AdaBoost 小结"></a>AdaBoost 小结</h3><p>训练数据中每个样本赋予一个权重，这个权重构成了向量 D ，之后分对的样本权重降低，分错的样本权重增高，构成新的 D ，同时 AdaBoost 为每个分类器都分配一个权重值 alpha：</p>
+<script type="math/tex; mode=display">
+\alpha = \frac { 1 } { 2 } \ln \left( \frac { 1 - \varepsilon } { \varepsilon } \right)</script><p>而分布 D :</p>
+<script type="math/tex; mode=display">
+D _ { i } ^ { ( t + 1 ) } = \frac { D _ { i } ^ { ( t ) } \mathrm { e } ^ { \pm \alpha } } { \operatorname { Sum } ( D ) }</script><p>进行下一轮迭代。</p>
+<h3 id="提升树"><a href="#提升树" class="headerlink" title="提升树"></a>提升树</h3><p>以决策树为基函数的提升方法被称为提升树，对分类问题决策树是二叉分类树，对回归问题决策树是二叉回归树。提升树可以表示为决策树的加法模型：</p>
+<script type="math/tex; mode=display">
+f _ { M } ( x ) = \sum _ { m = 1 } ^ { M } T \left( x ; \Theta _ { m } \right)</script><p>其中 $T \left( x ; \Theta _ { n } \right)$ 表示决策树；$\Theta _ { n }$ 表示决策树的参数； $M$ 是树的个数。</p>
+<p>提升树算法采用<strong>前向分步算法</strong>。首先确定初始提升树 $f_{0}(x)=0$ ，第 m 步的模型是：</p>
+<script type="math/tex; mode=display">
+f _ { m } ( x ) = f _ { m - 1 } ( x ) + T \left( x ; \Theta _ { m } \right)</script><p>通过<strong>经验风险极小化</strong>确定下一棵决策树的参数：</p>
+<script type="math/tex; mode=display">
+\hat { \Theta } _ { m } = \arg \min _ { \boldsymbol { \theta } _ { \boldsymbol { e } } } \sum _ { i = 1 } ^ { N } L \left( y _ { i } , f _ { m - 1 } \left( x _ { i } \right) + T \left( x _ { i } ; \Theta _ { m } \right) \right)</script><blockquote>
+<p>这里的 $T$ 指的就是下一棵决策树。</p>
+</blockquote>
+<p>不同问题的提升树学习算法，主要区别在于使用的损失函数不同，平方误差损失函数的回归问题，指数损失函数的分类问题。下面叙述回归问题的提升树：</p>
+<script type="math/tex; mode=display">
+T ( x ; \Theta ) = \sum _ { j = 1 } ^ { J } c _ { j } I \left( x \in R _ { j } \right)</script><p>x 是输入， y 是输出，c 是输出常量，J 是回归树的复杂度即叶节点的个数，$\Theta = \left\{ \left( R _ { 1 } , c _ { 1 } \right) , \left( R _ { 2 } , c _ { 2 } \right) , \cdots , \left( R _ { J } , c _ { J } \right) \right\}$ 表示树的区域划分和各区域上的常数。</p>
+<p>回归问题提升树使用以下前向分布算法：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}f _ { 0 } ( x ) &= 0 \\  f _ { m } ( x ) &= f _ { m - 1 } ( x ) + T \left( x ; \Theta _ { m } \right) , \quad m = 1,2 , \cdots , M \\ f _ { M } ( x ) &= \sum _ { m = 1 } ^ { M } T \left( x ; \Theta _ { m } \right)\end{aligned}</script><p>在前向分布算法的第 m 步，给定当前模型 $f_{m-1}(x)$ ，需求解：</p>
+<script type="math/tex; mode=display">
+\hat { \Theta } _ { m } = \arg \min _ { \Theta _ { m } } \sum _ { i = 1 } ^ { N } L \left( y _ { i } , f _ { m - 1 } \left( x _ { i } \right) + T \left( x _ { i } ; \Theta _ { m } \right) \right)</script><p>当使用平方误差损失函数时：</p>
+<script type="math/tex; mode=display">
+L ( y , f ( x ) ) = ( y - f ( x ) ) ^ { 2 }</script><p>其损失变为：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} L \left( y , f _ { m - 1 } ( x ) + T \left( x ; \Theta _ { m } \right) \right) & = \left[ y - f _ { m - 1 } ( x ) - T \left( x ; \Theta _ { m } \right) \right] ^ { 2 } \\ & = \left[ r - T \left( x ; \Theta _ { m } \right) \right] ^ { 2 } \end{aligned} \right.</script><p>这里， $r = y - f _ { m - 1 } ( x )$ ，是当前模型拟合数据的残差。</p>
+<p>所以，对回归问题的提升树来说，只需要简单地拟合当前模型的残差，这样，算法就相当简单。</p>
+<p><strong>回归问题的提升树算法</strong>：</p>
+<p>输入：训练数据集 $T={(x1,y1),(x2,y2),…(xn,yn)}, xi, yi$ </p>
+<p>输出：提升树 $f_{M}(x)$ </p>
+<ol>
+<li>初始化 $f_{0}(x)=0$ </li>
+<li>开始循环 m = 1,2,…M</li>
+<li>计算残差：$r _ { m i } = y _ { i } - f _ { m - 1 } \left( x _ { i } \right) , \quad i = 1,2 , \cdots , N$ </li>
+<li>拟合残差 $r_{mi}$ 学习一个回归树，得到 $T \left( x ; \Theta _ { m } \right)$ </li>
+<li>更新 $f _ { m } ( x ) = f _ { m - 1 } ( x ) + T \left( x ; \Theta _ { m } \right)$ </li>
+<li>对第 3 步到第 5 步进行循环</li>
+<li>得到回归问题提升树 $f _ { M } ( x ) = \sum _ { m = 1 } ^ { M } T \left( x ; \Theta _ { m } \right)$ </li>
+</ol>
+<h3 id="梯度提升"><a href="#梯度提升" class="headerlink" title="梯度提升"></a>梯度提升</h3><p>提升树利用加法模型和前向分布算法实现学习的优化过程，当损失函数是平方损失和指数损失的时候，每一步优化是很简单的，但一般损失函数而言，往往每一步优化并不容易，针对这一问题，出现了梯度提升。</p>
+<p>这是利用最速下降法的近似方法，其关键是利用损失函数的负梯度在当前模型的值，主要不同就是残差的计算方式：</p>
+<script type="math/tex; mode=display">
+- \left[ \frac { \partial L \left( y , f \left( x _ { i } \right) \right) } { \partial f \left( x _ { i } \right) } \right] _ { f ( x ) = f _ { m - 1 } ( x ) }</script><p>作为回归问题提升树算法中的残差的近似值。</p>
+<p>输入：训练数据集 $T={(x1,y1),(x2,y2),…(xn,yn)}, xi, yi$ ；损失函数 $L(y,f(x))$ </p>
+<p>输出：回归树 $\hat { f } ( x )$ </p>
+<ol>
+<li>初始化：$f _ { 0 } ( x ) = \arg \min _ { c } \sum _ { i = 1 } ^ { N } L \left( y _ { i } , c \right)$ </li>
+<li>开始循环 m 从 1 到 M</li>
+<li>对于 i 从 1 到 N ，计算： $r _ { m l } = - \left[ \frac { \partial L \left( y _ { i } , f \left( x _ { i } \right) \right) } { \partial f \left( x _ { i } \right) } \right] _ { f ( x ) = f _ { m- 1 } ( x ) }$ </li>
+<li>对 $r_{mi}$ 拟合一个回归树，得到第 m 棵树的叶节点区域 $R_{mj}$</li>
+<li>对 j 从 1 到 J ，计算：$c _ { m j } = \arg \min _ { c } \sum _ { x _ { i } \in R _ { mj } } L \left( y _ { i } , f _ { m - 1 } \left( x _ { i } \right) + c \right)$ </li>
+<li>更新 $f _ { m } ( x ) = f _ { m - 1 } ( x ) + \sum _ { j = 1 } ^ { J } c _ { m j } I \left( x \in R _ { m j } \right)$ </li>
+<li>得到回归树 $\hat { f } ( x ) = f _ { M } ( x ) = \sum _ { m = 1 } ^ { M } \sum _ { j = 1 } ^ { J } c _ { m j } I \left( x \in R _ { m j } \right)$ </li>
+</ol>
+<h3 id="XGBoost"><a href="#XGBoost" class="headerlink" title="XGBoost"></a>XGBoost</h3><p>原始的 GBDT 算法基于经验损失函数的负梯度来构造新的决策树，只是在决策树构建完成后再进行剪枝，而 XGBoost 在决策树构建阶段就加入了正则化：</p>
+<script type="math/tex; mode=display">
+L_{t} = \sum _ { i = 1 } ^ { n } l \left( y _ { i } , F_{t-1}(x_{i})+f_{t}(x_{i}) \right) + \sum _ { k = 1 } ^ { K } \Omega \left( f _ { k } \right)</script><p>对于上面的式子，我们可以发现，除去正则项以外，就是我们传统的决策树。对于决定下一棵树：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} \mathrm { obj } ^ { ( t ) } & = \sum _ { i = 1 } ^ { n } l \left( y _ { i } , \hat { y } _ { i } ^ { ( t ) } \right) + \sum _ { i = 1 } ^ { t } \Omega \left( f _ { i } \right) \\ & = \sum _ { i = 1 } ^ { n } l \left( y _ { i } , \hat { y } _ { i } ^ { ( t - 1 ) } + f _ { t } \left( x _ { i } \right) \right) + \Omega \left( f _ { t } \right) + \text { constant } \end{aligned} \right.</script><p>现在我们使用泰勒展开， $x$ 取值 $\hat { y } _ { i } ^ { ( t - 1 ) } + f _ { t } \left( x _ { i } \right)$ ，来逼近：</p>
+<script type="math/tex; mode=display">
+\mathrm { obj } ^ { ( t ) } = \sum _ { i = 1 } ^ { n } \left[ l \left( y _ { i } , \hat { y } _ { i } ^ { ( t - 1 ) } \right) + g _ { i } f _ { t } \left( x _ { i } \right) + \frac { 1 } { 2 } h _ { i } f _ { t } ^ { 2 } \left( x _ { i } \right) \right] + \Omega \left( f _ { t } \right) + \text { constant }</script><p>其中：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} g _ { i } & = \partial _ { \hat { y } _ { i } ( t - 1 ) } l \left( y _ { i } , \hat { y } _ { i } ^ { ( t - 1 ) } \right) \\ h _ { i } & = \partial _ { \hat { y } _ { i } ^ { ( t - 1 ) } } ^ { 2 } l \left( y _ { i } , \hat { y } _ { i } ^ { ( t - 1 ) } \right) \end{aligned} \right.</script><p>删除常数项，那么 t 目标函数就变成了：</p>
+<script type="math/tex; mode=display">
+\sum _ { i = 1 } ^ { n } \left[ g _ { i } f _ { t } \left( x _ { i } \right) + \frac { 1 } { 2 } h _ { i } f _ { t } ^ { 2 } \left( x _ { i } \right) \right] + \Omega \left( f _ { t } \right)</script><p>我们需要定义树的复杂度 $\Omega ( f )$ ，首先我们定义一棵树：</p>
+<script type="math/tex; mode=display">
+f _ { t } ( x ) = w _ { q ( x ) } , w \in R ^ { T } , q : R ^ { d } \rightarrow \{ 1,2 , \cdots , T \}</script><p>这里 w 是树叶上的分数向量，q 是将每个数据点分配给叶子的函数，T 是树叶的数量。正则化定义：</p>
+<script type="math/tex; mode=display">
+\Omega \left( f _ { t } \right) = \gamma T + \frac { 1 } { 2 } \lambda \sum _ { j = 1 } ^ { T } w _ { j } ^ { 2 }</script><p>注意，当正则项系数为 $\gamma$ 为 0 时，整体目标就退化回了 GBDT 。</p>
+<p>我们可以用第 t 棵树来编写目标值如：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} O b j ^ { ( t ) } & \approx \sum _ { i = 1 } ^ { n } \left[ g _ { i } w _ { q \left( x _ { i } \right) } + \frac { 1 } { 2 } h _ { i } w _ { q \left( x _ { i } \right) } ^ { 2 } \right] + \gamma T + \frac { 1 } { 2 } \lambda \sum _ { j = 1 } ^ { T } w _ { j } ^ { 2 } \\ & = \sum _ { j = 1 } ^ { T } \left[ \left( \sum _ { i \in I _ { j } } g _ { i } \right) w _ { j } + \frac { 1 } { 2 } \left( \sum _ { i \in I _ { j } } h _ { i } + \lambda \right) w _ { j } ^ { 2 } \right] + \gamma T \end{aligned} \right.</script><p>其中 $I _ { j } = \{ i | q \left( x _ { i } \right) = j \}$ 是分配给第 j 个叶子的数据点的索引的集合。 请注意，在第二行中，我们更改了总和的索引，因为同一叶上的所有数据点都得到了相同的分数。 我们可以通过定义 $G _ { j } = \sum _ { i \in I _ { j } } g _ { i }$ 和 $H _ { j } = \sum _ { i \in I _ { j } } h _ { i }$ 来进一步压缩表达式 :</p>
+<script type="math/tex; mode=display">
+O b j ^ { ( t ) } = \sum _ { j = 1 } ^ { T } \left[ G _ { j } w _ { j } + \frac { 1 } { 2 } \left( H _ { j } + \lambda \right) w _ { j } ^ { 2 } \right] + \gamma T</script><p>我们可以得到最好的客观规约：</p>
+<script type="math/tex; mode=display">
+w _ { j } ^ { * } = - \frac { G _ { j } } { H _ { j } + \lambda }</script><p>将预测值带入损失函数可以得到损失函数的最小值，同时也在度量一个树有多好：</p>
+<script type="math/tex; mode=display">
+{ Obj } _ { t } ^ { * } = - \frac { 1 } { 2 } \sum _ { j = 1 } ^ { T } \frac { G _ { j } ^ { 2 } } { H _ { j } + \lambda } + \gamma T</script><p>既然我们有了一个方法来衡量一棵树有多好，理想情况下我们会列举所有可能的树并挑选出最好的树。 在实践中，这种方法是比较棘手的，所以我们会尽量一次优化树的一个层次。 具体来说，我们试图将一片叶子分成两片，并得到分数：</p>
+<script type="math/tex; mode=display">
+\text { Gain } = \frac { 1 } { 2 } \left[ \frac { G _ { L } ^ { 2 } } { H _ { L } + \lambda } + \frac { G _ { R } ^ { 2 } } { H _ { R } + \lambda } - \frac { \left( G _ { L } + G _ { R } \right) ^ { 2 } } { H _ { L } + H _ { R } + \lambda } \right] - \gamma</script><p>这个公式可以分解为 1) 新左叶上的得分 2) 新右叶上的得分 3) 原始叶子上的得分 4) additional leaf（附加叶子）上的正则化。 我们可以在这里看到一个重要的事实：如果增益小于 γ，我们最好不要添加那个分支。这正是基于树模型的 <strong>pruning（剪枝）</strong> 技术！通过使用监督学习的原则，我们自然会想出这些技术工作的原因 :)</p>
+<p>另外，在分割的时候，这个系统还能感知稀疏值，我们给每个树的结点都加了一个默认方向，当一个值是缺失值时，我们就把他分类到默认方向，每个分支有两个选择，具体应该选哪个？这里提出一个算法，枚举向左和向右的情况，哪个 gain 大选哪个，这些都在这里完成。</p>
+<p>总结一下，XGBoost 就是最大化这个差来进行决策树的构建，XGBoost 和 GDBT 的差别和联系：</p>
+<ul>
+<li>GDBT 是机器学习算法， XGBoost 是该算法的工程实现。</li>
+<li>XGBoost 加入了正则化，支持多种类型的基分类器，支持对数据采样（和 RF 类似），能对缺省值处理。</li>
+</ul>
+<blockquote>
+<p>ps: 论文第二章里提到了shrinkage 和 column subsampling，就是相当于学习速率和对于列的采样骚操作。<strong>调低 eta 能减少个体的影响，给后续的模型更多学习空间</strong>。对于列的重采样，根据一些使用者反馈，列的 subsampling 比行的 subsampling 效果好，列的 subsampling 也加速了并行化的特征筛选。</p>
+</blockquote>
+<h3 id="XGBoost-的调参"><a href="#XGBoost-的调参" class="headerlink" title="XGBoost 的调参"></a>XGBoost 的调参</h3><ul>
+<li>过拟合：</li>
+</ul>
+<blockquote>
+<p>直接控制模型的复杂度：</p>
+<ul>
+<li>这包括 <code>max_depth</code>, <code>min_child_weight</code> 和 <code>gamma</code></li>
+</ul>
+<p>增加随机性，使训练对噪声强健：</p>
+<ul>
+<li>这包括 <code>subsample</code>, <code>colsample_bytree</code></li>
+<li>你也可以减小步长 <code>eta</code>, 但是当你这么做的时候需要记得增加 <code>num_round</code> 。</li>
+</ul>
+</blockquote>
+<ul>
+<li>不平衡的数据集</li>
+</ul>
+<blockquote>
+<p>如果你只关心预测的排名顺序：</p>
+<ul>
+<li>通过 <code>scale_pos_weight</code> 来平衡 positive 和 negative 权重。</li>
+<li>使用 AUC 进行评估</li>
+</ul>
+<p>如果你关心预测正确的概率：</p>
+<ul>
+<li>在这种情况下，您无法重新平衡数据集</li>
+<li>在这种情况下，将参数 <code>max_delta_step</code> 设置为有限数字（比如说1）将有助于收敛</li>
+</ul>
+</blockquote>
+<h2 id="Bagging"><a href="#Bagging" class="headerlink" title="Bagging"></a>Bagging</h2><p>给定包含 m 个样本的数据集，随机取出一个样本放到采样集中，再把样本放回初始数据集，使得下次采样时仍有可能被选中，经过 m 次随机采样，我们得到含 m 个样本的采样集，初始训练集中有的样本在采样集有多次出现，有的则从未出现。</p>
+<p>Bagging 可以不经修改用于多分类、回归等任务。</p>
+<p>因为 Bagging 只使用了部分数据，剩下的可以用作验证集，称为包外估计 out-of-bag estimate ：</p>
+<script type="math/tex; mode=display">
+H ^ { o o b } ( x ) = \underset { y \in \mathcal { Y } } { \arg \max } \sum _ { t = 1 } ^ { T } \mathbb { I } \left( h _ { t } ( \boldsymbol { x } ) = y \right) \cdot \mathbb { I } \left( \boldsymbol { x } \notin D _ { t } \right)</script><p>则泛化误差的包外估计是：</p>
+<script type="math/tex; mode=display">
+\epsilon ^ { o o b } = \frac { 1 } { | D | } \sum _ { ( \boldsymbol { x } , y ) \in D } \mathbb { I } \left( H ^ { o o b } ( \boldsymbol { x } ) \neq y \right)</script><blockquote>
+<p>Bagging 主要关注降低方差，因此它在不剪枝决策树、神经网络等易受样本扰动的学习器上效用更明显。</p>
+</blockquote>
+<h3 id="随机森林"><a href="#随机森林" class="headerlink" title="随机森林"></a>随机森林</h3><p>在 Bagging 的基础上，进一步引入随机属性选择，假定决策树有 d 个属性，现在我们只随机选择 k 个属性的子集，然后在这个子集中选择一个最优属性进行划分，推荐 $k = log_{2}d$ 。</p>
+<p>随机森林通常会训练效率优于 Bagging ，且随着学习器数目的增加，通常会收敛到更低的泛化误差。</p>
+<h2 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h2><h3 id="AdaBoost-伪码"><a href="#AdaBoost-伪码" class="headerlink" title="AdaBoost 伪码"></a>AdaBoost 伪码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">训练集 D = &#123;(x1, y1), (x2, y2)..., (xm, ym)&#125;</span></span><br><span class="line"><span class="string">基学习算法 L</span></span><br><span class="line"><span class="string">训练轮数 T</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line">D[<span class="number">1</span>] = <span class="number">1</span>/m <span class="comment"># 初始化样本权值分布</span></span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> range(T):</span><br><span class="line">  h[t] = L(D, D[t]) <span class="comment"># 基于分布 Dt 从数据集 D 中训练处分类器 ht</span></span><br><span class="line">  e[t] = P(ht(x), f(x)) <span class="comment"># 分类器 ht 的误差， ht(x) 是预测结果， f(x) 是真实结果</span></span><br><span class="line">  <span class="keyword">if</span> e[t] &gt; <span class="number">0.5</span>:</span><br><span class="line">    <span class="keyword">break</span></span><br><span class="line">  a[t] = <span class="number">0.5</span>*np.log((<span class="number">1</span>-e[t])/e[t])</span><br><span class="line">  D[t+<span class="number">1</span>] = D[t] / Z[t] <span class="comment"># Zt 是规范化因子</span></span><br><span class="line">  <span class="keyword">if</span> (h[t](x) == f(x)) D[t+<span class="number">1</span>] *= exp(-a[t]) <span class="comment"># 更新 D[t+1] 的权重</span></span><br><span class="line">  <span class="keyword">else</span> D[t+<span class="number">1</span>] *= exp(a[t])</span><br></pre></td></tr></table></figure>
+<p> 最终返回 $H(x) = \operatorname { sign } \left( \sum _ { t = 1 } ^ { T } \alpha _ { t } h _ { t } ( \boldsymbol { x } ) \right)$ 。</p>
+<blockquote>
+<p>sign 表达符号函数。</p>
+</blockquote>
+<h3 id="Bagging-伪码"><a href="#Bagging-伪码" class="headerlink" title="Bagging 伪码"></a>Bagging 伪码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">训练集 D = &#123;(x1, y1), (x2, y2)..., (xm, ym)&#125;</span></span><br><span class="line"><span class="string">基学习算法 L</span></span><br><span class="line"><span class="string">训练轮数 T</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> range(T):</span><br><span class="line">  h[t] = L(D, D[bs]) <span class="comment"># D[bs] 是自助采样生成的样本分布</span></span><br></pre></td></tr></table></figure>
+<p>最终返回 $H(x) = \underset { y \in \mathcal { Y } } { \arg \max } \sum _ { t = 1 } ^ { T } \mathbb { I } \left( h _ { t } ( \boldsymbol { x } ) = y \right)$ 。</p>
+<h3 id="Stacking-伪码"><a href="#Stacking-伪码" class="headerlink" title="Stacking 伪码"></a>Stacking 伪码</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">训练集 D = &#123;(x1, y1), (x2, y2)..., (xm, ym)&#125;</span></span><br><span class="line"><span class="string">初级学习算法 L1, L2, L3...</span></span><br><span class="line"><span class="string">次级学习算法 L</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> range(T):</span><br><span class="line">  h[t] = L(D) <span class="comment"># 初级学习器</span></span><br><span class="line">D_ = [] <span class="comment"># 生成次级训练集</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(m):</span><br><span class="line">  <span class="keyword">for</span> t <span class="keyword">in</span> range(T):</span><br><span class="line">    z[i][t] = ht(x[i])</span><br><span class="line">  D_ += ((z[i][<span class="number">1</span>], z[i][<span class="number">2</span>]...z[i][T]), y[i]) <span class="comment"># z 是由 x 产生的次级训练样例，标记是 yi</span></span><br><span class="line">h_ = L(D_)</span><br></pre></td></tr></table></figure>
+<p>输出 $H ( \boldsymbol { x } ) = h ^ { \prime } \left( h _ { 1 } ( \boldsymbol { x } ) , h _ { 2 } ( \boldsymbol { x } ) , \ldots , h _ { T } ( \boldsymbol { x } ) \right)$ 。</p>
+<h2 id="算法例子"><a href="#算法例子" class="headerlink" title="算法例子"></a>算法例子</h2><h3 id="AdaBoost-例子"><a href="#AdaBoost-例子" class="headerlink" title="AdaBoost 例子"></a>AdaBoost 例子</h3><p>假设存在3个分类器，对每一个分类器：</p>
+<ul>
+<li>初始化权值 Di。</li>
+<li>取阈值来分类，得到基分类器 hi。</li>
+<li>计算误差率 ei。</li>
+<li>得到分类器系数 ai。</li>
+<li>更新权值 Di+1。</li>
+</ul>
+<p>最后我们将三个分类器按照各自的系数 a 来进行预测，得到整体 H 。</p>
+<p>如果没看懂我们再来一次：</p>
+<p>输入数据集 $T = \left\{ \left( x _ { 1 } , y _ { 1 } \right) , \left( x _ { 2 } , y _ { 2 } \right) , \cdots , \left( x _ { N } , y _ { N } \right) \right\}$ 。</p>
+<p>输出最终分类器 $G(x)$ 。</p>
+<blockquote>
+<p>Ps：刚才我们用 $H$ 来表示分类器。</p>
+</blockquote>
+<ol>
+<li>初始化训练数据的权值分布：$D _ { 1 } = \left( w _ { 11 } , \cdots , w _ { 1 i } , \cdots , w _ { 1 N } \right) , \quad w _ { 1 } = \frac { 1 } { N } , \quad i = 1,2 , \cdots , N$ </li>
+<li>循环开始，对于 $m=1,2,…M$ </li>
+<li>使用具有权值分布 $D_{m}$ 的训练数据学习，得到基本分类器：$G _ { m } ( x ) : \mathcal { X } \rightarrow \{ - 1 , + 1 \}$ </li>
+<li>计算 $G_{m}(x)$ 在训练数据集上的分类误差率：$e _ { m } = P \left( G _ { m } \left( x _ { i } \right) \neq y _ { i } \right) = \sum _ { i = 1 } ^ { N } w _ { m i } I \left( G _ { m } \left( x _ { i } \right) \neq y _ { i } \right)$ </li>
+<li>计算 $G_m(x)$ 的系数：$\alpha _ { m } = \frac { 1 } { 2 } \log \frac { 1 - e _ { m } } { e _ { m } }$ </li>
+<li>更新训练集的权值分布：$D _ { m + 1 } = \left( w _ { m + 1,1 } , \cdots , w _ { m + 1 , l } , \cdots , w _ { m + 1 , N } \right)$ $w _ { m + 1 , i } = \frac { w _ { m i } } { Z _ { m } } \exp \left( - \alpha _ { m } y _ { i } G _ { m } \left( x _ { i } \right) \right) , \quad i = 1,2 , \cdots , N$ </li>
+<li>这里的 $Z_{m}$ 是规范化因子：$Z _ { m } = \sum _ { i = 1 } ^ { N } w _ { m } \exp \left( - \alpha _ { m } y _ { i } G _ { m } \left( x _ { i } \right) \right)$ ，它使 $D_{m+1}$ 成为一个概率分布</li>
+<li>构建基本分类器的线性组合：$f ( x ) = \sum _ { m = 1 } ^ { M } \alpha _ { m } G _ { m } ( x )$ </li>
+<li>得到最终分类器：$G ( x ) = \operatorname { sign } ( f ( x ) ) = \operatorname { sign } \left( \sum _ { m = 1 } ^ { M } \alpha _ { m } G _ { m } ( x ) \right)$ </li>
+</ol>
+<h2 id="经典题目"><a href="#经典题目" class="headerlink" title="经典题目"></a>经典题目</h2><ul>
+<li>XGBoost 与 GBDT 的联系与区别有哪些？</li>
+</ul>
+<blockquote>
+<p>GBDT 是机器学习算法；XGBoost 是工程实现。</p>
+<p>传统 GBDT 采用 CART 作为基分类器， XGBoost 支持多种类型的基分类器，比如线性分类器。</p>
+<p>XGBoost 增加了正则项，防止过拟合。</p>
+<p>XGBoost 支持对数据进行采样，对缺失值有处理。</p>
+</blockquote>
+<p>从方差和偏差的角度解释 Boosting 和 Bagging  的原理？</p>
+<h2 id="算法总结"><a href="#算法总结" class="headerlink" title="算法总结"></a>算法总结</h2><ul>
+<li>提升算法是将弱学习算法提升为强学习算法的统计学习算法，通过反复修改训练数据的权值分布，构建一系列基本分类器，并将这些基本分类器线性组合，构成一个强分类器。</li>
+<li>AdaBoost 将分类误差小的基本分类器以大的权值，给误差大的基本分类器以小的权值。</li>
+<li>提升树是以分类树或回归树为基本分类器的提升方法。</li>
+</ul>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#迭代过程"><span class="toc-number">1.</span> <span class="toc-text">迭代过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#理论基础"><span class="toc-number">2.</span> <span class="toc-text">理论基础</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#名词解释"><span class="toc-number">2.1.</span> <span class="toc-text">名词解释</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#集成学习的可行性证明"><span class="toc-number">2.2.</span> <span class="toc-text">集成学习的可行性证明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Boosting"><span class="toc-number">3.</span> <span class="toc-text">Boosting</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost"><span class="toc-number">3.1.</span> <span class="toc-text">AdaBoost</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost-算法的误差分析"><span class="toc-number">3.2.</span> <span class="toc-text">AdaBoost 算法的误差分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost-算法的解释"><span class="toc-number">3.3.</span> <span class="toc-text">AdaBoost 算法的解释</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost-小结"><span class="toc-number">3.4.</span> <span class="toc-text">AdaBoost 小结</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#提升树"><span class="toc-number">3.5.</span> <span class="toc-text">提升树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#梯度提升"><span class="toc-number">3.6.</span> <span class="toc-text">梯度提升</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XGBoost"><span class="toc-number">3.7.</span> <span class="toc-text">XGBoost</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#XGBoost-的调参"><span class="toc-number">3.8.</span> <span class="toc-text">XGBoost 的调参</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bagging"><span class="toc-number">4.</span> <span class="toc-text">Bagging</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#随机森林"><span class="toc-number">4.1.</span> <span class="toc-text">随机森林</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#算法实现"><span class="toc-number">5.</span> <span class="toc-text">算法实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost-伪码"><span class="toc-number">5.1.</span> <span class="toc-text">AdaBoost 伪码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bagging-伪码"><span class="toc-number">5.2.</span> <span class="toc-text">Bagging 伪码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stacking-伪码"><span class="toc-number">5.3.</span> <span class="toc-text">Stacking 伪码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#算法例子"><span class="toc-number">6.</span> <span class="toc-text">算法例子</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#AdaBoost-例子"><span class="toc-number">6.1.</span> <span class="toc-text">AdaBoost 例子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#经典题目"><span class="toc-number">7.</span> <span class="toc-text">经典题目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#算法总结"><span class="toc-number">8.</span> <span class="toc-text">算法总结</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/machine-learning/2018-10-24-boosting/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/machine-learning/2018-10-24-boosting/&text=Boosting 推导"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/machine-learning/2018-10-24-boosting/&title=Boosting 推导"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/machine-learning/2018-10-24-boosting/&is_video=false&description=Boosting 推导"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Boosting 推导&body=Check out this article: http://koon.cool/machine-learning/2018-10-24-boosting/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/machine-learning/2018-10-24-boosting/&title=Boosting 推导"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/machine-learning/2018-10-24-boosting/&title=Boosting 推导"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/machine-learning/2018-10-24-boosting/&title=Boosting 推导"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/machine-learning/2018-10-24-boosting/&title=Boosting 推导"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/machine-learning/2018-10-24-boosting/&name=Boosting 推导&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

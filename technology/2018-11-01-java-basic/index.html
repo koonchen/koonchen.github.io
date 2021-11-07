@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="这里我简单记录我认为比较重要的点。 1. 基本概念1.1 “Java 语言中的方法属于类中的成员” 为什么不对？类成员需要是静态的，而方法可能是静态方法，也可能是非静态方法。静态方法是类成员，非静态方法是实例成员。 1.2 什么是反射机制？反射机制允许程序在运行时进行自我检查，同时也允许对其内部的成员进行操作，反射的主要功能有：得到一个对象所属的类；获取一个类的所有成员变量和方法；在运行时创建对象">
+<meta name="keywords" content="java,面试宝典">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 基础常见问题">
+<meta property="og:url" content="http://koon.cool/technology/2018-11-01-java-basic/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="这里我简单记录我认为比较重要的点。 1. 基本概念1.1 “Java 语言中的方法属于类中的成员” 为什么不对？类成员需要是静态的，而方法可能是静态方法，也可能是非静态方法。静态方法是类成员，非静态方法是实例成员。 1.2 什么是反射机制？反射机制允许程序在运行时进行自我检查，同时也允许对其内部的成员进行操作，反射的主要功能有：得到一个对象所属的类；获取一个类的所有成员变量和方法；在运行时创建对象">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 基础常见问题">
+<meta name="twitter:description" content="这里我简单记录我认为比较重要的点。 1. 基本概念1.1 “Java 语言中的方法属于类中的成员” 为什么不对？类成员需要是静态的，而方法可能是静态方法，也可能是非静态方法。静态方法是类成员，非静态方法是实例成员。 1.2 什么是反射机制？反射机制允许程序在运行时进行自我检查，同时也允许对其内部的成员进行操作，反射的主要功能有：得到一个对象所属的类；获取一个类的所有成员变量和方法；在运行时创建对象">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>Java 基础常见问题</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/note/2018-11-08-tiny-spring-notes/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/technology/2018-10-29-mybatis-summary/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-11-01-java-basic/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-11-01-java-basic/&text=Java 基础常见问题"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-11-01-java-basic/&title=Java 基础常见问题"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-11-01-java-basic/&is_video=false&description=Java 基础常见问题"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java 基础常见问题&body=Check out this article: http://koon.cool/technology/2018-11-01-java-basic/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-11-01-java-basic/&title=Java 基础常见问题"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-11-01-java-basic/&title=Java 基础常见问题"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-11-01-java-basic/&title=Java 基础常见问题"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-11-01-java-basic/&title=Java 基础常见问题"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-11-01-java-basic/&name=Java 基础常见问题&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-基本概念"><span class="toc-number">1.</span> <span class="toc-text">1. 基本概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-“Java-语言中的方法属于类中的成员”-为什么不对？"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 “Java 语言中的方法属于类中的成员” 为什么不对？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-什么是反射机制？"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 什么是反射机制？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-Java-如何实现函数指针？"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 Java 如何实现函数指针？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-面向对象技术"><span class="toc-number">2.</span> <span class="toc-text">2. 面向对象技术</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-面向对象与面向过程的区别？"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 面向对象与面向过程的区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-面向对象的特征？"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 面向对象的特征？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-多态的两种实现机制？"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 多态的两种实现机制？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-抽象类和接口的区别？"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 抽象类和接口的区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-内部类有哪些？"><span class="toc-number">2.5.</span> <span class="toc-text">2.5 内部类有哪些？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-如何获取父类的类名？"><span class="toc-number">2.6.</span> <span class="toc-text">2.6 如何获取父类的类名？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-关键字"><span class="toc-number">3.</span> <span class="toc-text">3. 关键字</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-final-、-finally-、-finalize-的区别？"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 final 、 finally 、 finalize 的区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-static-有什么作用？"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 static 有什么作用？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-volatile-有什么作用？"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 volatile 有什么作用？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-strictfp-有什么作用？"><span class="toc-number">3.4.</span> <span class="toc-text">3.4 strictfp 有什么作用？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-基本类型与运算"><span class="toc-number">4.</span> <span class="toc-text">4. 基本类型与运算</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-什么是不可变类？"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 什么是不可变类？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-强制转换的注意事项？"><span class="toc-number">4.2.</span> <span class="toc-text">4.2 强制转换的注意事项？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-字符串与数组"><span class="toc-number">5.</span> <span class="toc-text">5. 字符串与数组</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-字符串创建与存储的机制是什么？"><span class="toc-number">5.1.</span> <span class="toc-text">5.1 字符串创建与存储的机制是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-String-、-StringBuffer-、-StringBuilder-、-StringTokenizer-有什么区别？"><span class="toc-number">5.2.</span> <span class="toc-text">5.2 String 、 StringBuffer 、 StringBuilder 、 StringTokenizer 有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-Java-中数组是不是对象？"><span class="toc-number">5.3.</span> <span class="toc-text">5.3 Java 中数组是不是对象？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-数组的初始化方式？"><span class="toc-number">5.4.</span> <span class="toc-text">5.4 数组的初始化方式？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-length-、-length-、-size-的使用？"><span class="toc-number">5.5.</span> <span class="toc-text">5.5 length 、 length() 、 size() 的使用？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-异常处理"><span class="toc-number">6.</span> <span class="toc-text">6. 异常处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-finally-块里的代码什么时候执行？"><span class="toc-number">6.1.</span> <span class="toc-text">6.1 finally 块里的代码什么时候执行？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-运行时异常和普通异常的区别？"><span class="toc-number">6.2.</span> <span class="toc-text">6.2 运行时异常和普通异常的区别？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-输入输出流"><span class="toc-number">7.</span> <span class="toc-text">7. 输入输出流</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-Java-Socket-是什么？"><span class="toc-number">7.1.</span> <span class="toc-text">7.1 Java Socket 是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-NIO-是什么？"><span class="toc-number">7.2.</span> <span class="toc-text">7.2 NIO 是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-3-什么是-Java-序列化？"><span class="toc-number">7.3.</span> <span class="toc-text">7.3 什么是 Java 序列化？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-内存管理"><span class="toc-number">8.</span> <span class="toc-text">8. 内存管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-JVM-是怎么加载-class-的？"><span class="toc-number">8.1.</span> <span class="toc-text">8.1 JVM 是怎么加载 class 的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-什么是-GC-？"><span class="toc-number">8.2.</span> <span class="toc-text">8.2 什么是 GC ？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-Java-中是否存在内存泄露？"><span class="toc-number">8.3.</span> <span class="toc-text">8.3 Java 中是否存在内存泄露？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-4-Java-中的堆和栈有什么区别？"><span class="toc-number">8.4.</span> <span class="toc-text">8.4 Java 中的堆和栈有什么区别？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-容器"><span class="toc-number">9.</span> <span class="toc-text">9. 容器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-1-什么是迭代器？"><span class="toc-number">9.1.</span> <span class="toc-text">9.1 什么是迭代器？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-ArrayList-、Vector-、LinkedList-有什么区别？"><span class="toc-number">9.2.</span> <span class="toc-text">9.2 ArrayList 、Vector 、LinkedList 有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-HashMap-、HashTable-、TreeMap-、WeakHashMap-有什么区别？"><span class="toc-number">9.3.</span> <span class="toc-text">9.3 HashMap 、HashTable 、TreeMap 、WeakHashMap 有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-4-把自定义的类作为-HashMap-的-key-需要注意什么？"><span class="toc-number">9.4.</span> <span class="toc-text">9.4 把自定义的类作为 HashMap 的 key 需要注意什么？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-多线程"><span class="toc-number">10.</span> <span class="toc-text">10. 多线程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-如果实现-Java-的多线程？"><span class="toc-number">10.1.</span> <span class="toc-text">10.1 如果实现 Java 的多线程？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-run-方法和-start-方法有什么区别？"><span class="toc-number">10.2.</span> <span class="toc-text">10.2 run() 方法和 start() 方法有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-3-多线程同步的实现方法有哪些？"><span class="toc-number">10.3.</span> <span class="toc-text">10.3 多线程同步的实现方法有哪些？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-4-sleep-和-wait-有什么区别？"><span class="toc-number">10.4.</span> <span class="toc-text">10.4 sleep() 和 wait() 有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-5-终止线程的方法有哪些？"><span class="toc-number">10.5.</span> <span class="toc-text">10.5 终止线程的方法有哪些？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-6-sychronized-与-Lock-有什么异同？"><span class="toc-number">10.6.</span> <span class="toc-text">10.6 sychronized 与 Lock 有什么异同？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-7-什么是守护线程？"><span class="toc-number">10.7.</span> <span class="toc-text">10.7 什么是守护线程？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-8-join-方法的作用是什么？"><span class="toc-number">10.8.</span> <span class="toc-text">10.8 join() 方法的作用是什么？</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Java 基础常见问题
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-10-31T16:00:00.000Z" itemprop="datePublished">2018-11-01</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/java/">java</a>, <a class="tag-link" href="/tags/面试宝典/">面试宝典</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <p>这里我简单记录我认为比较重要的点。</p>
+<h2 id="1-基本概念"><a href="#1-基本概念" class="headerlink" title="1. 基本概念"></a>1. 基本概念</h2><h3 id="1-1-“Java-语言中的方法属于类中的成员”-为什么不对？"><a href="#1-1-“Java-语言中的方法属于类中的成员”-为什么不对？" class="headerlink" title="1.1 “Java 语言中的方法属于类中的成员” 为什么不对？"></a>1.1 “<code>Java</code> 语言中的方法属于类中的成员” 为什么不对？</h3><p>类成员需要是静态的，而方法可能是静态方法，也可能是非静态方法。静态方法是类成员，非静态方法是实例成员。</p>
+<h3 id="1-2-什么是反射机制？"><a href="#1-2-什么是反射机制？" class="headerlink" title="1.2 什么是反射机制？"></a>1.2 什么是反射机制？</h3><p>反射机制允许程序在运行时进行自我检查，同时也允许对其内部的成员进行操作，反射的主要功能有：得到一个对象所属的类；获取一个类的所有成员变量和方法；在运行时创建对象；在运行时创建对象的方法。</p>
+<h3 id="1-3-Java-如何实现函数指针？"><a href="#1-3-Java-如何实现函数指针？" class="headerlink" title="1.3 Java 如何实现函数指针？"></a>1.3 <code>Java</code> 如何实现函数指针？</h3><p><code>Java</code> 没有指针的概念，如何能让 <code>Java</code> 实现类似函数指针的功能？用接口作为函数的参数，把参数实现传进去进行调用即可。</p>
+<h2 id="2-面向对象技术"><a href="#2-面向对象技术" class="headerlink" title="2. 面向对象技术"></a>2. 面向对象技术</h2><h3 id="2-1-面向对象与面向过程的区别？"><a href="#2-1-面向对象与面向过程的区别？" class="headerlink" title="2.1 面向对象与面向过程的区别？"></a>2.1 面向对象与面向过程的区别？</h3><ul>
+<li>出发点不同，面向对象方法是用符合常规思维的方式来处理客观世界的问题，强调把问题域的要领直接映射到对象及对象之间的接口上；面向对象强调是过程的抽象化和模块化。</li>
+<li>层级逻辑关系不同，面向对象方法则是用计算机逻辑来模拟客观世界的物理存在，以对象的集合类作为处理问题的基本单元；而面向过程的基本单元是能清晰表达过程的模块，用模块的层次结构概括模块或模块间的关系或功能。</li>
+<li>数据处理方式与控制程序方式不同，面向对象将数据和对应的代码封装成一个整体，是“事件驱动”来激活和运行程序的；而面向过程是直接通过程序来处理数据，处理完毕即可显示处理结果，各个模块之间可能存在控制、被控制，调用、被调用的关系。</li>
+<li>分析代码与编码转换的方式不同，面向对象贯穿软件声明周期的分析、设计、编码，是一种平滑的过程，是一种无缝连接；面向过程强调分析、设计、编码之间按规则进行转换，是一种有缝的连接。</li>
+</ul>
+<h3 id="2-2-面向对象的特征？"><a href="#2-2-面向对象的特征？" class="headerlink" title="2.2 面向对象的特征？"></a>2.2 面向对象的特征？</h3><p>这是一个老生常谈的问题：抽象、继承、封装、多态。</p>
+<ul>
+<li>抽象：忽略一个主题中与当前目标无关的部分。最直接的就是 <code>abstract</code> 类。</li>
+<li>继承：联结类的一种层次模型，允许和鼓励类的重用，它提供了一种明确的表述共性的方法。</li>
+<li>封装：将客观事物抽象成类，每个类对自身的数据和方法实行保护。</li>
+<li><p>多态：允许不同类的对象那个对同一消息进行响应。</p>
+<h3 id="2-3-多态的两种实现机制？"><a href="#2-3-多态的两种实现机制？" class="headerlink" title="2.3 多态的两种实现机制？"></a>2.3 多态的两种实现机制？</h3></li>
+</ul>
+<p>多态是面向对象中一个重要机制，它表示当同一个操作在不同的类的对象中具有不同的语义，主要有两种不同的表现方式：</p>
+<ul>
+<li>重载 <code>overload</code> ：同一个类中有多个同名的方法。 <strong>不能通过访问权限来区分，这样会报错，如果基类是 <code>private</code> 那么派生类中的同名方法不是重载，而是一个新的方法。</strong></li>
+<li>覆盖 <code>override</code> ：子类覆盖父类中的方法。 <strong>覆盖的方法不能是 <code>private</code> ，异常抛出也要是一致的，同时如果要覆盖的方法被定义为 <code>final</code> 与 <code>native</code> 那么也是不能覆盖的。</strong></li>
+</ul>
+<h3 id="2-4-抽象类和接口的区别？"><a href="#2-4-抽象类和接口的区别？" class="headerlink" title="2.4 抽象类和接口的区别？"></a>2.4 抽象类和接口的区别？</h3><ul>
+<li>它们都不能被实例化。</li>
+<li>接口的实现类和抽象类的子类都只有实现了方法后才能被实例化。</li>
+<li>接口中只有定义，其方法不能在接口中实现，抽象类有定义与实现。</li>
+<li>接口被实现 <code>implements</code> ，抽象类被继承 <code>extends</code> 。</li>
+<li>接口强调特定功能的实现，理念是 “has - a” 关系；抽象类强调所属广西，理念是 “is - a” 关系。</li>
+<li>接口中默认的成员变量是 <code>public static final</code> ，其所有成员变量都是 <code>public</code> 、 <code>abstract</code> 的，并且只能被这两个关键字修饰；而抽象类中可以有自己的数据成员变量。 <strong>当功能需要累计时，用抽象类；不需要累计时，用接口。</strong></li>
+<li>接口被运用到实际中比较偏向常用的功能；抽象类更倾向于充当公共类的角色。</li>
+</ul>
+<h3 id="2-5-内部类有哪些？"><a href="#2-5-内部类有哪些？" class="headerlink" title="2.5 内部类有哪些？"></a>2.5 内部类有哪些？</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">outerClass</span> </span>&#123;</span><br><span class="line">  <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">innerClass</span></span>&#123;&#125; <span class="comment">// 静态内部类</span></span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">innerClass2</span></span>&#123;&#125; <span class="comment">// 成员内部类</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">memberFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">innerClass</span></span>&#123;&#125; <span class="comment">// 局部内部类</span></span><br><span class="line">    addWindowListener(<span class="keyword">new</span> WindowAdapter() &#123; <span class="comment">// 匿名内部类</span></span><br><span class="line">      ...</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>静态内部类：带有 <code>static</code> 的内部类，<strong>它可以不依赖于外部类实例而被实例化</strong>，静态内部类不能与外部类有相同的名字，<strong>不能访问外部类的普通成员变量，只能访问外部类中的静态成员和静态方法（包括私有类型）</strong>。</li>
+<li>成员内部类：去掉 <code>static</code> 关键字的静态内部类，<strong>它可以自由地引用外部类的属性和方法，它与一个实例绑定在一起，不可以定义静态的属性和方法</strong>。</li>
+<li>局部内部类：作用域是这个代码块，不能是 <code>public</code> 、 <code>protected</code> 、 <code>private</code> 、 <code>static</code> 的，<strong>只能访问方法中定义为 <code>final</code> 类型的局部变量</strong>。把静态内部类的 <code>static</code> 去掉，将其定义放入外部类的静态方法或静态初始化代码段就成为了<strong>局部静态内部类</strong>，特性和静态内部类相似；把成员内部类的定义放入外部类的实例方法或实例初始化代码段中就成为了<strong>局部内部类</strong>，特性和成员内部类相似。</li>
+<li>匿名内部类：它必须继承其他类或者其他接口，不能有构造函数，不能有静态成员、方法、类，不能是 <code>public</code> 、 <code>protected</code> 、 <code>private</code> 、 <code>static</code> 的，只能创建匿名内部类的一个实例。</li>
+</ul>
+<h3 id="2-6-如何获取父类的类名？"><a href="#2-6-如何获取父类的类名？" class="headerlink" title="2.6 如何获取父类的类名？"></a>2.6 如何获取父类的类名？</h3><p>这个问题之所以提出来是因为我们前面说过覆盖的要求， <code>Object</code> 的 <code>getClass</code> 方法是 <code>final</code> 与 <code>native</code> 的，它返回的是运行时态，所以下面的结果是一样的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> <span class="keyword">extends</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    System.out.println(<span class="keyword">super</span>.getClass().getName()); <span class="comment">// 与下面的结果相同</span></span><br><span class="line">    System.out.println(<span class="keyword">this</span>.getClass().getName()); <span class="comment">// 结果相同，都是输出 Test</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-关键字"><a href="#3-关键字" class="headerlink" title="3. 关键字"></a>3. 关键字</h2><h3 id="3-1-final-、-finally-、-finalize-的区别？"><a href="#3-1-final-、-finally-、-finalize-的区别？" class="headerlink" title="3.1 final 、 finally 、 finalize 的区别？"></a>3.1 <code>final</code> 、 <code>finally</code> 、 <code>finalize</code> 的区别？</h3><ul>
+<li><code>final</code> : 它指的是不可变性，即它只能指向初始化时指向的那个对象，而不关心指向对象内容的变化。<strong>当 <code>final</code> 是方法的时候，不允许任何子类重写这个方法，但可以使用</strong>。<strong>当 <code>final</code> 是参数的时候，不允许修改</strong>。<strong>当 <code>final</code> 是类的时候，不能被继承，所有方法都不能被重写</strong>。<strong>一个方法不能既被定义为 <code>abstract</code>  ，又被定义成 <code>final</code></strong> 。</li>
+<li><code>finally</code> : 作为异常处理的一部分，表示最终一定被执行。</li>
+<li><code>finalize</code> : 是 <code>Object</code> 的一个方法，在垃圾回收器执行时调用被回收对象的 <code>finalize</code> 方法，可以覆盖该方法实现对其他资源的回收，比如关闭文件等。</li>
+</ul>
+<blockquote>
+<p><code>java</code> 中不能被集成的类是那些被 <code>final</code> 关键字修饰的类，比如 <code>String</code> 、 <code>StringBuffer</code> 等。</p>
+</blockquote>
+<h3 id="3-2-static-有什么作用？"><a href="#3-2-static-有什么作用？" class="headerlink" title="3.2 static 有什么作用？"></a>3.2 <code>static</code> 有什么作用？</h3><p>为某特定数据类型或对象分配单一的存储空间；实现某个方法或属性与类相关联，而不是对象。</p>
+<ul>
+<li><code>static</code> 成员变量： <code>static</code> 变量在内存中只有一个复制，所有实例都指向同一个内存地址，静态变量可以通过 <code>类.静态变量</code> 和 <code>对象.静态变量</code> 的方式引用。</li>
+<li><code>static</code> 成员方法： <code>static</code> 方法是类的方法，只能访问所属类的静态成员变量和成员方法，不能使用 <code>this</code> 和 <code>super</code> 关键字，不能调用非 <code>static</code> 方法以及变量，<strong>一个很重要的用途是实现单例模式</strong>。</li>
+<li><code>static</code> 代码块：独立于成员变量和成员函数的代码块，它不在任何一个方法体内， <code>JVM</code> 在加载类时会执行 <code>static</code> 代码块，<strong>如果有多个代码块，会顺序执行，它们只执行一次</strong>。</li>
+<li><code>static</code> 内部类：就是静态内部类，它可以不依赖于外部类实例对象而被实例化，<strong>不能访问外部类的普通成员变量，只能访问外部类的静态成员和静态方法</strong>。</li>
+</ul>
+<h3 id="3-3-volatile-有什么作用？"><a href="#3-3-volatile-有什么作用？" class="headerlink" title="3.3 volatile 有什么作用？"></a>3.3 <code>volatile</code> 有什么作用？</h3><p>在使用 <code>volatile</code> 修饰成员变量以后，所有线程在任何时候看到的变量的值都是相同的。 <code>volatile</code> 不能保证操作的原子性，一般情况下，不能替代 <code>sychronized</code> ，另外，它会阻止编译器对代码的优化，因此会降低程序的执行效率，除非迫不得已，不要使用 <code>volatile</code> 。</p>
+<h3 id="3-4-strictfp-有什么作用？"><a href="#3-4-strictfp-有什么作用？" class="headerlink" title="3.4 strictfp 有什么作用？"></a>3.4 <code>strictfp</code> 有什么作用？</h3><p>精确计算浮点数运算，当一个类被 <code>strictfp</code> 修饰，所有方法都被被动地加上 <code>strictfp</code> ，并且在不同的硬件上会有一致的运行结果。</p>
+<h2 id="4-基本类型与运算"><a href="#4-基本类型与运算" class="headerlink" title="4. 基本类型与运算"></a>4. 基本类型与运算</h2><h3 id="4-1-什么是不可变类？"><a href="#4-1-什么是不可变类？" class="headerlink" title="4.1 什么是不可变类？"></a>4.1 什么是不可变类？</h3><p>这指的是当创建了这个类的实例以后，我们不能修改它的值，也就是说，一旦对象创建，它的成员变量不能被修改，只允许别的程序来读，但是不能进行修改。</p>
+<p>如果一个类成员不是不可变量，那么在成员初始化或者使用 <code>get</code> 方法获取该成员变量的时候，可以通过 <code>clone</code> 方法来确保类的不可变性。</p>
+<p>比如下面的赋值一个是正确的，一个是错误的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ImmutableClass</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> Date d;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ImmutableClass</span> <span class="params">(Date d)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.d = d; <span class="comment">// 这是不正确的，现在的 d 是一个引用，外部修改它也会修改</span></span><br><span class="line">    <span class="keyword">this</span>.d = d.clone(); <span class="comment">// 这是正确的，现在已经取消了引用的关系</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="4-2-强制转换的注意事项？"><a href="#4-2-强制转换的注意事项？" class="headerlink" title="4.2 强制转换的注意事项？"></a>4.2 强制转换的注意事项？</h3><p><code>Java</code> 语言在涉及 <code>byte</code> 、 <code>short</code> 、 <code>char</code> 运算的时候，首先会先将这些变量强制转换为 <code>int</code> ，然后对 <code>int</code> 进行运算，最后会的值也是 <code>int</code> 类型。</p>
+<p>所以两个 <code>short</code> 相加、两个 <code>byte</code> 相加，最后得到的都是一个 <code>int</code> 类型的值。下面的代码会报错：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">short</span> s1 = <span class="number">1</span>;</span><br><span class="line">s1 = s1 + <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>正确的写法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">short</span> s1 = <span class="number">1</span>;</span><br><span class="line">s1 = (<span class="keyword">short</span>)(s1 + <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>值得注意的是，有些符号 <code>Java</code> 编译器会进行特殊处理，下面是正确的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">short</span> s1 = <span class="number">1</span>;</span><br><span class="line">s1 += <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="5-字符串与数组"><a href="#5-字符串与数组" class="headerlink" title="5. 字符串与数组"></a>5. 字符串与数组</h2><h3 id="5-1-字符串创建与存储的机制是什么？"><a href="#5-1-字符串创建与存储的机制是什么？" class="headerlink" title="5.1 字符串创建与存储的机制是什么？"></a>5.1 字符串创建与存储的机制是什么？</h3><p>对于下面的语句：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String s1 = <span class="string">"abc"</span>;</span><br><span class="line">String t1 = <span class="string">"abc"</span>;</span><br></pre></td></tr></table></figure>
+<p>这段语句是将字符串<code>s1</code> 赋值， <code>abc</code> 放到常量区中，如果这个时候创建一个新的字符串 <code>t1</code> 也是这样 <code>abc</code> ，那么 <code>s1</code> 和 <code>t1</code> 都将指向常量区中的 <code>abc</code> ，同一块内存地址。</p>
+<p>对于下面的语句：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">String s2 = <span class="keyword">new</span> String(<span class="string">"abc"</span>);</span><br></pre></td></tr></table></figure>
+<p>它的操作等价于两个部分： <code>abc</code> 和 <code>new String()</code> 。这两个操作，若在字符串池中没有 <code>abc</code> ，那么先创建一个 <code>abc</code> ，然后进行 <code>new String()</code> 在<strong>堆内存</strong>中创建一个新的对象，注意一点这里的 <code>s1</code> 、 <code>t1</code> 、 <code>s2</code> 都是栈空间里的内容。</p>
+<h3 id="5-2-String-、-StringBuffer-、-StringBuilder-、-StringTokenizer-有什么区别？"><a href="#5-2-String-、-StringBuffer-、-StringBuilder-、-StringTokenizer-有什么区别？" class="headerlink" title="5.2 String 、 StringBuffer 、 StringBuilder 、 StringTokenizer 有什么区别？"></a>5.2 <code>String</code> 、 <code>StringBuffer</code> 、 <code>StringBuilder</code> 、 <code>StringTokenizer</code> 有什么区别？</h3><p>这个问题非常好，我确实不知道。</p>
+<p><code>String</code> 和 <code>StringBuffer</code> 的区别在于当实例化 <code>String</code> 的时候，可以利用构造函数或者赋值的方式来进行初始化，但是 <code>StringBuffer</code> 只能使用构造函数的方式来进行初始化。</p>
+<p><code>String</code> 的初始化其实是有中间步骤的，比如下面的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String s = <span class="string">"Hello"</span>;</span><br><span class="line">s += <span class="string">"World"</span>;</span><br></pre></td></tr></table></figure>
+<p>它等价于以下代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">String s = <span class="string">"Hello"</span>;</span><br><span class="line"><span class="comment">// 下面是等价代码</span></span><br><span class="line">StringBuffer sb = <span class="keyword">new</span> StringBuffer(s);</span><br><span class="line">s.append(<span class="string">"world"</span>);</span><br><span class="line">s = sb.toString();</span><br></pre></td></tr></table></figure>
+<p>所以说修改多的话，建议使用 <code>StringBuffer</code> 。</p>
+<p>而 <code>StringBuilder</code> 是单线程的，线程不安全，如果操作的数据量小，应优先使用 <code>String</code> ，如果单线程大量数据，应该使用 <code>StringBuilder</code> ，当多个线程访问，应该使用 <code>StringBuilder</code> 。</p>
+<p>而最后的 <code>StringTokenizer</code> 是用来分割字符串的工具。</p>
+<h3 id="5-3-Java-中数组是不是对象？"><a href="#5-3-Java-中数组是不是对象？" class="headerlink" title="5.3 Java 中数组是不是对象？"></a>5.3 <code>Java</code> 中数组是不是对象？</h3><p>在 <code>Java</code> 中数据不仅有自己的属性，还拥有一些方法可以被调用，对象的特点是封装了一些数据，同时提供了一些属性和方法，从这个角度看，数组是对象。</p>
+<h3 id="5-4-数组的初始化方式？"><a href="#5-4-数组的初始化方式？" class="headerlink" title="5.4 数组的初始化方式？"></a>5.4 数组的初始化方式？</h3><p>这个问题还是很重要的，确实五花八门！</p>
+<p>与 <code>C++</code> 不同在于， <code>Java</code> 在创建数组的时候回根据数据类型进行初始化，并且不会给数组元素分配存储空间，因此我们需要为其设置长度：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">arrayName = <span class="keyword">new</span> type[arraySize];</span><br></pre></td></tr></table></figure>
+<p>二维数组的创建有三种声明方式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">type arrayName[][];</span><br><span class="line">type[][] arrayName;</span><br><span class="line">type[] arrayName[];</span><br></pre></td></tr></table></figure>
+<p><strong>在 <code>Java</code> 中二维数组的第二维的长度可以不同</strong>。</p>
+<p><strong>数组是对象不是原生类</strong>。</p>
+<h3 id="5-5-length-、-length-、-size-的使用？"><a href="#5-5-length-、-length-、-size-的使用？" class="headerlink" title="5.5 length 、 length() 、 size() 的使用？"></a>5.5 <code>length</code> 、 <code>length()</code> 、 <code>size()</code> 的使用？</h3><p>数组提供了 <code>length</code> 属性来获取数组的长度。</p>
+<p>字符串提供了 <code>length()</code> 方法来计算字符串的长度。</p>
+<p><code>size()</code> 方法是针对泛型集合而言的，用于查看泛型中有多少个元素。</p>
+<h2 id="6-异常处理"><a href="#6-异常处理" class="headerlink" title="6. 异常处理"></a>6. 异常处理</h2><h3 id="6-1-finally-块里的代码什么时候执行？"><a href="#6-1-finally-块里的代码什么时候执行？" class="headerlink" title="6.1 finally 块里的代码什么时候执行？"></a>6.1 <code>finally</code> 块里的代码什么时候执行？</h3><p>如果 <code>try</code> 里面有 <code>return</code> 我们的 <code>finally</code> 还执行吗？什么时候执行？</p>
+<p>任何代码都要在 <code>return</code> 前执行，因此 <code>finally</code> 里的代码也会在 <code>return</code> 前执行，如果说现在 <code>try-finally</code> 和 <code>catch-finally</code> 里都有 <code>return</code> 那么 <code>finally</code> 里的 <code>return</code> 会覆盖别处的 <code>return</code> 语句。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">testFinally</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      System.out.println(<span class="string">"execute finally"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> result = testFinally();</span><br><span class="line">    System.out.println(result);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行的结果是：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">execute finally</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
+<p><strong>可以发现，我们的执行是先进行了 <code>finally</code> 里的操作，然后执行 <code>try</code> 里的 <code>return</code> 操作。</strong></p>
+<p>而如果说我们在 <code>finally</code> 里设置了 <code>return</code> 那么：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">testFinally</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span>(Exception e) &#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      System.out.println(<span class="string">"execute finally"</span>);</span><br><span class="line">      <span class="keyword">return</span> <span class="number">3</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> result = testFinally();</span><br><span class="line">    System.out.println(result);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果是：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">execute finally</span><br><span class="line">3</span><br></pre></td></tr></table></figure>
+<p><strong>可以发现，现在，<code>finally</code> 里的 <code>return</code> 替换了之前的 <code>return</code> 。</strong></p>
+<p>而事实上，它做的操作是什么顺序呢？先 <code>finally</code> 再 <code>try</code> ？</p>
+<p><strong>事实上，程序在执行 <code>try</code> 里的 <code>return</code> 时，会先将返回值存储到一个指定的地址，然后执行 <code>finally</code> ，最后再返回结果。因此，如果返回值是基本类型，那么再在 <code>finally</code> 修改已经没用了，而如果返回是引用类型，那么再在 <code>finally</code> 里修改是可以直接修改到目标内容的。</strong></p>
+<p>什么情况下不会执行 <code>finally</code> 带代码：</p>
+<ol>
+<li>在 <code>try</code> 以前就报错了，嗨呀大兄弟，长点心吧。</li>
+<li>使用 <code>System.exit(0)</code> 强制退出。</li>
+</ol>
+<h3 id="6-2-运行时异常和普通异常的区别？"><a href="#6-2-运行时异常和普通异常的区别？" class="headerlink" title="6.2 运行时异常和普通异常的区别？"></a>6.2 运行时异常和普通异常的区别？</h3><p><code>Java</code> 有两种错误的异常类： <code>Error</code> 和 <code>Exception</code> 。他们有共同的父类：<code>Throwable</code> 。</p>
+<p><code>Error</code> 是严重的错误，多是由于逻辑错误导致的，编译器不会检查，一旦发生，<code>JVM</code> 会终止线程。</p>
+<p><code>Exception</code> 是可以恢复的异常，是编译器可以捕捉的，它有两种类型：<strong>检查异常</strong>和<strong>运行异常</strong>。</p>
+<p>检查异常：<strong>编译器强制对其进行捕捉并处理。</strong>所有继承自 <code>Exception</code> 且不是运行时异常的异常都是检查异常，最常见的有 IO 异常和 SQL 异常，这些异常都发生在便一阶段，只需要放到 <code>try</code> 中，异常处理放到 <code>catch</code> 中即可。</p>
+<p>运行时异常：<strong>编译器没有强制对其进行捕捉并处理。</strong>如果出现，会由 <code>JVM</code> 来处理，出现会向上层抛出，直到遇到处理代码，多线程会直到 <code>Thread.run()</code> 单线程直到 <code>main()</code> ，到了这里，线程退出或者主线程退出。</p>
+<p>PS: <code>Java</code> 的异常捕获有多态的概念，是应该先捕获子类，然后捕获基类，否则，子类捕获不会执行。</p>
+<h2 id="7-输入输出流"><a href="#7-输入输出流" class="headerlink" title="7. 输入输出流"></a>7. 输入输出流</h2><h3 id="7-1-Java-Socket-是什么？"><a href="#7-1-Java-Socket-是什么？" class="headerlink" title="7.1 Java Socket 是什么？"></a>7.1 <code>Java Socket</code> 是什么？</h3><p>基于 <code>TCP</code> 的通信过程如下：</p>
+<ol>
+<li>首先，<code>Server</code> 端监听指定的某个端口是否有连接请求；</li>
+<li>其次，<code>Client</code> 端向 <code>Server</code> 端发送 <code>Connect</code> 请求；</li>
+<li>最后，<code>Server</code> 端向 <code>Client</code> 发送 <code>Accept</code> 消息，一个连接就建立起来了。</li>
+</ol>
+<h3 id="7-2-NIO-是什么？"><a href="#7-2-NIO-是什么？" class="headerlink" title="7.2 NIO 是什么？"></a>7.2 <code>NIO</code> 是什么？</h3><p>非阻塞 <code>IO</code> 通过 <code>Selector</code> 、 <code>Channel</code> 、 <code>Buffer</code> 来实现非阻塞的 <code>IO</code> 操作，具体使用一个线程来管理多个通道，轮询处理多线程的请求，保存的是 <code>SelectionKey</code> 和 <code>Channel</code> 之间的关系，这种轮询在处理多线程请求的时候不需要上下文切换。</p>
+<p>在处理大量并发请求的时候，使用 <code>NIO</code> 比使用 <code>Socket</code> 效率要高很多。</p>
+<h3 id="7-3-什么是-Java-序列化？"><a href="#7-3-什么是-Java-序列化？" class="headerlink" title="7.3 什么是 Java 序列化？"></a>7.3 什么是 <code>Java</code> 序列化？</h3><p>对象持久化有的方式分为序列化和外部序列化。</p>
+<ul>
+<li>序列化</li>
+</ul>
+<p>将对象以一连串的字节描述的过程，用于解决在对对象流进行读写操作时所引发的问题。所有要实现序列化的类都必须实现 <code>Serializable</code> 接口，它没有包含任何方法，使用一个输出流来构造一个 <code>ObjectOutputStream</code> 对象，紧接着，使用该对象的 <code>writeObject</code> 方法将对象写出，要恢复可以使用其对应的输入流。</p>
+<p>值得注意的有两点：</p>
+<blockquote>
+<ol>
+<li>如果一个类能被序列化，那么它的子类也可以被序列化。</li>
+<li><code>static</code> 和 <code>transient</code> 这两种类型的数据成员不能被序列化。</li>
+</ol>
+</blockquote>
+<p>序列化会影响系统的性能，什么情况下需要使用序列化？</p>
+<blockquote>
+<ol>
+<li>需要通过网络来发送对象，或对象的状态需要被持久化到数据库或者文件中。</li>
+<li>序列化能实现深赋值，即可以复制引用的对象。</li>
+</ol>
+</blockquote>
+<p>与序列化相对的是反序列化，它将流转换成对象。每个类都有一个特定的 <code>serialVersionUID</code> ，在反序列化的过程中，通过 <code>serialVersionUID</code> 来判定类的兼容性，而显式声明 <code>serialVersionUID</code> 有以下 3 个优点：</p>
+<ol>
+<li>提高程序的运行效率。省去了计算的过程。</li>
+<li>提高程序在不同平台上的兼容性。因为大家的计算方式不同。</li>
+<li>增强各个版本的兼容性。因为后期该 <code>ID</code> 可能会出现变化。</li>
+</ol>
+<ul>
+<li>外部序列化</li>
+</ul>
+<p>外部序列化与序列化主要叙别在于序列化是内置的 <code>API</code> ，而外部序列化需要继承 <code>Serializable</code> 接口，其中的读写方法需要自己实现。</p>
+<p>如果我们想对一个类中的部分属性进行序列化，可以这么做：</p>
+<ol>
+<li>实现继承自 <code>Serializable</code> 的接口的新的接口的方法，根据实际情况来控制需要序列化的属性。</li>
+<li>使用关键字 <code>transient</code> 来控制序列化的属性，被该关键字修饰的属性是临时的，不会被序列化。</li>
+</ol>
+<h2 id="8-内存管理"><a href="#8-内存管理" class="headerlink" title="8. 内存管理"></a>8. 内存管理</h2><h3 id="8-1-JVM-是怎么加载-class-的？"><a href="#8-1-JVM-是怎么加载-class-的？" class="headerlink" title="8.1 JVM 是怎么加载 class 的？"></a>8.1 <code>JVM</code> 是怎么加载 <code>class</code> 的？</h3><p>类 <code>class</code> 被加载到 <code>JVM</code> 中才能运行，<code>JVM</code> 会将编译成的 <code>.class</code> 文件按照需求和一定的规则加载到内存中。组织成为一个完整的 <code>Java</code> 应用。<strong>这个过程是使用类加载器来完成的，它本身也是一个类。实质就是从硬盘读取到内存中。</strong></p>
+<p>类的加载分为隐式和显式，其中隐式是 <code>new</code> ；显式是 <code>class.forName()</code> 。</p>
+<p>类的加载是动态的，它不会一次加载全部的类，只有在需要的时候进行加载。同理，只有部分类被修改的时候，只会重新编译变化的类，而不会重新编译所有文件，加快了编译速度。</p>
+<p><code>Java</code> 中 3 种不同的类的加载器，对应：系统类、扩展类、自定义类。它们使用委托的方式实现类的加载。当一个类在父类加载器中无法搜索，那么就用它的子类（加载器的子类）来加载。</p>
+<p>类的加载：</p>
+<blockquote>
+<ol>
+<li>装载。根据路径查询到相应的 <code>class</code> 文件，然后导入。</li>
+<li>链接：</li>
+</ol>
+<blockquote>
+<ol>
+<li>检查。检查加载 <code>class</code> 的正确性。</li>
+<li>准备。给类中的静态变量分配空间。</li>
+<li>解析。符号引用转换成直接引用。</li>
+</ol>
+</blockquote>
+<ol>
+<li>初始化。对静态变量和静态代码块执行初始化工作。</li>
+</ol>
+</blockquote>
+<h3 id="8-2-什么是-GC-？"><a href="#8-2-什么是-GC-？" class="headerlink" title="8.2 什么是 GC ？"></a>8.2 什么是 <code>GC</code> ？</h3><p>垃圾回收。回收程序中不再使用的内存。主要有以下三个任务：</p>
+<ol>
+<li>分配内存。</li>
+<li>确保被引用对象的内存不被错误地回收。</li>
+<li>回收不再被引用的对象的内存空间。</li>
+</ol>
+<p>但是垃圾回收有以下缺点：</p>
+<ol>
+<li>跟踪内存的使用情况。</li>
+<li>释放没用的对象。</li>
+<li>处理堆里的碎片。</li>
+</ol>
+<p>垃圾回收可以用有向图来表示，如果一个节点（对象）是不可达的，那么就是可以回收的。 <strong>追踪回收</strong></p>
+<p>把堆中活动的对象放到堆的一端中，这样堆的另外一端就留出了一块空闲，相当于对堆中的碎片进行了处理，但是这样会有性能损失。<strong>压缩回收</strong></p>
+<p>把堆分成两份，只在一份存放内容，如果满了，将活动的部分放到另外一份中。<strong>复制回收</strong></p>
+<p>把堆分成两个或多个子堆，每一堆都是一代，经过多次复制回收以后依然存活的对象升到高一级的堆中。<strong>按代回收</strong></p>
+<h3 id="8-3-Java-中是否存在内存泄露？"><a href="#8-3-Java-中是否存在内存泄露？" class="headerlink" title="8.3 Java 中是否存在内存泄露？"></a>8.3 <code>Java</code> 中是否存在内存泄露？</h3><p>首先我们需要知道的是，垃圾回收器帮我们做了什么，它回收有两个标准：</p>
+<ol>
+<li>对象赋予了 <code>null</code> ，以后再没有使用了。</li>
+<li>对象赋予了新值，重新分配了内存空间。</li>
+</ol>
+<p>内存泄露指下面两种情况：</p>
+<ol>
+<li>堆中申请的空间没有释放掉。</li>
+<li>对象已不再使用，但是仍然存在在内存中。</li>
+</ol>
+<p>我们可以发现这里内存泄露的第一种情况已经被 <code>GC</code> 的第二条解决了，剩下的是对象已经不再使用，但是仍然在内存中。</p>
+<p>内存泄露的情况：</p>
+<ol>
+<li>静态集合类。它们如果不释放，那么内部对象也无法释放。</li>
+<li>各种连接。不 <code>close()</code> 那么内部对象无法释放。</li>
+<li>监听器。同理，需要删除监听器。</li>
+<li>变量不合理的作用域。方法变量写到类中的情况。</li>
+<li>单例。或者说 <code>static</code> 对象对于类而言是一直存在的。</li>
+</ol>
+<h3 id="8-4-Java-中的堆和栈有什么区别？"><a href="#8-4-Java-中的堆和栈有什么区别？" class="headerlink" title="8.4 Java 中的堆和栈有什么区别？"></a>8.4 <code>Java</code> 中的堆和栈有什么区别？</h3><p>基本数据类型和引用变量在栈中。</p>
+<p>引用类型在堆中。</p>
+<p>堆空间的变量有 <code>GC</code> 来帮我们处理。</p>
+<h2 id="9-容器"><a href="#9-容器" class="headerlink" title="9. 容器"></a>9. 容器</h2><h3 id="9-1-什么是迭代器？"><a href="#9-1-什么是迭代器？" class="headerlink" title="9.1 什么是迭代器？"></a>9.1 什么是迭代器？</h3><p>迭代器是一个对象，它的工作是遍历并选择序列中的对象。</p>
+<ol>
+<li>使用 <code>iterator()</code> 将返回一个 <code>Iterator</code> ，然后通过使用 <code>next()</code> 来返回第一个元素。</li>
+<li>使用 <code>Iterator</code> 的 <code>hasNext()</code> 方法判断容器中是否还有元素，如果有，继续使用 <code>next()</code> 获取下一个元素。</li>
+<li>使用 <code>remove()</code> 来删除迭代器中的对象。</li>
+</ol>
+<p><code>ListIterator</code> 只存在在 <code>List</code> 中，支持在迭代过程中向 <code>List</code> 中添加或删除元素，并且可以在 <code>List</code> 中双向滚动。</p>
+<p>如果我们遇到 <code>ConcurrentModificationException</code> 异常，这通常是因为使用 <code>Iterator</code> 遍历容器的同时，对容器进行了修改，或者在多线程中，一个线程对容器进行了遍历，另外一个线程对容器进行了修改。</p>
+<p>我们在使用 <code>next()</code> 的时候，会比较变量 <code>expectedModCount</code> 和容器中的实际对象的个数 <code>modCount</code> 的值是否相等，如果不相等，就会出现 <code>ConcurrentModificationException</code> 异常。</p>
+<p>正确的做法应该是：</p>
+<blockquote>
+<p> 在遍历中把删除的对象放到一个集合中，等遍历结束以后调用 <code>removeAll()</code> 方法来删除，或者使用 <code>iter.remove()</code> 方法。</p>
+</blockquote>
+<p>在多线线程中，我们可以使用一些线程安全的容器：<code>ConcurrentHashMap</code> 和 <code>CopyOnWriteArrayList</code> ，或者使用 <code>synchronized</code> 代码块来存放容器的遍历操作。</p>
+<h3 id="9-2-ArrayList-、Vector-、LinkedList-有什么区别？"><a href="#9-2-ArrayList-、Vector-、LinkedList-有什么区别？" class="headerlink" title="9.2 ArrayList 、Vector 、LinkedList 有什么区别？"></a>9.2 <code>ArrayList</code> 、<code>Vector</code> 、<code>LinkedList</code> 有什么区别？</h3><p>它们都在 <code>java.util</code> 包下。</p>
+<p>其中 <code>ArrayList</code> 和 <code>Vector</code> 都适合访问，内存地址是连续的，但是前者默认扩充是原来的 1.5 倍，后者扩充是原来的 2 倍；前者是线程不安全的，后者是线程安全的。</p>
+<p>而 <code>LinkedList</code> 采用了双向链表来实现，适合修改。</p>
+<h3 id="9-3-HashMap-、HashTable-、TreeMap-、WeakHashMap-有什么区别？"><a href="#9-3-HashMap-、HashTable-、TreeMap-、WeakHashMap-有什么区别？" class="headerlink" title="9.3 HashMap 、HashTable 、TreeMap 、WeakHashMap 有什么区别？"></a>9.3 <code>HashMap</code> 、<code>HashTable</code> 、<code>TreeMap</code> 、<code>WeakHashMap</code> 有什么区别？</h3><ol>
+<li><code>HashMap</code> 是 <code>HashTable</code> 的轻量级实现，非线程安全的实现，<code>HashMap</code> 允许一条记录的 <code>key</code> 是 <code>null</code> 。</li>
+<li><code>HashTable</code> 是线程安全的，就效率而言，<code>HashMap</code> 要优于 <code>HashTable</code> 。</li>
+<li><code>HashTable</code> 使用 <code>Enumeration</code> ，<code>HashMap</code> 使用 <code>Iterator</code> 。</li>
+<li><code>HashMap</code> 的默认大小是 16，每次增加是原来的两倍加一；<code>HashTable</code> 的默认大小是 11，每次增加是原来的两倍。</li>
+<li><code>TreeMap</code> 实现了 <code>SortMap</code> 接口，保证记录根据键值排序。</li>
+<li><code>WeakHashMap</code> 是弱引用类型，如果其中的 <code>map</code> 没有外部引用，那么将会自动删除。</li>
+</ol>
+<p>下面的代码实现了一个线程安全的 <code>HashMap</code> ：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map m = Collections.synchronizedMap(<span class="keyword">new</span> HashMap());</span><br></pre></td></tr></table></figure>
+<h3 id="9-4-把自定义的类作为-HashMap-的-key-需要注意什么？"><a href="#9-4-把自定义的类作为-HashMap-的-key-需要注意什么？" class="headerlink" title="9.4 把自定义的类作为 HashMap 的 key 需要注意什么？"></a>9.4 把自定义的类作为 <code>HashMap</code> 的 <code>key</code> 需要注意什么？</h3><p>当一个新的元素到 <code>HashMap</code> ，它会先比较 <code>hashCode()</code> ，如果不相等，则添加这个元素，如果相等，则需要用 <code>equals()</code> 方法比较 <code>key</code> ，如果 <code>key</code> 相等，则覆盖 <code>value</code> ，如果不相等，则说明出现了冲突。</p>
+<p><code>HashMap</code> 中使用链地址法来解决冲突，比如我们现在通过 <code>key</code> 来找到 <code>value</code> ，它是怎么办到的？</p>
+<ol>
+<li>首先通过 <code>key</code> 进行 <code>hashCode()</code> 方法找到值存储的首地址</li>
+<li>发现存在多个 <code>key</code> 满足组成的 <code>keyList</code></li>
+<li>遍历每个 <code>key</code> ，用 <code>equals()</code> 来找到 <code>key</code> 相同的键值对，这里的 <code>value</code> 就是返回结果</li>
+</ol>
+<p>默认的 <code>hashCode()</code> 返回对象存储的内存地址，默认的 <code>equals()</code> 比较对象是否是同一个对象。</p>
+<p>这告诉我们，在使用自定义类实现 <code>key</code> 的时候，我们需要重写 <code>equals()</code> 和 <code>hashCode()</code> 。</p>
+<h2 id="10-多线程"><a href="#10-多线程" class="headerlink" title="10. 多线程"></a>10. 多线程</h2><h3 id="10-1-如果实现-Java-的多线程？"><a href="#10-1-如果实现-Java-的多线程？" class="headerlink" title="10.1 如果实现 Java 的多线程？"></a>10.1 如果实现 <code>Java</code> 的多线程？</h3><ul>
+<li>继承 <code>Thread</code> 类，重写 <code>run()</code> 方法：注意 <code>Thread</code> 类实际上是实现了 <code>Runnable</code> 接口的一个实例，启动线程唯一的方法是 <code>Thread</code> 类的 <code>start()</code> 方法，该方法将启动一个新线程，并执行 <code>run()</code> 方法。</li>
+<li>实现 <code>Runnable</code> 接口，实现 <code>run()</code> 方法：也是通过 <code>Thread</code> 类的 <code>start()</code> 方法来启动新的线程。</li>
+<li>实现 <code>Callable</code> 接口，重写 <code>call()</code> 方法。</li>
+</ul>
+<p>关于 <code>Callable</code> 接口和 <code>Runnable</code> 接口的不同点：</p>
+<ol>
+<li><code>Callable</code> 可以在任务结束后提供一个返回值</li>
+<li><code>Callable</code> 的 <code>call()</code> 方法可以抛出异常</li>
+<li>运行 <code>Callable</code> 可以获取一个 <code>Future</code> 对象，表示异步计算的结果，由于线程输入异步计算模型，因此无法从别的线程中得到函数的返回值，这时，可以使用 <code>Future</code> 来监控目标线程调用 <code>call()</code> 方法的情况，当调用 <code>Future</code> 的 <code>get()</code> 可以获取结果，同时当前线程将阻塞，直到 <code>call()</code> 方法返回结果。</li>
+</ol>
+<p>推荐使用 <code>Runnable</code> 接口，这比较轻量。</p>
+<h3 id="10-2-run-方法和-start-方法有什么区别？"><a href="#10-2-run-方法和-start-方法有什么区别？" class="headerlink" title="10.2 run() 方法和 start() 方法有什么区别？"></a>10.2 <code>run()</code> 方法和 <code>start()</code> 方法有什么区别？</h3><p>通常，系统通过调用线程类的 <code>start()</code> 方法来启动一个线程，此时线程处于就绪态，可以被 <code>JVM</code> 调用。在调度过程中，<code>start()</code> 方法异步调用线程类的 <code>run()</code> 方法来完成实际的操作，当 <code>run()</code> 方法结束了，此线程也结束了。</p>
+<p>如果直接调用 <code>run()</code> ，那么仅仅是一个同步的方法。</p>
+<h3 id="10-3-多线程同步的实现方法有哪些？"><a href="#10-3-多线程同步的实现方法有哪些？" class="headerlink" title="10.3 多线程同步的实现方法有哪些？"></a>10.3 多线程同步的实现方法有哪些？</h3><p><strong><code>sychronized</code> 关键字</strong></p>
+<ul>
+<li><code>synchronized</code> 方法：放到方法中的关键字，但是会大大影响程序的效率。</li>
+<li><code>sychronized</code> 块：锁定对象，有非常高的灵活性。</li>
+</ul>
+<p><strong><code>wait()</code> 方法和 <code>notify()</code> 方法</strong> (这个使用基本在使用 <code>sychronized</code> 关键字基础上)</p>
+<ul>
+<li><code>wait()</code> 方法释放对象锁，进入等待状态，并且可以调用 <code>notify()</code> 方法通知正在等待的其他线程。</li>
+<li><code>notifyAll()</code> 允许其他进程去竞争。</li>
+</ul>
+<p><strong><code>Lock</code></strong></p>
+<ul>
+<li><code>lock()</code> 方法以阻塞的方式获取锁，如果获得了锁，立即返回，如果别的线程持有锁，当前线程等待。</li>
+<li><code>tryLock()</code> 方法以非阻塞的方式获取锁，尝试性获取锁，如果得到立即返回 <code>true</code> ，否则 <code>false</code> 。</li>
+<li><code>lockInterruptibly()</code> 如果获取了锁，立即返回，如果没有获取锁，当前线程进入休眠状态，直到获取锁或者<strong>被中断</strong>，和 <code>lock()</code> 最大的不同在于，如果 <code>lock()</code> 获取不到锁，会一直处于阻塞状态，并且会忽略 <code>interrupt()</code> 方法。</li>
+</ul>
+<h3 id="10-4-sleep-和-wait-有什么区别？"><a href="#10-4-sleep-和-wait-有什么区别？" class="headerlink" title="10.4 sleep() 和 wait() 有什么区别？"></a>10.4 <code>sleep()</code> 和 <code>wait()</code> 有什么区别？</h3><ul>
+<li>原理不同：<code>sleep()</code> 是 <code>Thread</code> 的静态方法，是线程用来控制自身流程的，令线程暂停一段时间，像是一个闹钟；<code>wait()</code> 是 <code>Object</code> 的方法，用于线程通信，使当前拥有该对象锁的进程等待，可以设定时间自动醒来或者其他线程调用 <code>notify()</code>。</li>
+<li>对锁的处理机制不同：调用 <code>sleep()</code> 不会释放锁，而 <code>wait()</code> 会释放它占用的锁。</li>
+<li>使用区域不同：<code>wait()</code> 具有特殊意义，使用在同步控制语句中，而 <code>sleep()</code> 则可以随时随地。</li>
+</ul>
+<p><code>sleep()</code> 和 <code>yield()</code> 的区别：</p>
+<ul>
+<li><code>sleep()</code> 给其他线程机会不考虑优先级；<code>yield()</code> 给其他线程机会只会给比自己相同等级或等级高的线程。</li>
+<li><code>sleep()</code> 会进入阻塞态，在此期间，线程不会被执行；而 <code>yield()</code> 会使当前线程回到可执行状态很可能又马上被执行。</li>
+</ul>
+<h3 id="10-5-终止线程的方法有哪些？"><a href="#10-5-终止线程的方法有哪些？" class="headerlink" title="10.5 终止线程的方法有哪些？"></a>10.5 终止线程的方法有哪些？</h3><p><code>stop()</code> 会释放锁，但存在不一致的状态，所以是不安全的。</p>
+<p><code>suspend()</code> 不释放锁，可能发生死锁，不安全。</p>
+<p>有一个标志，在 <code>while</code> 里，终止就设置标志，但是可能是非运行态，所以有时候不可行。</p>
+<p>我们可以通过捕获异常的方式，来安全结束进程，比如使用 <code>InterruptedException</code> 。</p>
+<h3 id="10-6-sychronized-与-Lock-有什么异同？"><a href="#10-6-sychronized-与-Lock-有什么异同？" class="headerlink" title="10.6 sychronized 与 Lock 有什么异同？"></a>10.6 <code>sychronized</code> 与 <code>Lock</code> 有什么异同？</h3><ul>
+<li>用法不一样：前者托管给 <code>JVM</code> ，后者需要我们通过代码实现。</li>
+<li>性能不一样：在资源竞争不是很激烈的时候，<code>sychronized</code> 的性能比 <code>Lock</code> 好，但是在竞争激烈的情况下，<code>sychronized</code> 性能下降很快，而 <code>Lock</code> 基本不变。</li>
+<li>锁的机制不一样：<code>sychronized</code> 是自动解锁，是相反顺序释放；<code>Lock</code> 需要手动释放，还必须在 <code>finally</code> 里。</li>
+</ul>
+<p>两种锁的机制不要一起使用！</p>
+<p>当一个线程进入一个对象的一个 <code>synchronized</code> 方法后，其他线程能进入其他普通方法和带 <code>static</code> 标记的方法 (<code>static sychronized</code> 也包括)。</p>
+<h3 id="10-7-什么是守护线程？"><a href="#10-7-什么是守护线程？" class="headerlink" title="10.7 什么是守护线程？"></a>10.7 什么是守护线程？</h3><p>设置 <code>setDaemon</code> 为 <code>true</code> 以后，表示是守护进程，当进程中只有守护进程，<code>JVM</code> 会自动退出。</p>
+<h3 id="10-8-join-方法的作用是什么？"><a href="#10-8-join-方法的作用是什么？" class="headerlink" title="10.8 join() 方法的作用是什么？"></a>10.8 <code>join()</code> 方法的作用是什么？</h3><p><code>join()</code> 方法的作用是让调用该方法的进程在执行完 <code>run()</code> 以后再执行 <code>join()</code> 后的方法。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-基本概念"><span class="toc-number">1.</span> <span class="toc-text">1. 基本概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-“Java-语言中的方法属于类中的成员”-为什么不对？"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 “Java 语言中的方法属于类中的成员” 为什么不对？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-什么是反射机制？"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 什么是反射机制？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-Java-如何实现函数指针？"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 Java 如何实现函数指针？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-面向对象技术"><span class="toc-number">2.</span> <span class="toc-text">2. 面向对象技术</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-面向对象与面向过程的区别？"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 面向对象与面向过程的区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-面向对象的特征？"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 面向对象的特征？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-多态的两种实现机制？"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 多态的两种实现机制？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-抽象类和接口的区别？"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 抽象类和接口的区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-内部类有哪些？"><span class="toc-number">2.5.</span> <span class="toc-text">2.5 内部类有哪些？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-如何获取父类的类名？"><span class="toc-number">2.6.</span> <span class="toc-text">2.6 如何获取父类的类名？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-关键字"><span class="toc-number">3.</span> <span class="toc-text">3. 关键字</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-final-、-finally-、-finalize-的区别？"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 final 、 finally 、 finalize 的区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-static-有什么作用？"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 static 有什么作用？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-volatile-有什么作用？"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 volatile 有什么作用？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4-strictfp-有什么作用？"><span class="toc-number">3.4.</span> <span class="toc-text">3.4 strictfp 有什么作用？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-基本类型与运算"><span class="toc-number">4.</span> <span class="toc-text">4. 基本类型与运算</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-什么是不可变类？"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 什么是不可变类？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-强制转换的注意事项？"><span class="toc-number">4.2.</span> <span class="toc-text">4.2 强制转换的注意事项？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-字符串与数组"><span class="toc-number">5.</span> <span class="toc-text">5. 字符串与数组</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-字符串创建与存储的机制是什么？"><span class="toc-number">5.1.</span> <span class="toc-text">5.1 字符串创建与存储的机制是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-String-、-StringBuffer-、-StringBuilder-、-StringTokenizer-有什么区别？"><span class="toc-number">5.2.</span> <span class="toc-text">5.2 String 、 StringBuffer 、 StringBuilder 、 StringTokenizer 有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-Java-中数组是不是对象？"><span class="toc-number">5.3.</span> <span class="toc-text">5.3 Java 中数组是不是对象？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-数组的初始化方式？"><span class="toc-number">5.4.</span> <span class="toc-text">5.4 数组的初始化方式？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-5-length-、-length-、-size-的使用？"><span class="toc-number">5.5.</span> <span class="toc-text">5.5 length 、 length() 、 size() 的使用？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-异常处理"><span class="toc-number">6.</span> <span class="toc-text">6. 异常处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-finally-块里的代码什么时候执行？"><span class="toc-number">6.1.</span> <span class="toc-text">6.1 finally 块里的代码什么时候执行？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-运行时异常和普通异常的区别？"><span class="toc-number">6.2.</span> <span class="toc-text">6.2 运行时异常和普通异常的区别？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-输入输出流"><span class="toc-number">7.</span> <span class="toc-text">7. 输入输出流</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-Java-Socket-是什么？"><span class="toc-number">7.1.</span> <span class="toc-text">7.1 Java Socket 是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-NIO-是什么？"><span class="toc-number">7.2.</span> <span class="toc-text">7.2 NIO 是什么？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-3-什么是-Java-序列化？"><span class="toc-number">7.3.</span> <span class="toc-text">7.3 什么是 Java 序列化？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-内存管理"><span class="toc-number">8.</span> <span class="toc-text">8. 内存管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-JVM-是怎么加载-class-的？"><span class="toc-number">8.1.</span> <span class="toc-text">8.1 JVM 是怎么加载 class 的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-什么是-GC-？"><span class="toc-number">8.2.</span> <span class="toc-text">8.2 什么是 GC ？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-Java-中是否存在内存泄露？"><span class="toc-number">8.3.</span> <span class="toc-text">8.3 Java 中是否存在内存泄露？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-4-Java-中的堆和栈有什么区别？"><span class="toc-number">8.4.</span> <span class="toc-text">8.4 Java 中的堆和栈有什么区别？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-容器"><span class="toc-number">9.</span> <span class="toc-text">9. 容器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-1-什么是迭代器？"><span class="toc-number">9.1.</span> <span class="toc-text">9.1 什么是迭代器？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-2-ArrayList-、Vector-、LinkedList-有什么区别？"><span class="toc-number">9.2.</span> <span class="toc-text">9.2 ArrayList 、Vector 、LinkedList 有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-HashMap-、HashTable-、TreeMap-、WeakHashMap-有什么区别？"><span class="toc-number">9.3.</span> <span class="toc-text">9.3 HashMap 、HashTable 、TreeMap 、WeakHashMap 有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-4-把自定义的类作为-HashMap-的-key-需要注意什么？"><span class="toc-number">9.4.</span> <span class="toc-text">9.4 把自定义的类作为 HashMap 的 key 需要注意什么？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-多线程"><span class="toc-number">10.</span> <span class="toc-text">10. 多线程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-如果实现-Java-的多线程？"><span class="toc-number">10.1.</span> <span class="toc-text">10.1 如果实现 Java 的多线程？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-run-方法和-start-方法有什么区别？"><span class="toc-number">10.2.</span> <span class="toc-text">10.2 run() 方法和 start() 方法有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-3-多线程同步的实现方法有哪些？"><span class="toc-number">10.3.</span> <span class="toc-text">10.3 多线程同步的实现方法有哪些？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-4-sleep-和-wait-有什么区别？"><span class="toc-number">10.4.</span> <span class="toc-text">10.4 sleep() 和 wait() 有什么区别？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-5-终止线程的方法有哪些？"><span class="toc-number">10.5.</span> <span class="toc-text">10.5 终止线程的方法有哪些？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-6-sychronized-与-Lock-有什么异同？"><span class="toc-number">10.6.</span> <span class="toc-text">10.6 sychronized 与 Lock 有什么异同？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-7-什么是守护线程？"><span class="toc-number">10.7.</span> <span class="toc-text">10.7 什么是守护线程？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-8-join-方法的作用是什么？"><span class="toc-number">10.8.</span> <span class="toc-text">10.8 join() 方法的作用是什么？</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-11-01-java-basic/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-11-01-java-basic/&text=Java 基础常见问题"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-11-01-java-basic/&title=Java 基础常见问题"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-11-01-java-basic/&is_video=false&description=Java 基础常见问题"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Java 基础常见问题&body=Check out this article: http://koon.cool/technology/2018-11-01-java-basic/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-11-01-java-basic/&title=Java 基础常见问题"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-11-01-java-basic/&title=Java 基础常见问题"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-11-01-java-basic/&title=Java 基础常见问题"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-11-01-java-basic/&title=Java 基础常见问题"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-11-01-java-basic/&name=Java 基础常见问题&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="1. 消息中间件的价值传统意义上来说，消息中间件为我们带来了异步的特性，同时解耦了系统。 假设我们做一个登录系统，那么可能需要有短信服务、安全系统…等等，这让系统变得越来越复杂，我们从新考虑可以发现，登录系统只要判断用户名和密码，而其他能力与原系统应该是可解耦的部分，因此通过消息中间件来解耦，我们不用关心有多少系统知道登录这件事，我们现在需要保证仅仅是一个消息发送到消息中间件，当然我们可以这样做：">
+<meta name="keywords" content="分布式,大型网站系统与 Java 中间件开发实践">
+<meta property="og:type" content="article">
+<meta property="og:title" content="消息中间件小记">
+<meta property="og:url" content="http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="1. 消息中间件的价值传统意义上来说，消息中间件为我们带来了异步的特性，同时解耦了系统。 假设我们做一个登录系统，那么可能需要有短信服务、安全系统…等等，这让系统变得越来越复杂，我们从新考虑可以发现，登录系统只要判断用户名和密码，而其他能力与原系统应该是可解耦的部分，因此通过消息中间件来解耦，我们不用关心有多少系统知道登录这件事，我们现在需要保证仅仅是一个消息发送到消息中间件，当然我们可以这样做：">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200412230852.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200413162419.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200413163513.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415155124.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415155707.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415160604.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415161031.png">
+<meta property="og:image" content="http://koon.cool/Users/ronnie/Library/Application%20Support/typora-user-images/image-20200415161417881.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415233335.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415234449.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200416233309.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200416234721.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200427144032.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200427144129.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428011536.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428011722.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428012012.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428021824.png">
+<meta property="og:image" content="http://koon.cool/Users/ronnie/Library/Application%20Support/typora-user-images/image-20200428021935265.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428112735.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428154420.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428154736.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428161955.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428162104.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428023443.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428023640.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428163706.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428164121.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428022804.png">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.401Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="消息中间件小记">
+<meta name="twitter:description" content="1. 消息中间件的价值传统意义上来说，消息中间件为我们带来了异步的特性，同时解耦了系统。 假设我们做一个登录系统，那么可能需要有短信服务、安全系统…等等，这让系统变得越来越复杂，我们从新考虑可以发现，登录系统只要判断用户名和密码，而其他能力与原系统应该是可解耦的部分，因此通过消息中间件来解耦，我们不用关心有多少系统知道登录这件事，我们现在需要保证仅仅是一个消息发送到消息中间件，当然我们可以这样做：">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200412230852.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>消息中间件小记</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2019-08-12-leetcode/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/technology/2019-06-11-java-distributed-system-chapter5/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&text=消息中间件小记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&is_video=false&description=消息中间件小记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=消息中间件小记&body=Check out this article: http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&name=消息中间件小记&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-消息中间件的价值"><span class="toc-number">1.</span> <span class="toc-text">1. 消息中间件的价值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-互联网时代的消息中间件"><span class="toc-number">2.</span> <span class="toc-text">2. 互联网时代的消息中间件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-发送一致性"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 发送一致性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-消息中间件与使用者的强依赖"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 消息中间件与使用者的强依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-消息模型对消息接收的影响"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 消息模型对消息接收的影响</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-消息的订阅方式"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 消息的订阅方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-消息可靠性"><span class="toc-number">2.5.</span> <span class="toc-text">2.5 消息可靠性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-5-1-存储可靠性"><span class="toc-number">2.5.1.</span> <span class="toc-text">2.5.1 存储可靠性</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-5-2-消息系统扩容"><span class="toc-number">2.5.2.</span> <span class="toc-text">2.5.2 消息系统扩容</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-5-3-消息投递可靠性"><span class="toc-number">2.5.3.</span> <span class="toc-text">2.5.3 消息投递可靠性</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-订阅者视角消息的重复产生"><span class="toc-number">2.6.</span> <span class="toc-text">2.6 订阅者视角消息的重复产生</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-7-消息投递的其他属性支持"><span class="toc-number">2.7.</span> <span class="toc-text">2.7 消息投递的其他属性支持</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-保证顺序的消息队列"><span class="toc-number">2.8.</span> <span class="toc-text">2.8 保证顺序的消息队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-Push-与-Pull-方式"><span class="toc-number">2.9.</span> <span class="toc-text">2.9 Push 与 Pull 方式</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        消息中间件小记
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-07-10T16:00:00.000Z" itemprop="datePublished">2019-07-11</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/分布式/">分布式</a>, <a class="tag-link" href="/tags/大型网站系统与-Java-中间件开发实践/">大型网站系统与 Java 中间件开发实践</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-消息中间件的价值"><a href="#1-消息中间件的价值" class="headerlink" title="1. 消息中间件的价值"></a>1. 消息中间件的价值</h2><p>传统意义上来说，消息中间件为我们带来了异步的特性，同时解耦了系统。</p>
+<p>假设我们做一个登录系统，那么可能需要有短信服务、安全系统…等等，这让系统变得越来越复杂，我们从新考虑可以发现，登录系统只要判断用户名和密码，而其他能力与原系统应该是可解耦的部分，因此通过消息中间件来解耦，我们不用关心有多少系统知道登录这件事，我们现在需要保证仅仅是一个消息发送到消息中间件，当然我们可以这样做：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200412230852.png" alt></p>
+<p>通过数据库的记录，我们可以保证一条登录消息一定被消费，登录系统负责写，用到这个状态的系统自己来查，杜宇感知状态的应用还需要对数据库轮询，这是一种解决但是比较简单，同时问题也比较多：增加业务数据库负担、依赖复杂且不安全、扩展性不好。</p>
+<h2 id="2-互联网时代的消息中间件"><a href="#2-互联网时代的消息中间件" class="headerlink" title="2. 互联网时代的消息中间件"></a>2. 互联网时代的消息中间件</h2><h3 id="2-1-发送一致性"><a href="#2-1-发送一致性" class="headerlink" title="2.1 发送一致性"></a>2.1 发送一致性</h3><p>所谓发送一致性是说<strong>产生消息的业务动作与消息发送的一致</strong>。如果业务操作成功，那么这个操作产生的消息一定发送，否则消息丢失。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">fool</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 业务操作</span></span><br><span class="line">  <span class="comment">// DB 、调用服务等</span></span><br><span class="line">  <span class="comment">// 发送消息</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">fool2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 发送消息</span></span><br><span class="line">  <span class="comment">// 业务操作</span></span><br><span class="line">  <span class="comment">// DB 、调用服务等</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们可能会有这两种的操作，但是都是不可靠的，这两种方式都不能选择。</p>
+<p>在 JMS 中我们一般是这样发送消息的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ConnectionFactory -&gt; Connection -&gt; Session -&gt; Message</span><br><span class="line">Destination + Session -&gt; MessageProducer</span><br><span class="line">Destination + Session -&gt; MessageConsumer</span><br></pre></td></tr></table></figure>
+<p>同时在 JMS 中的<strong>发送消息与业务操作之间事务保证</strong>是用 XA 系列接口保证的，这增加了复杂性，同时要求业务操作的资源必须支持 XA 协议。</p>
+<p>我们需要一种方案对正常流程影响尽可能小：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200413162419.png" alt></p>
+<ol>
+<li>业务应用首先把消息发送给消息中间件，标记状态为<strong>待处理</strong>；</li>
+<li>消息中间件存储消息，并不投递该消息；</li>
+<li>消息中间件返回该消息已经入库，结果成功或失败；</li>
+<li>业务应用收到结果处理：<ol>
+<li>如果失败，则放弃业务处理，结束；</li>
+<li>如果成功，则进行业务处理。</li>
+</ol>
+</li>
+<li>业务处理完成，把处理结果发送给消息中间件；</li>
+<li>消息中间件收到业务处理结果，根据结果处理：<ol>
+<li>如果业务失败，则删除消息存储的的信息，结束；</li>
+<li>如果消息成功，把消息存储的状态改为<strong>可发送</strong>，调度进行消息投递。</li>
+</ol>
+</li>
+</ol>
+<p>开始考虑上述 6 步，最后 2 步是可能出现『不一致』的，如果第 5 步出现问题，那么消息中间件不知道怎样处理该消息；如果第 6 步没有更新状态，也没有了下一步操作。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200413163513.png" alt></p>
+<p>梳理异常情况可以找到以下 3 种状态：</p>
+<ul>
+<li>业务操作未进行，消息未存储；</li>
+<li>业务操作未进行，消息已存储，状态为待处理；</li>
+<li>业务操作已进行，消息已存储，状态为待处理。</li>
+</ul>
+<p>这三种状态中第一种不需要额外处理，另外两种需要根据业务操作的结果来处理。</p>
+<p>这里有补偿流程：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415155124.png" alt></p>
+<ol>
+<li>由消息中间件主动询问业务应用获取待处理消息对应的业务操作的结果；</li>
+<li>业务应用对业务操作进行结果查询；</li>
+<li>业务应用将业务结果发送到消息中间件（失败、成功、等待）；</li>
+<li>消息中间件根据业务应用返回结果更新消息状态。</li>
+</ol>
+<p>这里的 4 步操作是为了确认业务处理操作的结果，前面 3 步失败便失败，最后一步如果失败进行重试即可。</p>
+<p>将正向和反向流程结合就是解决业务操作与发送消息一致性的方案了。</p>
+<p>正向角度来看我们仅仅是增加了一次网络操作与一次更新 DB 的操作，开销并不大，而且还能优化。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415155707.png" alt></p>
+<p>一致性方案下的业务代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Result <span class="title">postMessage</span><span class="params">(Message, PostMessageCallback)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 发送消息到消息中间件</span></span><br><span class="line">  <span class="comment">// 获取返回结果</span></span><br><span class="line">  <span class="keyword">if</span> (result == <span class="keyword">false</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> FAIL;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 进行业务操作</span></span><br><span class="line">  <span class="comment">// 获取业务操作结果</span></span><br><span class="line">  <span class="comment">// 发送业务操作结果到消息中间件</span></span><br><span class="line">  <span class="comment">// 返回处理结果</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在开发中处理提供发送一致性的消息外，还应该提供一个传统的发送消息的接口，为了适应其他场景，也会提供独立的接口把流程的控制权交给业务应用自身。</p>
+<h3 id="2-2-消息中间件与使用者的强依赖"><a href="#2-2-消息中间件与使用者的强依赖" class="headerlink" title="2.2 消息中间件与使用者的强依赖"></a>2.2 消息中间件与使用者的强依赖</h3><p>在一致性的要求下，可能消息中间件会成为业务系统的强依赖，为了解决这个问题有三种思路：</p>
+<ol>
+<li>提供消息中间件系统的可靠性，但是不是 100% 可靠；</li>
+<li>对于消息中间件系统中影响业务操作的部分，使其可靠性与业务自身的可靠性相同；</li>
+<li>提供弱依赖支持。</li>
+</ol>
+<p>第一种方案中既然不能 100% 保证，自然不能入选；第二种方案中『相同的可靠性』就是保证业务能成功就需要消息能够入库；结合第二点和第三点可以得出如下架构：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415160604.png" alt></p>
+<p>现在消息表、业务表在一块，写入消息作为一个本地事务来完成，然后通知消息中间件有消息可以发送了，这就处理了一致性问题。</p>
+<blockquote>
+<p>虚线表示这是一个不必要的操作、依赖。消息中间件轮询业务数据库，找到需要发送的消息，取出消息发送即可。</p>
+</blockquote>
+<p>这样做有以下三点问题：</p>
+<ol>
+<li>业务数据库承载消息数据；</li>
+<li>消息中间件访问业务数据库；</li>
+<li>业务操作的数据库能支持消息中间件的需求。</li>
+</ol>
+<p>我们进行一定的变通，可以让消息中间件的轮询操作也由业务应用完成，让消息中间件不与业务应用直接打交道。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415161031.png" alt></p>
+<p>绝大部分问题解决了，但是这样架构需要业务操作是支持事务的数据库操作，具有一定的局限性。</p>
+<p>更改思路是：可以将本地磁盘作为存储消息的地方，等待消息回复后再把消息发送给消息中间件，所有投递、重试等管理仍然在消息中间件中进行，本地磁盘作为业务应用上发送消息一定成功的一个保证。</p>
+<p><img src="/Users/ronnie/Library/Application Support/typora-user-images/image-20200415161417881.png" alt="image-20200415161417881"></p>
+<p>风险是：如果消息中间件不可用，并且本地磁盘坏了，那么消息就彻底丢失了。从业务数据上进行消息补发是最彻底的容灾手段。</p>
+<p>将本地磁盘作为消息存储的方式有两种做法：</p>
+<ol>
+<li>作为一致性发送消息的解决方案的容灾手段，平时不用，只有出问题了才切换到这种方式；</li>
+<li>直接使用该方式，可以控制业务操作本身调用发送消息的接口的处理时间，此外也有机会在业务应用与消息中间件之间做一些批处理的工作。</li>
+</ol>
+<h3 id="2-3-消息模型对消息接收的影响"><a href="#2-3-消息模型对消息接收的影响" class="headerlink" title="2.3 消息模型对消息接收的影响"></a>2.3 消息模型对消息接收的影响</h3><p>JMS 中有 Queue 点对点和 Topic 发布订阅两种模式。</p>
+<p>Queue 模式下发送端不确定消息被哪个应用消费，被称为 Peer To Peer PTP 方式。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415233335.png" alt></p>
+<p>Topic 模式中，接收消息的应用都能收到所有 Topic 的消息，也被称为 Pub/Sub 方式。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415234449.png" alt></p>
+<p>在使用 JMS 时，每个 Connection 都有一个唯一的 ClientId ，用于标记连接的唯一性，我们是默认一个接收应用只用了一个连接，可以看一下多连接的情况：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200416233309.png" alt></p>
+<p>在 Queue 下应用 3 与 应用 4 是两个不同的应用，应用 3 与 JMS 建立了两个连接，而应用 4 与 JMS 建立了一个连接，每个连接收到的消息条数以及收到消息的顺序则不是固定的。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200416234721.png" alt></p>
+<p>在 Topic 下，应用 3 与应用 4 会受到所有发送到 Topic 的消息。</p>
+<p>现在思考我们需要的消息模型应该是什么样的？它需要满足以下需求：</p>
+<ul>
+<li>消息发送方和接收方都是集群；</li>
+<li>同一个消息的接收方可能有多个集群进行消息的处理；</li>
+<li>不同集群对于同一条消息的处理不能相互干扰。</li>
+</ul>
+<p>假设现在有两个集群和八条消息，每个集群两台机器，每个集群的机器应该分别处理所有的消息，不能遗漏或重复。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200427144032.png" alt></p>
+<p>如果使用 JMS Queue 模型，那么集群 A 和集群 B 收到的消息都不完整。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200427144129.png" alt></p>
+<p>如果使用 JMS Topic 的情况，每一台机器都可以收到所有消息，这种方式负担太大。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428011536.png" alt></p>
+<p>正确的做法应该是：</p>
+<ul>
+<li>集群之间使用 Topic 模型；</li>
+<li>集群内部使用 Queue 模型；</li>
+<li>用 ClusterId 标识不同集群。</li>
+</ul>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428011722.png" alt></p>
+<p>如果单纯使用 JMS 的话，需要用上图思路将 Topic 与 Queue 进行级联。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428012012.png" alt></p>
+<p>用 JMS 的方式级联工作相对繁重，需要实现中转者，推荐抛弃 JMS 的束缚自己实现。</p>
+<h3 id="2-4-消息的订阅方式"><a href="#2-4-消息的订阅方式" class="headerlink" title="2.4 消息的订阅方式"></a>2.4 消息的订阅方式</h3><p>消息的订阅分为持久与非持久两种方式，非持久是说如果接收消息者关闭则接收不到消息。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428021824.png" alt></p>
+<p>持久消息是即使接收者关闭了，还是会接收到消息（下一次启动时投递），只能选择显示关闭。</p>
+<p><img src="/Users/ronnie/Library/Application Support/typora-user-images/image-20200428021935265.png" alt="image-20200428021935265"></p>
+<p>因此我们的目标就是实现持久订阅。</p>
+<h3 id="2-5-消息可靠性"><a href="#2-5-消息可靠性" class="headerlink" title="2.5 消息可靠性"></a>2.5 消息可靠性</h3><p>消息从发送端到接收端，中间有三个阶段需要保证可靠性：</p>
+<ul>
+<li>消息发送者发送消息到中间件；</li>
+<li>中间件把消息存储；</li>
+<li>中间件发送消息到消息接收者。</li>
+</ul>
+<p>第一步只需要确定消息发送者与消息中间件之间的返回结果。</p>
+<h4 id="2-5-1-存储可靠性"><a href="#2-5-1-存储可靠性" class="headerlink" title="2.5.1 存储可靠性"></a>2.5.1 存储可靠性</h4><ol>
+<li>基于文件的消息存储</li>
+<li>采用数据库进行消息存储</li>
+<li>双机内存的消息存储</li>
+</ol>
+<p>在实际开发中应该根据实际业务场景进行选择。比如如果当前的使用场景是：</p>
+<p><em>很高的消息吞吐量，写入速度很快，灵活检索，同时消息本身不大（1.5K），对消息的顺序不敏感。</em></p>
+<p>那么可以选择关系型数据库来进行消息存储（比如参考 ActiveMQ 中的 Kaha Persistence 实现）。因为分布式文件系统的稳定性和性能还有待改善，同时也不支持灵活的检索；NoSQL的迁移、扩容在当前场景不重要。可以自己实现一个单机存储，难点有四个：</p>
+<ul>
+<li>完全重写一个单机的存储引擎；</li>
+<li>各个场景的测试没有遇到问题不代表没有问题，可靠性挑战大；</li>
+<li>由于关注吞吐量而不是消息顺序，会导致原本连续的消息有些不需要了，有些则必须保留，会造成文件的缺失；<ul>
+<li>可以通过保留的信息顺序写入来弥补缺失，空缺的部分不再理会；</li>
+</ul>
+</li>
+<li>检索处理会考虑索引对内存的消耗，必须考虑索引不能完全加载到内存的情况，涉及内存与磁盘的交换；</li>
+</ul>
+<p>可以发现完全自主实现一个单机存储引擎很麻烦，可以采用现有数据库。使用现有数据库后下一步操作就是数据库的设计。对于消息中间件而言，也要考虑到数据冗余、级联查询的问题，当然希望一个消息只用一个单行的数据来解决，对于一个消息而言，可以分成三个部分：</p>
+<ul>
+<li>消息的 Header 信息；<ul>
+<li>如消息 Id 、创建时间、投递次数、优先级、自定义键值对等；</li>
+</ul>
+</li>
+<li>消息的 Body；<ul>
+<li>消息的具体内容；</li>
+</ul>
+</li>
+<li>消息的投递目标；<ul>
+<li>指单条消息要投递到的目标集群的 ClusterId ；</li>
+</ul>
+</li>
+</ul>
+<p>消息表示、投递表示可以放到一张表中。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428112735.png" alt></p>
+<p>同时需要注意两个问题：</p>
+<ul>
+<li>投递列表字段有长度限制，一个变通是将投递列表转换成多个字段；</li>
+<li>无法按照单独的接收者来进行消息的调度，整合以后根据 ClusterId 进行调度无法直接做到，无法直接给 ClusterId 建立索引。</li>
+</ul>
+<blockquote>
+<p>合并投递表和消息表后，如果订阅集群挂了，我们再去统一发送消息是比较低效的，此时可以在消息调度外增加一个针对特定集群的调度支持，也就是为需要尽快调度的集群建一个调度表，看上去不太优雅，但是比较好用。</p>
+</blockquote>
+<p>此外还需要考虑到安全问题，单机不考虑；多机数据复制有延迟，如果需要低延迟且异地容灾可以用异步复制；也可以用应用实现双写，但是会让应用变得复杂。这些需要针对具体业务权衡。</p>
+<p>在使用文件系统、数据库存储的时候因为磁盘 IO 的原因性能会受到限制。一个改进是采用混合方式进行存储的管理，可以用双机的内存来保证数据的可靠，如图所示正常情况下消息持久化是不工作的，而是基于内存存储信息来提供高吞吐，一旦机器故障，则停止另一台数据的写操作，并把当前数据落库。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428154420.png" alt></p>
+<p>正常机器把数据落库保证安全，只要不遇到两台机器都故障消息是安全的。</p>
+<h4 id="2-5-2-消息系统扩容"><a href="#2-5-2-消息系统扩容" class="headerlink" title="2.5.2 消息系统扩容"></a>2.5.2 消息系统扩容</h4><p>如图为消息中间件与消息存储之间的关系，不同的消息中间件可能会共用存储，而同一个消息中间件机器可能使用不同的存储。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428154736.png" alt></p>
+<ul>
+<li>消息中间件自身扩容<ul>
+<li>软负载动态感知新加入的中间件机器到集群；</li>
+<li>同一个存储区分消息的中间件来源，可以给每条数据增加一个 server 标识，新的消息中间件加入会有新的 server 标识；</li>
+<li>需要注意如果有消息中间件长期不可用，需要把这些标识的消息给其他机器处理。</li>
+</ul>
+</li>
+<li>消息存储的扩容<ul>
+<li>不保证消息顺序，push 方式，这两点令存储变得相对简单；</li>
+<li>消息发送到中间件，中间件将消息入库，这时中间件知道消息在哪儿，不会出现主动搜索的场景（比如通过消息的 Id 查询），消息的索引信息都会在内存中；</li>
+<li>通过 push 绕过了主动查询的动作，使得存储扩容变得容易（不用担心分库分表找某一条会复杂）。</li>
+</ul>
+</li>
+</ul>
+<h4 id="2-5-3-消息投递可靠性"><a href="#2-5-3-消息投递可靠性" class="headerlink" title="2.5.3 消息投递可靠性"></a>2.5.3 消息投递可靠性</h4><p>这里有两个优化点：</p>
+<p>首先是消息投递一定要采用多线程方式，如果某一个消息订阅者集群有一个很慢的订阅者会有堵塞，也可以把消息返回的处理工作放到另一个线程池中，保证投递的环节不会堵死。</p>
+<p>其次在如图场景中，一个应用中可能有多个订阅者订阅了相同的消息，消息中间件会向机器发送多次同样的消息。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428161955.png" alt></p>
+<ul>
+<li>单机多订阅者共享连接；</li>
+<li>消息只发送一次，然后单机的多订阅者生成多个实例。</li>
+</ul>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428162104.png" alt></p>
+<h3 id="2-6-订阅者视角消息的重复产生"><a href="#2-6-订阅者视角消息的重复产生" class="headerlink" title="2.6 订阅者视角消息的重复产生"></a>2.6 订阅者视角消息的重复产生</h3><p>有两大类原因会导致产生重复消息。</p>
+<ul>
+<li>消息发送端应用的消息重复发送；<ul>
+<li>消息中间件收到消息并成功存储，但是消息中间件出现问题（应用异常）；</li>
+<li>中间件收到消息，但是存储异常（超时），导致发送端重试，此时网络恢复，导致消息重复；</li>
+<li>总结：消息到达存储因各种原因没收到成功的返回，并且又有重试机制导致消息重复；</li>
+<li>处理：重试使用相同的消息 Id 。</li>
+</ul>
+</li>
+<li>消息到达消息存储，由消息中间件进行向外投递时产生重复；<ul>
+<li>消息成功到达接收者，接收者处理完成出问题（网络异常、处理超时、应用异常），消息中间件不知道处理结果再次投递；</li>
+<li>接收者处理完，中间件收到结果，但是此时消息存储异常，导致消息中间件再次向接收者投递；</li>
+<li>总结：消息接收者处理完成，消息中间件不能及时更新投递状态；</li>
+<li>处理：分布式事务，但是成本高，或者让接收者来处理重复，进行幂等操作。</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-7-消息投递的其他属性支持"><a href="#2-7-消息投递的其他属性支持" class="headerlink" title="2.7 消息投递的其他属性支持"></a>2.7 消息投递的其他属性支持</h3><ul>
+<li>消息优先级；</li>
+<li>订阅者消息处理顺序与分级订阅；<ul>
+<li>如果希望消息在消费者中的处理有顺序的，可以用字段定义优先级，也可以分级订阅；</li>
+<li>将消息接收者分成一般接收者与优先接收者，做到先后顺序；</li>
+<li><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428023443.png" alt></li>
+</ul>
+</li>
+<li>自定义属性；</li>
+<li>局部顺序；<ul>
+<li>众多消息中与某件事相关的消息是有序的，而多件事之间是无序的；</li>
+<li><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428023640.png" alt></li>
+</ul>
+</li>
+</ul>
+<h3 id="2-8-保证顺序的消息队列"><a href="#2-8-保证顺序的消息队列" class="headerlink" title="2.8 保证顺序的消息队列"></a>2.8 保证顺序的消息队列</h3><p>在中间件内部，有多个物理上的队列，每一个队列严格按照顺序被接收，而消息中间件内部的队列之间是互不影响的。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428163706.png" alt></p>
+<p>具体实现中，每一个接收者在队列上有一个当前消费消息的位置，这个位置是已经完成消费的消息。同一个队列中，不同接收着维护各自的指针，该方式下，就能完成接收端的自主控制。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428164121.png" alt></p>
+<h3 id="2-9-Push-与-Pull-方式"><a href="#2-9-Push-与-Pull-方式" class="headerlink" title="2.9 Push 与 Pull 方式"></a>2.9 Push 与 Pull 方式</h3><p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428022804.png" alt></p>
+<p>push 动作来自服务端，pull 动作来自消费端。因此实时性强的操作应该用 push ，实时性不强的可以选用 pull 方式。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-消息中间件的价值"><span class="toc-number">1.</span> <span class="toc-text">1. 消息中间件的价值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-互联网时代的消息中间件"><span class="toc-number">2.</span> <span class="toc-text">2. 互联网时代的消息中间件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-发送一致性"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 发送一致性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-消息中间件与使用者的强依赖"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 消息中间件与使用者的强依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-消息模型对消息接收的影响"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 消息模型对消息接收的影响</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-消息的订阅方式"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 消息的订阅方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-消息可靠性"><span class="toc-number">2.5.</span> <span class="toc-text">2.5 消息可靠性</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-5-1-存储可靠性"><span class="toc-number">2.5.1.</span> <span class="toc-text">2.5.1 存储可靠性</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-5-2-消息系统扩容"><span class="toc-number">2.5.2.</span> <span class="toc-text">2.5.2 消息系统扩容</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-5-3-消息投递可靠性"><span class="toc-number">2.5.3.</span> <span class="toc-text">2.5.3 消息投递可靠性</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6-订阅者视角消息的重复产生"><span class="toc-number">2.6.</span> <span class="toc-text">2.6 订阅者视角消息的重复产生</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-7-消息投递的其他属性支持"><span class="toc-number">2.7.</span> <span class="toc-text">2.7 消息投递的其他属性支持</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8-保证顺序的消息队列"><span class="toc-number">2.8.</span> <span class="toc-text">2.8 保证顺序的消息队列</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-9-Push-与-Pull-方式"><span class="toc-number">2.9.</span> <span class="toc-text">2.9 Push 与 Pull 方式</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&text=消息中间件小记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&is_video=false&description=消息中间件小记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=消息中间件小记&body=Check out this article: http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&name=消息中间件小记&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

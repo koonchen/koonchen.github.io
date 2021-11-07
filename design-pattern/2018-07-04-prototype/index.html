@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="代码链接koonchen/design-patterns/prototype 要点 用原型实例指定创建对象的种类，并且通过拷贝这些原型创建新的对象。  我们假设存在一个框架，它拥有大量的图形 Graphic ，对图形本身的选择等框架层面的功能存放在 Tool 中，并且每一个图形的创建都需要 Tool 的一个实现 GraphicTool 子类来协助。现在问题来了，框架的 GraphicTool 并不">
+<meta name="keywords" content="原型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初探原型模式">
+<meta property="og:url" content="http://koon.cool/design-pattern/2018-07-04-prototype/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="代码链接koonchen/design-patterns/prototype 要点 用原型实例指定创建对象的种类，并且通过拷贝这些原型创建新的对象。  我们假设存在一个框架，它拥有大量的图形 Graphic ，对图形本身的选择等框架层面的功能存放在 Tool 中，并且每一个图形的创建都需要 Tool 的一个实现 GraphicTool 子类来协助。现在问题来了，框架的 GraphicTool 并不">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/prototype.jpg">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/prototype-frame.png">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.393Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初探原型模式">
+<meta name="twitter:description" content="代码链接koonchen/design-patterns/prototype 要点 用原型实例指定创建对象的种类，并且通过拷贝这些原型创建新的对象。  我们假设存在一个框架，它拥有大量的图形 Graphic ，对图形本身的选择等框架层面的功能存放在 Tool 中，并且每一个图形的创建都需要 Tool 的一个实现 GraphicTool 子类来协助。现在问题来了，框架的 GraphicTool 并不">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/prototype.jpg">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>初探原型模式</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/design-pattern/2018-07-12-builder/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/design-pattern/2018-06-23-abstract-factory/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/design-pattern/2018-07-04-prototype/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/design-pattern/2018-07-04-prototype/&text=初探原型模式"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/design-pattern/2018-07-04-prototype/&title=初探原型模式"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/design-pattern/2018-07-04-prototype/&is_video=false&description=初探原型模式"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=初探原型模式&body=Check out this article: http://koon.cool/design-pattern/2018-07-04-prototype/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/design-pattern/2018-07-04-prototype/&title=初探原型模式"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/design-pattern/2018-07-04-prototype/&title=初探原型模式"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/design-pattern/2018-07-04-prototype/&title=初探原型模式"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/design-pattern/2018-07-04-prototype/&title=初探原型模式"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/design-pattern/2018-07-04-prototype/&name=初探原型模式&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#代码链接"><span class="toc-number">1.</span> <span class="toc-text">代码链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#要点"><span class="toc-number">2.</span> <span class="toc-text">要点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">3.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java-实现"><span class="toc-number">3.1.</span> <span class="toc-text">java 实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#python-实现"><span class="toc-number">3.2.</span> <span class="toc-text">python 实现</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        初探原型模式
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-07-03T16:00:00.000Z" itemprop="datePublished">2018-07-04</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/design-pattern/">design pattern</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/原型/">原型</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a>代码链接</h2><p><a href="https://github.com/koonchen/design-patterns/tree/master/prototype" target="_blank" rel="noopener">koonchen/design-patterns/prototype</a></p>
+<h2 id="要点"><a href="#要点" class="headerlink" title="要点"></a>要点</h2><blockquote>
+<p>用原型实例指定创建对象的种类，并且通过拷贝这些原型创建新的对象。</p>
+</blockquote>
+<p>我们假设存在一个框架，它拥有大量的图形 <code>Graphic</code> ，对图形本身的选择等框架层面的功能存放在 <code>Tool</code> 中，并且每一个图形的创建都需要 <code>Tool</code> 的一个实现 <code>GraphicTool</code> 子类来协助。现在问题来了，框架的 <code>GraphicTool</code> 并不知道我们需要创建的 <code>Graphic</code> 具体是什么，最朴素的想法是为每一个图形都创建一个 <code>GraphicTool</code> 的子类，但这样将产生大量的子类，<strong>对象复合是比创建子类更灵活的一种选择</strong>。</p>
+<p>原型模式让 <code>GraphicTool</code> 通过克隆具体图形( <code>Graphic</code> 子类，或者称之为<strong>原型</strong> )实例来创建新的图形，或者说将这个具体的图形实例作为了参数，所以如果 <code>Graphic</code> 子类都支持克隆操作，那么 <code>GraphicTool</code> 就可以克隆所有类型的图形。可以看下图更好理解这一模式：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/prototype.jpg" alt="cover"></p>
+<p>什么时候适用这种模式：</p>
+<blockquote>
+<ul>
+<li>当一个系统独立于它的产品创建、构造、表示时；</li>
+<li>当要实例化的类是在运行时指定，比如动态加载时；</li>
+<li>为了避免创建一个与产品类层次平行的工厂类层次时 ( 现在工厂类和产品类之间仅仅是聚合关系 ) ；</li>
+<li>当一个类的实例只能有几个不同状态组合中的一种的时。</li>
+</ul>
+<p>建立相应数目的原型并克隆他们可能比每次用特定的状态手动实例化该类更方便时。</p>
+</blockquote>
+<p>他拥有以下参与者：</p>
+<blockquote>
+<ul>
+<li>Prototype—声明一个克隆自身的接口。</li>
+<li>ConcretePrototype—实现一个克隆自身的操作。</li>
+<li>Client—让一个原型克隆自身从而创建一个新的对象。</li>
+</ul>
+</blockquote>
+<p>所以一个典型的原型模式结构也就呼之欲出了：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/prototype-frame.png" alt="cover"></p>
+<p>我们发现到现在为止的模式：工厂方法、抽象工厂，以及现在的原型模式。他们都有一个一样的效果：隐藏了具体的产品类，下面是原型模式的一些优点：</p>
+<blockquote>
+<ul>
+<li>运行时增加和删除产品。客户只要注册原型实例就可以将一个新的产品类加入系统中。</li>
+<li>改变值以指定新对象。我们现在拥有原型，而原型就是新类别的对象，我们将职责给实例化，就表现出了新的行为。比如刚才的 <code>GraphicTool</code> 类，他就可以创建无数种图形对象，是职责代理的一种应用。</li>
+<li>改变结构以指定新对象。在电路设计中，我们存在子电路构造电路的情况，并且允许一次又一次重复使用一个特定的子电路，将子电路作为原型完成电路就是这一优点的体现。</li>
+<li>减少子类的构造。工厂方法中还需要一个产品类平行的 <code>Creator</code> 类，原型模式则克隆一个原型，这一平行层次都需要了。更有甚者，在类作为一级类对象的语言中，类对象已经起到了原型的作用，所以获益较少，比如 Python 、 Smalltalk 等等 。</li>
+<li>用类动态配置应用。一些运行时刻环境允许你动态将类装载到应用中。有一句很绕口的话是这么说的：一个希望创建动态载入类的实例的应用不能静态引入类的构造器，而应该由运行环境在载入时创建每个类的实例。( 多读几遍还是很好懂的 ) 在像 C++ 这样的语言中，原型模式是这种功能的关键。</li>
+</ul>
+<p>原型模式的主要缺陷是每一个原型的子类都必须有克隆操作，这可能是困难的。比方说这个类只要存在了，就难以新增克隆操作；或者当内部一些不支持拷贝或有循环引用的对象时，实现克隆也会困难。</p>
+</blockquote>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>在像 C++ 这样的语言中，类不是对象，所以原型模式特别有用，当实现原型时，要考虑：</p>
+<blockquote>
+<ul>
+<li>使用一个原型管理器。当一个系统中原型数目不固定时，要保持一个可用原型的注册表。</li>
+<li>实现克隆操作。原型模式最困难的部分在于正确实现克隆操作。</li>
+<li>初始化克隆对象。当一部分人对克隆对象已经满意，另一部分人可能希望使用他们所选择的一些值来初始化该对象。一种是有专门该值更改的方法，一种是初始化方法，后者需要删除已有对象，而前者要逐一修改已有对象。</li>
+</ul>
+</blockquote>
+<h3 id="java-实现"><a href="#java-实现" class="headerlink" title="java 实现"></a>java 实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Hashtable;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Prototype</span> <span class="keyword">implements</span> <span class="title">Cloneable</span> </span>&#123;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">protected</span> Prototype <span class="title">clone</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Prototype clone = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      clone = (Prototype) <span class="keyword">super</span>.clone();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (CloneNotSupportedException e) &#123;</span><br><span class="line">      e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> clone;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">check</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    System.out.println(<span class="string">"Prototype instance has been created"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcretePrototype1</span> <span class="keyword">extends</span> <span class="title">Prototype</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">check</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    System.out.println(<span class="string">"ConcretePrototype1 instance has been created"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcretePrototype2</span> <span class="keyword">extends</span> <span class="title">Prototype</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">check</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    System.out.println(<span class="string">"ConcretePrototype2 instance has been created"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrototypeClient</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Hashtable map = <span class="keyword">new</span> Hashtable&lt;String,Prototype&gt;();</span><br><span class="line">    map.put(<span class="string">"Prototype"</span>,<span class="keyword">new</span> Prototype());</span><br><span class="line">    map.put(<span class="string">"ConcretePrototype1"</span>,<span class="keyword">new</span> ConcretePrototype1());</span><br><span class="line">    map.put(<span class="string">"ConcretePrototype2"</span>,<span class="keyword">new</span> ConcretePrototype2());</span><br><span class="line">    ((Prototype) map.get(<span class="string">"Prototype"</span>)).clone().check();</span><br><span class="line">    ((Prototype) map.get(<span class="string">"ConcretePrototype1"</span>)).clone().check();</span><br><span class="line">    ((Prototype) map.get(<span class="string">"ConcretePrototype2"</span>)).clone().check();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里使用了 <code>Cloneable</code> 接口实现 <code>clone</code> 方法，使用一个 <code>map</code> 作为原型管理器，但不是最理想的状态，因为取出的内容是 <code>object</code> 所以需要从父类转换成子类，这是一个不规范的行为，但是如果全部的行为在父类都有了默认的定义，那就变得可以接受了。</p>
+<p>这里的克隆操作是最简单的浅拷贝，如果存在引用类型还是要自己完成深拷贝。</p>
+<blockquote>
+<p><em>PS: 这里方法完全可以和工厂模式相互结合：</em></p>
+<p>抽象工厂和工厂方法中，可以先保存产品原型的集合，然后返回产品对象，跳过从 <code>Factory</code> 或 <code>Creator</code> 创建产品；</p>
+</blockquote>
+<h3 id="python-实现"><a href="#python-实现" class="headerlink" title="python 实现"></a>python 实现</h3><p>参考 <a href="https://github.com/faif/python-patterns/blob/master/creational/prototype.py" target="_blank" rel="noopener">python-patterns/creational/prototype.py</a> 。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># coding:utf8</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Prototype</span><span class="params">(object)</span>:</span></span><br><span class="line">  value = <span class="string">'default'</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">clone</span><span class="params">(self, **kwargs)</span>:</span></span><br><span class="line">    obj = self.__class__()</span><br><span class="line">    obj.__dict__.update(kwargs)</span><br><span class="line">    <span class="keyword">return</span> obj</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PrototypeDispatcher</span><span class="params">(object)</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">    self._objs=&#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">get_objects</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> self._objs</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">register_obj</span><span class="params">(self, name, obj)</span>:</span></span><br><span class="line">    self._objs[name]=obj</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">unregister_obj</span><span class="params">(self, name)</span>:</span></span><br><span class="line">    <span class="keyword">del</span> self._objs[name]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  prototypeDispatcher = PrototypeDispatcher()</span><br><span class="line">  prototype = Prototype()</span><br><span class="line">  a = prototype.clone(value=<span class="string">'a'</span>)</span><br><span class="line">  b = prototype.clone(value=<span class="string">'b'</span>)</span><br><span class="line">  prototypeDispatcher.register_obj(<span class="string">'objDefault'</span>, prototype)</span><br><span class="line">  prototypeDispatcher.register_obj(<span class="string">'objA'</span>, a)</span><br><span class="line">  prototypeDispatcher.register_obj(<span class="string">'objB'</span>, b)</span><br><span class="line">  print([&#123;n:p.value&#125; <span class="keyword">for</span> n, p <span class="keyword">in</span> prototypeDispatcher.get_objects().items()])</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>在 python 的实现中使用一个 <code>PrototypeDispatcher</code> 作为原型管理器；</li>
+<li>克隆操作上创建新的实例，开辟了新的内存空间，如果有其他引用类型应该会引入 <code>copy</code> 包协同工作；</li>
+<li>初始化对于该例，可以选择删除全部已有实例或者逐个更改，这值得斟酌。</li>
+</ul>
+</blockquote>
+<p>原型模式一句话概括就是运行时复制原型实例，抽象工厂要求我们按部就班创建工厂然后创建产品 (工厂方法是搭建一个和产品平行层次的 <code>Creator</code> ，所以不加入讨论) ，原型模式直接用一个产品作为原型，然后复制生产，前者在大方向上指明道路，后者在某一条分支上另辟蹊径，这些思想非常有趣。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#代码链接"><span class="toc-number">1.</span> <span class="toc-text">代码链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#要点"><span class="toc-number">2.</span> <span class="toc-text">要点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">3.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java-实现"><span class="toc-number">3.1.</span> <span class="toc-text">java 实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#python-实现"><span class="toc-number">3.2.</span> <span class="toc-text">python 实现</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/design-pattern/2018-07-04-prototype/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/design-pattern/2018-07-04-prototype/&text=初探原型模式"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/design-pattern/2018-07-04-prototype/&title=初探原型模式"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/design-pattern/2018-07-04-prototype/&is_video=false&description=初探原型模式"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=初探原型模式&body=Check out this article: http://koon.cool/design-pattern/2018-07-04-prototype/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/design-pattern/2018-07-04-prototype/&title=初探原型模式"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/design-pattern/2018-07-04-prototype/&title=初探原型模式"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/design-pattern/2018-07-04-prototype/&title=初探原型模式"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/design-pattern/2018-07-04-prototype/&title=初探原型模式"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/design-pattern/2018-07-04-prototype/&name=初探原型模式&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

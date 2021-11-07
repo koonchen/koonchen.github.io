@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="代码链接koonchen/design-patterns/chain-of-responsibility 要点 使多个对象都有机会处理请求，从而避免请求的发送者和接受者之间的耦合关系。将这些对象连成一条链，并沿着这条连链传递该请求，直到有一个对象处理它为止。  如果我们在一个界面上进行帮助功能的编写，那么非常自然的，我们可以从最特殊的帮助开始编写，同时，我们需要一个对象来处理帮助请求，这里我们请求">
+<meta name="keywords" content="责任链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初探职责链模式">
+<meta property="og:url" content="http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="代码链接koonchen/design-patterns/chain-of-responsibility 要点 使多个对象都有机会处理请求，从而避免请求的发送者和接受者之间的耦合关系。将这些对象连成一条链，并沿着这条连链传递该请求，直到有一个对象处理它为止。  如果我们在一个界面上进行帮助功能的编写，那么非常自然的，我们可以从最特殊的帮助开始编写，同时，我们需要一个对象来处理帮助请求，这里我们请求">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/chain_of_responsibility.png">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初探职责链模式">
+<meta name="twitter:description" content="代码链接koonchen/design-patterns/chain-of-responsibility 要点 使多个对象都有机会处理请求，从而避免请求的发送者和接受者之间的耦合关系。将这些对象连成一条链，并沿着这条连链传递该请求，直到有一个对象处理它为止。  如果我们在一个界面上进行帮助功能的编写，那么非常自然的，我们可以从最特殊的帮助开始编写，同时，我们需要一个对象来处理帮助请求，这里我们请求">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/chain_of_responsibility.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>初探职责链模式</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/after-reading/2018-09-12-cai-zhi-zhong-for-striving/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/design-pattern/2018-08-27-proxy/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&text=初探职责链模式"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&title=初探职责链模式"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&is_video=false&description=初探职责链模式"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=初探职责链模式&body=Check out this article: http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&title=初探职责链模式"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&title=初探职责链模式"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&title=初探职责链模式"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&title=初探职责链模式"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&name=初探职责链模式&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#代码链接"><span class="toc-number">1.</span> <span class="toc-text">代码链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#要点"><span class="toc-number">2.</span> <span class="toc-text">要点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">3.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java-实现"><span class="toc-number">3.1.</span> <span class="toc-text">java 实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#python-实现"><span class="toc-number">3.2.</span> <span class="toc-text">python 实现</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        初探职责链模式
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-09-11T16:00:00.000Z" itemprop="datePublished">2018-09-12</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/design-pattern/">design pattern</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/责任链/">责任链</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a>代码链接</h2><p><a href="https://github.com/koonchen/design-patterns/tree/master/chain-of-responsibility" target="_blank" rel="noopener">koonchen/design-patterns/chain-of-responsibility</a></p>
+<h2 id="要点"><a href="#要点" class="headerlink" title="要点"></a>要点</h2><blockquote>
+<p>使多个对象都有机会处理请求，从而避免请求的发送者和接受者之间的耦合关系。将这些对象连成一条链，并沿着这条连链传递该请求，直到有一个对象处理它为止。</p>
+</blockquote>
+<p>如果我们在一个界面上进行帮助功能的编写，那么非常自然的，我们可以从最特殊的帮助开始编写，同时，我们需要一个对象来处理帮助请求，这里我们请求的对象并不知道最终提供帮助的对象是谁。我们需要一种方法来将他们解耦。</p>
+<p>Chain of Responsibility 模式的想法是，给与一条链，链中每一个对象将处理请求，或者将这一请求转发给下一个候选对象，直到该请求被处理并返回给最开始的一个按钮或者其他的提示框。</p>
+<p>职责链模式的适用性：</p>
+<blockquote>
+<ul>
+<li>有多个对象可以处理一个请求，而哪个对象处理该请求运行时刻自动确定。</li>
+<li>在不明确指定接收者的情况下，向多个对象的其中一个提交请求。</li>
+<li>可以处理一个请求的对象集合应被动态指定。</li>
+</ul>
+</blockquote>
+<p>职责链模式的参与者：</p>
+<blockquote>
+<ul>
+<li>Handler — 定义一个处理请求的接口。</li>
+<li>ConcreteHandler — 处理它所负责的请求。</li>
+<li>Client — 提交请求者。</li>
+</ul>
+</blockquote>
+<p>现在， Chain of Responsibility 模式的结构已经显而易见了：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/chain_of_responsibility.png" alt="cover"></p>
+<p>职责链模式的优缺点：</p>
+<blockquote>
+<ul>
+<li>降低耦合度：接收者和发送者都没有对方明确的信息。</li>
+<li>增强了给对象指派职责的灵活性：我们可以在运行时刻对该链进行动态地增加或修改来增加或改变一个请求的职责。</li>
+<li>不保证被接受：既然接收者和发送者都不知道对方的存在，所以一个请求可能会因为没有被正确配置二得不到处理。</li>
+</ul>
+</blockquote>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>我们在实现前需要考虑实现问题：</p>
+<blockquote>
+<ul>
+<li>实现后继者链有两种方法：</li>
+</ul>
+<blockquote>
+<ul>
+<li>定义新的链接：通常在 Handler 中定义，但也可由 ConcreteHandlers 来定义。</li>
+<li>使用已有的链接：在一个部分 — 整体 的结构中，父构件应用可定义一个部件的后继者，此时窗口组件是已经有了的链接，我们可以直接使用。就像 Composite 模式那样。</li>
+</ul>
+</blockquote>
+<ul>
+<li>连接后继者：Handler 不仅需要定义请求的接口，同时需要维护后继链接，它需要提供一个缺省实现，向后继者转发请求。</li>
+<li>表示请求：可以有不同的方法来表示请求，一种是硬编码操作调用，另一种是使用一个处理函数，这个函数以一个请求码为参数。</li>
+</ul>
+</blockquote>
+<h3 id="java-实现"><a href="#java-实现" class="headerlink" title="java 实现"></a>java 实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> RequestType &#123;</span><br><span class="line">  ConcreteHandler1, ConcreteHandler2</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Request</span> </span>&#123;</span><br><span class="line">  RequestType requestType;</span><br><span class="line">  String requestDescription;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Request</span><span class="params">(RequestType requestType, String requestDescription)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.requestType = requestType;</span><br><span class="line">    <span class="keyword">this</span>.requestDescription = requestDescription;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"Request&#123;"</span> +</span><br><span class="line">        <span class="string">"requestType="</span> + requestType +</span><br><span class="line">        <span class="string">", requestDescription='"</span> + requestDescription + <span class="string">'\''</span> +</span><br><span class="line">        <span class="string">'&#125;'</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> RequestType <span class="title">getRequestType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> requestType;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Handler</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> Handler next;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">Handler</span><span class="params">(Handler next)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.next = next;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">handleRequest</span><span class="params">(Request request)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (next != <span class="keyword">null</span>) &#123;</span><br><span class="line">      next.handleRequest(request);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteHandler1</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ConcreteHandler1</span><span class="params">(Handler next)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>(next);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">handleRequest</span><span class="params">(Request request)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (request.getRequestType().equals(RequestType.ConcreteHandler1))</span><br><span class="line">      System.out.println(<span class="string">"ConcreteHandler1 instance has been created"</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      <span class="keyword">super</span>.handleRequest(request);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteHandler2</span> <span class="keyword">extends</span> <span class="title">Handler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ConcreteHandler2</span><span class="params">(Handler next)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>(next);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">handleRequest</span><span class="params">(Request request)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (request.getRequestType().equals(RequestType.ConcreteHandler2))</span><br><span class="line">      System.out.println(<span class="string">"ConcreteHandler2 instance has been created"</span>);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      <span class="keyword">super</span>.handleRequest(request);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CorClient</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Handler handler = <span class="keyword">new</span> Handler(<span class="keyword">new</span> ConcreteHandler1(<span class="keyword">new</span> ConcreteHandler2(<span class="keyword">null</span>)));</span><br><span class="line">    handler.handleRequest(<span class="keyword">new</span> Request(RequestType.ConcreteHandler1, <span class="string">"ConcreteHandler1"</span>));</span><br><span class="line">    handler.handleRequest(<span class="keyword">new</span> Request(RequestType.ConcreteHandler2, <span class="string">"ConcreteHandler2"</span>));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="python-实现"><a href="#python-实现" class="headerlink" title="python 实现"></a>python 实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Request</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, _type)</span>:</span></span><br><span class="line">        self._type = _type</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Handler</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, _next)</span>:</span></span><br><span class="line">        self._next = _next</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle_request</span><span class="params">(self, request)</span>:</span></span><br><span class="line">        self._next.handle_request(request);</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteHandler1</span><span class="params">(Handler)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle_request</span><span class="params">(self, request)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> request._type == <span class="string">'ConcreteHandler1'</span>:</span><br><span class="line">            print(<span class="string">'ConcreteHandler1 instance has been created'</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self._next.handle_request(request)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ConcreteHandler2</span><span class="params">(Handler)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle_request</span><span class="params">(self, request)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> request._type == <span class="string">'ConcreteHandler2'</span>:</span><br><span class="line">            print(<span class="string">'ConcreteHandler2 instance has been created'</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self._next.handle_request(request)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DefaultHandler</span><span class="params">(Handler)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle_request</span><span class="params">(self, request)</span>:</span></span><br><span class="line">        print(<span class="string">'Without this request type'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    handler = ConcreteHandler1(ConcreteHandler2(DefaultHandler()))</span><br><span class="line">    handler.handle_request(Request(<span class="string">'ConcreteHandler1'</span>))</span><br><span class="line">    handler.handle_request(Request(<span class="string">'ConcreteHandler2'</span>))</span><br><span class="line">    handler.handle_request(Request(<span class="string">'ConcreteHandler3'</span>))</span><br></pre></td></tr></table></figure>
+<p>职责链模式与 Composite 模式一起使用，这种情况下，一个构件的父构件也可以作为它的后继。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#代码链接"><span class="toc-number">1.</span> <span class="toc-text">代码链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#要点"><span class="toc-number">2.</span> <span class="toc-text">要点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">3.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java-实现"><span class="toc-number">3.1.</span> <span class="toc-text">java 实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#python-实现"><span class="toc-number">3.2.</span> <span class="toc-text">python 实现</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&text=初探职责链模式"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&title=初探职责链模式"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&is_video=false&description=初探职责链模式"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=初探职责链模式&body=Check out this article: http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&title=初探职责链模式"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&title=初探职责链模式"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&title=初探职责链模式"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&title=初探职责链模式"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/design-pattern/2018-09-12-chain-of-responsibility/&name=初探职责链模式&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

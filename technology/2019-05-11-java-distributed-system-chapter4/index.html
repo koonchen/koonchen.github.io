@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="这一节主要讲数据库的设计，首先要说的就是单机设计方式，一个 JVM 连上一个 DB 完成。 1. 垂直/水平拆分的苦难除了上升硬件能力以外，我们有什么办法给数据库减压，这里提了三个方法：  优化应用，减少不必要的数据库压力； 引入缓存、加入搜索引擎支持； 分摊 DB 压力，分库分表。  这一节当然从分库分表开始，垂直拆分是把同一个数据库里不同业务的数据分到不同的数据库里；水平拆分则是根据规则把同一">
+<meta name="keywords" content="分布式,大型网站系统与 Java 中间件开发实践">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据层的挑战与应对">
+<meta property="og:url" content="http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="这一节主要讲数据库的设计，首先要说的就是单机设计方式，一个 JVM 连上一个 DB 完成。 1. 垂直/水平拆分的苦难除了上升硬件能力以外，我们有什么办法给数据库减压，这里提了三个方法：  优化应用，减少不必要的数据库压力； 引入缓存、加入搜索引擎支持； 分摊 DB 压力，分库分表。  这一节当然从分库分表开始，垂直拆分是把同一个数据库里不同业务的数据分到不同的数据库里；水平拆分则是根据规则把同一">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200322215851.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200323000432.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/二阶段流程.jpg">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/二阶段失败.jpg">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/Vector Clock.jpg">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/独立id生成器.jpg">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/内嵌生成器.jpg">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/分库分表.jpg">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.401Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="数据层的挑战与应对">
+<meta name="twitter:description" content="这一节主要讲数据库的设计，首先要说的就是单机设计方式，一个 JVM 连上一个 DB 完成。 1. 垂直/水平拆分的苦难除了上升硬件能力以外，我们有什么办法给数据库减压，这里提了三个方法：  优化应用，减少不必要的数据库压力； 引入缓存、加入搜索引擎支持； 分摊 DB 压力，分库分表。  这一节当然从分库分表开始，垂直拆分是把同一个数据库里不同业务的数据分到不同的数据库里；水平拆分则是根据规则把同一">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200322215851.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>数据层的挑战与应对</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/machine-learning/2019-06-10-numpy-learning/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/technology/2019-04-24-java-distributed-system-chapter3/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&text=数据层的挑战与应对"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&title=数据层的挑战与应对"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&is_video=false&description=数据层的挑战与应对"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=数据层的挑战与应对&body=Check out this article: http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&title=数据层的挑战与应对"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&title=数据层的挑战与应对"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&title=数据层的挑战与应对"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&title=数据层的挑战与应对"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&name=数据层的挑战与应对&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-垂直-水平拆分的苦难"><span class="toc-number">1.</span> <span class="toc-text">1. 垂直/水平拆分的苦难</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-事务处理"><span class="toc-number">2.</span> <span class="toc-text">2. 事务处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-分布式事务模型与规范"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 分布式事务模型与规范</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-二阶段提交"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 二阶段提交</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-CAP-BASE"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 CAP/BASE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-Paxos-协议"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 Paxos 协议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-集群内数据一致性"><span class="toc-number">2.5.</span> <span class="toc-text">2.5 集群内数据一致性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-多机-Sequence-问题"><span class="toc-number">3.</span> <span class="toc-text">3. 多机 Sequence 问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-多机查询"><span class="toc-number">4.</span> <span class="toc-text">4. 多机查询</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        数据层的挑战与应对
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-05-10T16:00:00.000Z" itemprop="datePublished">2019-05-11</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/分布式/">分布式</a>, <a class="tag-link" href="/tags/大型网站系统与-Java-中间件开发实践/">大型网站系统与 Java 中间件开发实践</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <p>这一节主要讲数据库的设计，首先要说的就是单机设计方式，一个 JVM 连上一个 DB 完成。</p>
+<h2 id="1-垂直-水平拆分的苦难"><a href="#1-垂直-水平拆分的苦难" class="headerlink" title="1. 垂直/水平拆分的苦难"></a>1. 垂直/水平拆分的苦难</h2><p>除了上升硬件能力以外，我们有什么办法给数据库减压，这里提了三个方法：</p>
+<ol>
+<li>优化应用，减少不必要的数据库压力；</li>
+<li>引入缓存、加入搜索引擎支持；</li>
+<li>分摊 DB 压力，分库分表。</li>
+</ol>
+<p>这一节当然从分库分表开始，<strong>垂直拆分是把同一个数据库里不同业务的数据分到不同的数据库里</strong>；<strong>水平拆分则是根据规则把同一业务的数据拆分到不同数据库里</strong>。</p>
+<p>垂直拆分影响：</p>
+<ol>
+<li>单机 ACID 保障打破，原来的事务处理收到影响，引入分布式事务；</li>
+<li>Join 可能变得复杂，因为数据被分到了不同的库里，需要使用应用或其他方式解决；</li>
+<li>外键约束场景也会相应收到影响。</li>
+</ol>
+<p>水平拆分影响：</p>
+<ol>
+<li>ACID 打破；</li>
+<li>Join 影响；</li>
+<li>外键影响；</li>
+<li>生成 ID 策略收到影响；</li>
+<li>现在单表查询跨库。</li>
+</ol>
+<h2 id="2-事务处理"><a href="#2-事务处理" class="headerlink" title="2. 事务处理"></a>2. 事务处理</h2><p>现在我们就来细聊多库以后事务的支持问题。</p>
+<h3 id="2-1-分布式事务模型与规范"><a href="#2-1-分布式事务模型与规范" class="headerlink" title="2.1 分布式事务模型与规范"></a>2.1 分布式事务模型与规范</h3><p>X/Open 组织提出的分布式事务规范——XA。我们先把 XA 当黑盒，先来看看 DTP (X/Open Distributed Transaction Processing Reference Model)模型。其中包含三个组件：Application Program、Resource Manager 和 Transaction Manager 。</p>
+<ol>
+<li>AP 即应用程序，它定义了事务的边界；</li>
+<li>RM 资源管理器，即一个 DBMS 系统，或者一个消息服务器管理系统，AP 通过 RM 对资源进行管理，资源实现 XA 实现的接口；</li>
+<li>TM 事务管理器，负责协调和管理事务，给事务指定标识，监控他们的进程，其标识即事务分支标识 XID ，由 TM 指定。</li>
+</ol>
+<p>如图可以看到三者的通信关系。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200322215851.png" alt></p>
+<p>AP 与 RM 是一定要存在的，而 TM 则是人为加入的，因为我们需要给多台机器<strong>达到一致的状态</strong>，因此需要这个单点来进行调节。</p>
+<p>此外，DTP 中还有几个概念：</p>
+<ol>
+<li>事务：一个完整工作的单元；</li>
+<li>全局事务：一次操作多个 RM 的事务叫做全局事务；</li>
+<li>分支事务：全局事务中，每一个 RM 所对应任务的集合就是分支事务；</li>
+<li>控制线程：事务上下文环境，用来关联 AP RM TM 三者。</li>
+</ol>
+<p>下图是完整的 DTP 模型。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200323000432.png" alt></p>
+<p>上图重点在于 AP RM TM 三者之间的关系。</p>
+<ol>
+<li>AP 与 RM 之间：使用 RM 自身提供的 native API ，当开始分布式事务的时候，AP 需要得到 RM 的连接，此连接由 TM 管理，然后使用 XA specific native API 交互；</li>
+<li>AP 与 TM 之间：图中为 TX 接口，也是 X/Open 规范的。主要用于控制事务，比如启动、提交、回滚；</li>
+<li>TM 与 RM 之间：通过 XA 接口进行交互，TM 管理了 RM 的连接。</li>
+</ol>
+<h3 id="2-2-二阶段提交"><a href="#2-2-二阶段提交" class="headerlink" title="2.2 二阶段提交"></a>2.2 二阶段提交</h3><p>2PC ，Two Phase Commitment Protocol ，二阶段是对于单库事务提交来说的。单库中我们 DB 完成后「提交」或「回滚」，而这里我们增加了一步——「准备」，因此称作二阶段。</p>
+<p>顾名思义，二阶段就有两个阶段，我们这里假设存在两个「资源」需要进行同步的操作，可以看到如下两个阶段。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/二阶段流程.jpg" alt></p>
+<p>可以发现主要的参与者仅有 TM 与两个资源对象，值得注意的是，如果在「准备」阶段有一个资源准备失败了，那么二阶段的处理就是回滚所有的资源。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/二阶段失败.jpg" alt></p>
+<p>网络上交互的增加以及引入 TM 的开销，是使用 2PC 事务开销大的两个重要方面。</p>
+<h3 id="2-3-CAP-BASE"><a href="#2-3-CAP-BASE" class="headerlink" title="2.3 CAP/BASE"></a>2.3 CAP/BASE</h3><p>CAP 理论相当经典：</p>
+<ul>
+<li>Consistency: all nodes see the same data at the same time. 所有节点同时看到相同的数据；</li>
+<li>Availability: a guarantee that every request receives a response about whether it was successful or failed. 保证成功还是失败，只能二选一；</li>
+<li>Partition-Tolerance: the system continues to operate despite arbitrary message loss or failure of part of the system. 即使系统有部分问题或消息丢失，但是系统依然可以运行，即分区容忍。</li>
+</ul>
+<p>我们只能同时选择三者的其中两者。</p>
+<ul>
+<li>CA，放弃分区容忍，加强了一致性和可用性。这是传统单机的做法；</li>
+<li>AP，放弃一致性，追求分区容忍和可用性。这是很多分布式系统的选择，例如很多 NoSQL 就是如此；</li>
+<li>CP，放弃可用性，追求一致性和分区容忍性。这种选择可用性比较低，主要问题在于网络导致系统不可用。</li>
+</ul>
+<p>主流方案是 AP ，并不是不关心 C ，而是在 AP 满足的基础上再考虑 C 。</p>
+<p>再来看看 BASE 模型：</p>
+<ul>
+<li>Basically Available：基本可用，允许分区失败；</li>
+<li>Soft state：软状态，接收一段时间的状态不可用；</li>
+<li>Eventually consistent：最终一直，保证最终数据状态一致。</li>
+</ul>
+<p>可以发现选择了 AP 以后和 BASE 模型是相通的。</p>
+<h3 id="2-4-Paxos-协议"><a href="#2-4-Paxos-协议" class="headerlink" title="2.4 Paxos 协议"></a>2.4 Paxos 协议</h3><p>它把二阶段要轻量一些，节点之间的交互有两种方式：</p>
+<ol>
+<li>共享内存共用一份数据；</li>
+<li>消息传递信息。</li>
+</ol>
+<p>消息在传递过程中容易出现失败，而 Paxos 就是帮助解决「一致性问题」的一个方案。</p>
+<p>Paxos 的前提是不存在「拜占庭将军问题」。也就是说需要保证当前是一个可信的通信环境，消息都是准确的。</p>
+<p>我们假设有三种角色的节点，Proposers Acceptors Learners :</p>
+<ul>
+<li>Proposers，提议者，提出议案的角色；</li>
+<li>Acceptors，接收者，收到议案后进行判断的角色，可以选择「接收」，若议案被大部分接收者「接收」，则议案会被「批准」即 Chosen ；</li>
+<li>Learners，学习者，只能学习被「批准」的议案的角色。</li>
+</ul>
+<blockquote>
+<p>每个角色可以身兼数职。</p>
+</blockquote>
+<p>这里有两个重要的名词：</p>
+<ul>
+<li>Proposal，议案，由 Proposers 提出，被 Acceptors 「批准」或「否决」；</li>
+<li>Value，决议，每个决议都有是一由二元组 <code>{编号，决议}</code> 组成。</li>
+</ul>
+<p>Paxos 在解决的问题用上面这些名词来描述的话，就是：</p>
+<ul>
+<li>Value 只有被 Proposers 提出后才能被 Chosen（未 Chosen 的决议叫做 Proposal ）；</li>
+<li>在 Paxos 的执行过程中，一次只能 Chosen 一个 Value；</li>
+<li>Learners 只能获得被 Chosen 的 Value 。</li>
+</ul>
+<p>每个角色都会进行记录，记录中 Proposal 不会被改变，而有些信息可以改变：</p>
+<ul>
+<li>LastTried[p]，由角色 p 试图发起的最后一个 Proposal 的编号，初始值为 -∞ ；</li>
+<li>PreviousVote[p]，角色 p 投票的所有 Proposal 中，编号最大的 Proposal 对应的投票，初始值为 -∞ ；</li>
+<li>NextBallot[p]，角色 p 发出所有 LastVote(b,v) 消息中，Proposal 编号 b 的最大值。</li>
+</ul>
+<p>那么 Paxos 的流程就可以这样理解：</p>
+<ol>
+<li>角色 p 选择一个比 LastTried[p] 大的 Proposal 编号 b ，设置 LastTried[p] 为 b ，然后将 NextBallot(b) 发送给其他角色；</li>
+<li>在 p 收到一个 b &gt; NextBallot[q] 的 NextBallot(b) 消息后，角色 q 将 NextBallot[q] 设置成 b ，然后发出一条 LastVote(b,v)，其中 v = PreviousVote[q] ；</li>
+</ol>
+<blockquote>
+<p>这里比较绕的点是 p 收到 q 的消息，且这条消息的 NextBallot 要比 b 小，如果说 NextBallot[q] &lt;= b ，则忽略。</p>
+</blockquote>
+<ol>
+<li>然后奇妙的事情发生了，当一个集合 Q 的所有人都收到一个 LastVote(b,v) 后，角色 p 就会发起一个「编号为 b ，人数为 Q ，Proposal 为 d 」的表决，然后 p 给这个 Q 里每一个人都发送一个 BeginBallot(b,d) 的消息；</li>
+<li>在收到一个 b = NextBallot[q] 的 BeginBallot(b,d) 的消息后，人员 q 在编号为 b 的 Proposal 中投票，设置 PreviousVote[q] 为这一票，然后向 p 发送了 Voted(b,q) 消息；</li>
+<li>p 收到了 Q 中每一个 q 的 Voted(b,q) 后（此时 LastTried[p]==b），将 Proposal d 的记录记下，发送 Success(d) 给每一个 q ；</li>
+<li>每一个人收到 Success(d) 后，将 Proposal d 记下。</li>
+</ol>
+<p>如果一个系统中同时有人提案，可能会出现碰撞失败，然后双方都需要增加议案的编号再进行提交；如果此时提交仍然可能出现冲突，因此双方需要继续增加编号。这就产生了「活锁」，且永远没有尽头。</p>
+<p>解决方法是整个集群里只有一个 Leader ，所有的 Proposal 都由他提出，而 Leader 出现了问题就需要重新选举。</p>
+<h3 id="2-5-集群内数据一致性"><a href="#2-5-集群内数据一致性" class="headerlink" title="2.5 集群内数据一致性"></a>2.5 集群内数据一致性</h3><p>这里讲的是亚马逊 Dynamo 的论文中 Quorum 和 Vector Clock 算法的比较详情。</p>
+<p>首先是关于 Quorum 算法，它用来权衡分布式系统中数据一致性与可用性，其中有是三个变量：</p>
+<ol>
+<li>N：数据复制节点数</li>
+<li>R：成功读操作的最小节点数</li>
+<li>W：成功写操作的最小节点数</li>
+</ol>
+<p>如果 W+R&gt;N ，是可以保证强一致性的，而如果 W+R≤N ，则是可以保证最终一致性的。</p>
+<p>根据 CAP 理论，举个例子，如果使 N=W ，而 R=1 ，则可用性会大大降低，但是一致性是最好的。</p>
+<hr>
+<p>而 Vector Clock 的思路是对同一份数据的每一次修改都加上 <code>&lt;修改者，版本号&gt;</code> 的二元组，在现实生活中我们往往不能在一群中达到一个一致结果，在计算机这样的虚拟世界里这样的问题尤为重要，而「时间」是 Vector Clock 算法的核心，所有结果都带上时间。</p>
+<p>假设现在有四个人：Alice Ben Catby Dave 。Alice 说周三聚餐，Dave 和 Catby 商量改周四，Dave 又和 Ben 商量改周二，最后 Alice 汇总大家的结果。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/Vector Clock.jpg" alt></p>
+<p>现在 Alice 收到来自 Ben 的消息是周四，收到来自 Catby 的消息同样是周四（这里有一个选择，Dave 第二次的决定是周二还是周四，这里假设是 Dave 第二次依然决定是周四，没有同意改成周二），答案就有解了。</p>
+<h2 id="3-多机-Sequence-问题"><a href="#3-多机-Sequence-问题" class="headerlink" title="3. 多机 Sequence 问题"></a>3. 多机 Sequence 问题</h2><p>水平分库以后，单表放在多机上，自然自增 id 不能用了，连续 id 有两个特性：</p>
+<ul>
+<li>唯一性</li>
+<li>连续性</li>
+</ul>
+<p>从唯一性可以想到简单的 UUID ，或者根据 IP MAC 时间 机器等生成一个唯一的 id ，但是连续性并不好。</p>
+<p>有一种较为主流的实现方式是把所有 id 在一个地方进行管理，这里有几个关键问题。</p>
+<ol>
+<li>性能问题：每次远程获取 id 都有资源消耗，一种方式是一次取一批 id ，然后缓存在本地，但是如果此时宕机，那么这些 id 就浪费了；</li>
+<li>稳定性问题：id 生成器其稳定性要靠整个集群来保证；</li>
+<li>存储问题：底层存储的选择空间很大，根据不同的类型进行容灾方案。</li>
+</ol>
+<p>下面有两种存储方案，一种是在底层使用一个独立的存储来记录每个 id 序列当前的最大值，并控制并发更新：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/独立id生成器.jpg" alt></p>
+<p>另一种则是直接把整个 id 生成器舍弃，把相关逻辑放到需要生成 id 的应用本身：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/内嵌生成器.jpg" alt></p>
+<p>但是因为没有中心节点，我们还是希望生成器之间有通信，管理上也需要额外的功能。</p>
+<h2 id="4-多机查询"><a href="#4-多机查询" class="headerlink" title="4. 多机查询"></a>4. 多机查询</h2><p>分库以后，存在问题解决了，读的问题仍然存在，我们还是要把数据从不同机器 join 到一个库里，解决记录有如下几种。</p>
+<ol>
+<li>在应用层把原来的数据库的 join 操作分成多次的数据库操作，说白了就是原来的 join 不用了，用逻辑来连接；</li>
+<li>数据冗余，把一些常用数据冗余，去除 join 操作；</li>
+<li>借助外部系统比如搜索引擎来解决跨库问题。</li>
+</ol>
+<p>假设用户信息根据地域进行划分，一个数据库分成多个库，而库中有多个表，如图。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/分库分表.jpg" alt></p>
+<p>我们在查询的时候可能会遇到跨库、跨表的问题，结果处理还是相对简单，但是有写场景需要特殊处理：</p>
+<ol>
+<li>排序：如果各自有序应该用多路归并，如果各自无序则全排；</li>
+<li>函数处理：使用 Max Min Sum Count 等对多个数据来源的值进行相应函数处理；</li>
+<li>求平均值：这没啥好说的其实，多个数据源的 Sum 求和计算平均即可；</li>
+<li>非排序分页：看属于「同等步长的分页」还是「同等比例的分页」，前者是说同页中来自不同数据源的记录数相同；后者是说同页中来自不同数据源的数据占数据总数的比例是一样的；</li>
+<li>排序后分页：这个最复杂，需要把排序和分页放在一起的情况，我们需要每个数据源结果都排好序，然后在取下一页的时候每个数据源都给出足量的数据进行排序，约到后面负担越大，比如第100页，需要每个数据源把前100页都取出进行归并，才能得到正确的结果。</li>
+</ol>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-垂直-水平拆分的苦难"><span class="toc-number">1.</span> <span class="toc-text">1. 垂直/水平拆分的苦难</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-事务处理"><span class="toc-number">2.</span> <span class="toc-text">2. 事务处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-分布式事务模型与规范"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 分布式事务模型与规范</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-二阶段提交"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 二阶段提交</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-CAP-BASE"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 CAP/BASE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4-Paxos-协议"><span class="toc-number">2.4.</span> <span class="toc-text">2.4 Paxos 协议</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-集群内数据一致性"><span class="toc-number">2.5.</span> <span class="toc-text">2.5 集群内数据一致性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-多机-Sequence-问题"><span class="toc-number">3.</span> <span class="toc-text">3. 多机 Sequence 问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-多机查询"><span class="toc-number">4.</span> <span class="toc-text">4. 多机查询</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&text=数据层的挑战与应对"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&title=数据层的挑战与应对"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&is_video=false&description=数据层的挑战与应对"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=数据层的挑战与应对&body=Check out this article: http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&title=数据层的挑战与应对"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&title=数据层的挑战与应对"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&title=数据层的挑战与应对"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&title=数据层的挑战与应对"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-05-11-java-distributed-system-chapter4/&name=数据层的挑战与应对&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

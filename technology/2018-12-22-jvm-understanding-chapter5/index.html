@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="这里对应该书的第五部分。  我们不希望处理器在大部分时间里都处于等待其他资源的状态，因此使用一些手段来压榨处理器的运算能力，衡量一个服务性能的好坏，每秒事务处理数（Transactions Per Second , TPS）是一个最重要的指标，它代表一秒内服务端平均能响应的请求总数，而 TPS 与程序的并发能力又有非常密切的关系。  CPU 太快，而 IO 太慢，不让 CPU 等待的办法就是让它">
+<meta name="keywords" content="java,深入理解 JVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="高效并发">
+<meta property="og:url" content="http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="这里对应该书的第五部分。  我们不希望处理器在大部分时间里都处于等待其他资源的状态，因此使用一些手段来压榨处理器的运算能力，衡量一个服务性能的好坏，每秒事务处理数（Transactions Per Second , TPS）是一个最重要的指标，它代表一秒内服务端平均能响应的请求总数，而 TPS 与程序的并发能力又有非常密切的关系。  CPU 太快，而 IO 太慢，不让 CPU 等待的办法就是让它">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190120155506.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190120161521.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190121165533.png">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="高效并发">
+<meta name="twitter:description" content="这里对应该书的第五部分。  我们不希望处理器在大部分时间里都处于等待其他资源的状态，因此使用一些手段来压榨处理器的运算能力，衡量一个服务性能的好坏，每秒事务处理数（Transactions Per Second , TPS）是一个最重要的指标，它代表一秒内服务端平均能响应的请求总数，而 TPS 与程序的并发能力又有非常密切的关系。  CPU 太快，而 IO 太慢，不让 CPU 等待的办法就是让它">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190120155506.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>高效并发</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2018-12-29-jvm-understanding-chapter13/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/technology/2018-12-15-jvm-understanding-chapter2/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&text=高效并发"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&title=高效并发"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&is_video=false&description=高效并发"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=高效并发&body=Check out this article: http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&title=高效并发"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&title=高效并发"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&title=高效并发"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&title=高效并发"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&name=高效并发&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Java-内存模型"><span class="toc-number">1.</span> <span class="toc-text">1. Java 内存模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-主内存和工作内存"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 主内存和工作内存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-内存间的交互操作"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 内存间的交互操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-对于-volatile-型变量的特殊规则"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 对于 volatile 型变量的特殊规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-对-long-和-double-型变量的特殊规则"><span class="toc-number">1.4.</span> <span class="toc-text">1.4 对 long 和 double 型变量的特殊规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-原子性、可见性与有序性"><span class="toc-number">1.5.</span> <span class="toc-text">1.5 原子性、可见性与有序性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-先行发生原则"><span class="toc-number">1.6.</span> <span class="toc-text">1.6 先行发生原则</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Java-与线程"><span class="toc-number">2.</span> <span class="toc-text">2. Java 与线程</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        高效并发
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-12-21T16:00:00.000Z" itemprop="datePublished">2018-12-22</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/java/">java</a>, <a class="tag-link" href="/tags/深入理解-JVM/">深入理解 JVM</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <blockquote>
+<p>这里对应该书的第五部分。</p>
+</blockquote>
+<p>我们不希望处理器在大部分时间里都处于等待其他资源的状态，因此使用一些手段来压榨处理器的运算能力，衡量一个服务性能的好坏，<strong>每秒事务处理数（Transactions Per Second , TPS）是一个最重要的指标</strong>，它代表一秒内服务端平均能响应的请求总数，而 TPS 与程序的并发能力又有非常密切的关系。</p>
+<blockquote>
+<p>CPU 太快，而 IO 太慢，不让 CPU 等待的办法就是让它处理多件事情。</p>
+</blockquote>
+<p>由于计算机的存储设备与处理器的运算速度有几个数量级的差距，所以现代计算机系统都不得不加入一层读写速度尽可能接近处理器运算速度的高速缓存（Cache）来作为内存与处理器之间的缓冲：<strong>将运算需要使用到的数据复制到缓存中，让运算能快速进行，当运算结束后再从缓存同步回内存之中，这样处理器就无须等待缓慢的内存读写了</strong>。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190120155506.png" alt></p>
+<p>现在，因为缓存的出现，我们遇到了新的问题：<strong>缓存一致性</strong>。在多处理器系统中，每个处理器都有自己的高速缓存，而它们共同享有一个主内存，如上图所示。当多个处理器的任务都涉及同一块主内存区域的时候，<strong>同步到主内存时以谁的数据为准</strong>？我们需要各个处理器访问缓存时都遵循一些协议。</p>
+<p><strong>所谓内存模型，就是在特定的操作协议下，对特定的内存或高速缓存进行读写访问的过程抽象</strong>。</p>
+<p>为了处理器内部的运算单元尽量被充分利用，处理器可能会对代码进行<strong>乱序处理</strong>，JVM 的即时编译器中也有类似的<strong>指令重排序</strong>优化。</p>
+<h2 id="1-Java-内存模型"><a href="#1-Java-内存模型" class="headerlink" title="1. Java 内存模型"></a>1. Java 内存模型</h2><p>就是所谓的 Java Memory Model ，简称 JMM 。用以屏蔽各种硬件和操作系统的内存访问差异，实现 Java 在各个平台下都能一致的内存访问效果。</p>
+<p>我们需要尽可能严谨，保证内存访问不会出现歧义；也要足够宽松，让虚拟机可以有足够的自由空间去利用硬件的各种特性。在 Jdk1.5 发布后，JMM 已经成熟和完善起来了。</p>
+<h3 id="1-1-主内存和工作内存"><a href="#1-1-主内存和工作内存" class="headerlink" title="1.1 主内存和工作内存"></a>1.1 主内存和工作内存</h3><p><strong>JMM 的主要目标是定义程序中各个变量的访问规则，即在虚拟机中将变量存储到内存和从内存取出变量这样的底层细节。</strong>这里的变量和一般的变量是不同的，它包括了实例字段、静态字段、构成数组的元素，<strong>但不包括局部变量和方法参数</strong>，因为它们是线程私有的，不会存在竞争问题。</p>
+<p>JMM 规定了所有变量都存储在主内存中，同时，每个线程都有自己的工作内存，<strong>工作内存中存放了被该线程使用到的变量的主内存副本拷贝，线程对变量的所有操作都必须在工作内存中进行，而不能直接读写主内存中的变量</strong>，不同线程直接无法直接访问对方工作内存中的变量，线程间变量值的传递均需要通过主内存完成，下面是线程、主内存、工作内存三者的交互关系。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190120161521.png" alt></p>
+<p>JMM 和 JVM 中的内存划分不是同一个层次的内存划分，两者基本上没有关系，<strong>主内存主要对应于 JVM Heap 中对象实例数据部分，而工作内存对应 JVM 虚拟机栈中的部分</strong>。</p>
+<h3 id="1-2-内存间的交互操作"><a href="#1-2-内存间的交互操作" class="headerlink" title="1.2 内存间的交互操作"></a>1.2 内存间的交互操作</h3><p>JMM 中定义了8种<strong>操作</strong>，虚拟机实现时必须保证下面提及的每一种操作都是原子的，不可再分：</p>
+<ul>
+<li>lock（锁定）：作用于主内存的变量，它把一个变量标识为一条<strong>线程独占</strong>的状态。</li>
+<li>unlock（解锁）：作用于主内存的变量，它把一个处于<strong>锁定状态的变量释放</strong>出来，释放后的变量才可以被其他线程锁定。</li>
+<li>read（读取）：作用于主内存的变量，它把一个变量的值<strong>从主内存传输到线程的工作内存</strong>中，以便随后的 load 动作使用。</li>
+<li>load（载入）：作用于工作内存的变量，它把 read 操作<strong>从主内存中得到的变量值放入工作内存的变量副本中</strong>。</li>
+<li>use（使用）：作用于工作内存的变量，它把<strong>工作内存中一个变量的值传递给执行引擎</strong>，每当虚拟机遇到一个需要使用到变量的值的字节码指令时将会执行这个操作。</li>
+<li>assign（赋值）：作用于工作内存的变量，它把一个<strong>从执行引擎接收到的值赋给工作内存的变量</strong>，每当虚拟机遇到一个给变量赋值的字节码指令时执行这个操作。</li>
+<li>store（存储）：作用于工作内存的变量，它把<strong>工作内存中一个变量的值传送到主内存</strong>中，以便随后的 write 操作使用。</li>
+<li>￼write（写入）：作用于主内存的变量，它把 store 操作<strong>从工作内存中得到的变量的值放入主内存的变量</strong>中。</li>
+</ul>
+<blockquote>
+<p>lock 和 unlock 在线程中常用，在这里不解释。</p>
+<p>use 和 assign 作用在工作内存，前者把变量给工作引擎；后者把执行引擎的值传给变量。</p>
+<p>read 以后 load ，先读取主内存到工作内存（作用在主内存），再加载到工作内存（作用在工作内存）。</p>
+<p>store 以后 write ，先读取工作内存到主内存（作用在工作内存），再存储到主内存（作用在主内存）。</p>
+</blockquote>
+<p>JMM 只要求了上述两组操作需按顺序执行，并没有保证说是<strong>连续执行</strong>，<strong>这两组操作中间是可以插入其他指令的</strong>。</p>
+<p>在执行上述8种基本操作的时候，必须满足以下<strong>规则</strong>：</p>
+<ul>
+<li>不允许 read 和 load 、 store 和 write 操作之一单独出现，即不允许一个变量从主内存读取了但工作内存不接受，或者从工作内存发起回写了但主内存不接受的情况出现。</li>
+<li>不允许一个线程丢弃它的最近的 assign 操作，即<strong>变量在工作内存中改变了之后必须把该变化同步回主内存</strong>。</li>
+<li>不允许一个线程无原因地（没有发生过任何 assign 操作）把数据从线程的工作内存同步回主内存中。</li>
+<li><strong>一个新的变量只能在主内存中“诞生”</strong>，不允许在工作内存中直接使用一个未被初始化（ load 或 assign ）的变量，换句话说，就是对一个变量实施 use 、 store 操作之前，必须先执行过了 assign 和 load 操作。</li>
+<li>一个变量在同一个时刻只允许一条线程对其进行 lock 操作，但 lock 操作可以被同一条线程重复执行多次，多次执行 lock 后，只有执行相同次数的 unlock 操作，变量才会被解锁。</li>
+<li>如果对一个变量执行 lock 操作，那将会清空工作内存中此变量的值，在执行引擎使用这个变量前，需要重新执行 load 或 assign 操作初始化变量的值。</li>
+<li>如果一个变量事先没有被 lock 操作锁定，那就不允许对它执行 unlock 操作，也不允许去 unlock 一个被其他线程锁定住的变量。</li>
+<li>对一个变量执行 unlock 操作之前，必须先把此变量同步回主内存中（执行 store 、 write 操作）。</li>
+</ul>
+<p><strong>这些规则加上 volatile 的特殊规定，已经能完全确定哪些内存访问操作在并发下是安全的</strong>，这里的定义很繁琐，之后有一个<strong>先行发生原则，用以判断一个访问在并发下是否安全</strong>。</p>
+<h3 id="1-3-对于-volatile-型变量的特殊规则"><a href="#1-3-对于-volatile-型变量的特殊规则" class="headerlink" title="1.3 对于 volatile 型变量的特殊规则"></a>1.3 对于 volatile 型变量的特殊规则</h3><p>它是 JVM 提供最轻量级的同步机制，但是它并不容易被正确、完整地理解，以至于许多程序员都习惯不使用它，遇到需要多线程数据竞争的时候一律使用 synchronized 来进行同步，了解 volatile 变量的语义对后面了解多线程操作的其他特性很有意义。</p>
+<blockquote>
+<p>volatile 适用的场景是一写多读，例如比较经典的单例对象，它可以保证所有读取的值都会是最新的，<strong>实现原理是该关键字在读的时候回强制从主内存中读取</strong>。</p>
+</blockquote>
+<p>当一个变量定义为 volatile 之后，它将具备两种特性，<strong>第一是保证此变量对所有线程的可见性</strong>，这里的“可见性”是指当一条线程修改了这个变量的值，新值对于其他线程来说是可以立即得知的。</p>
+<p>volatile 变量在各个线程的工作内存中不存在一致性问题（在各个线程的工作内存中，volatile 变量也可以存在不一致的情况，<strong>但由于每次使用之前都要先刷新，执行引擎看不到不一致的情况，因此可以认为不存在一致性问题</strong>），但是 <strong>Java 里面的运算并非原子操作，导致 volatile 变量的运算在并发下一样是不安全的</strong>。</p>
+<p>我们来看一个例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">/＊＊￼</span><br><span class="line">＊ <span class="keyword">volatile</span>变量自增运算测试￼</span><br><span class="line">＊￼</span><br><span class="line">＊ <span class="meta">@author</span> zzm￼</span><br><span class="line">＊/￼</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">VolatileTest</span> </span>&#123;￼</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">volatile</span> <span class="keyword">int</span> race = <span class="number">0</span>;</span><br><span class="line">  ￼</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">increase</span><span class="params">()</span> </span>&#123;￼</span><br><span class="line">    race++;￼</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> THREADS_COUNT = <span class="number">20</span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;￼</span><br><span class="line">    Thread[] threads = <span class="keyword">new</span> Thread[THREADS_COUNT];￼</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; THREADS_COUNT; i++) &#123;￼</span><br><span class="line">      threads[i] = <span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;￼</span><br><span class="line">        <span class="meta">@Override</span>￼</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;￼</span><br><span class="line">          <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; i++) &#123;￼</span><br><span class="line">            increase();￼</span><br><span class="line">          &#125;￼</span><br><span class="line">        &#125;￼</span><br><span class="line">      &#125;);￼</span><br><span class="line">      threads[i].start();￼</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 等待所有累加线程都结束￼</span></span><br><span class="line">    <span class="keyword">while</span> (Thread.activeCount() &gt; <span class="number">1</span>)￼</span><br><span class="line">      Thread.yield();</span><br><span class="line">    System.out.println(race);￼</span><br><span class="line">  &#125;￼</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>答案不是我们预想的200000，而是一个比它小的数字，问题就在我们的 <code>race++</code> 里面，反编译代码得到 <code>increase</code>  方法的以下指令码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">increase</span><span class="params">()</span></span>;￼</span><br><span class="line">  Code:￼</span><br><span class="line">    Stack=<span class="number">2</span>, Locals=<span class="number">0</span>, Args_size=<span class="number">0</span>￼</span><br><span class="line">    0:   getstatic       #13; //Field race:I￼</span><br><span class="line">    <span class="number">3</span>:   iconst_1￼</span><br><span class="line">    <span class="number">4</span>:   iadd￼</span><br><span class="line">    5:   putstatic       #13; //Field race:I￼</span><br><span class="line">    <span class="number">8</span>:   <span class="keyword">return</span>￼</span><br><span class="line">    LineNumberTable:￼</span><br><span class="line">    line <span class="number">14</span>: <span class="number">0</span>￼</span><br><span class="line">    line <span class="number">15</span>: <span class="number">8</span></span><br></pre></td></tr></table></figure>
+<p>首先是一条 <code>getstatic</code> 指令，把 race 的值取到操作栈顶， volatile 关键字保证了 race 的值再此时是正确的，但是执行 <code>iconst_1</code> 和 <code>iadd</code> 的时候，可能有其他线程把 race 的值改变了（变大），而操作栈顶的值也就过期了，现在我们使用 <code>putstatic</code> 把一个较小的 race 值写回到了主内存中。</p>
+<blockquote>
+<p>一条字节码指令，也并不意味着这条指令就是一个原子操作，一条字节码指令执行的时候，解释器要运行许多行代码才能实现它的语义，使用指令 -XX:+PrintAssembly 会更加严谨。</p>
+</blockquote>
+<p>由于 volatile 变量<strong>只能保证可见性</strong>，在不符合以下两条规则的运算场景中，我们仍然要通过加锁（使用 synchronized 或 java.util.concurrent 中的原子类）来保证原子性。</p>
+<ol>
+<li><p>￼<strong>运算结果并不依赖变量的当前值</strong>，或者能够确保<strong>只有单一的线程修改变量的值</strong>。</p>
+</li>
+<li><p>￼<strong>变量不需要与其他的状态变量共同参与不变约束</strong>。</p>
+</li>
+</ol>
+<p>比如说下面的代码，就非常适合使用使用 volatile 关键字：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">volatile</span> <span class="keyword">boolean</span> shutdownRequested;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shutdown</span><span class="params">()</span> </span>&#123;￼</span><br><span class="line">  shutdownRequested = <span class="keyword">true</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doWork</span><span class="params">()</span> </span>&#123;￼</span><br><span class="line">  <span class="keyword">while</span> (!shutdownRequested) &#123;￼</span><br><span class="line">    <span class="comment">// do stuff￼</span></span><br><span class="line">  &#125;￼</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>使用 volatile 变量的第二个语义是禁止指令重排序优化</strong>，普通的变量仅仅会保证在该方法的执行过程中所有依赖赋值结果的地方都能获取到正确的结果，而不能保证变量赋值操作的顺序与程序代码中的执行顺序一致。因为在一个线程的方法执行过程中无法感知到这点，这也就是 Java 内存模型中描述的所谓的“线程内表现为串行的语义”（Within-Thread As-If-Serial Semantics）。</p>
+<p>对于一个双锁单例 DCL ，我们看一下代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">static</span> Singleton instance;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;￼</span><br><span class="line">    <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;￼</span><br><span class="line">      <span class="keyword">synchronized</span> (Singleton.class) &#123;￼</span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;￼</span><br><span class="line">          instance = <span class="keyword">new</span> Singleton();￼</span><br><span class="line">        &#125;￼</span><br><span class="line">      &#125;￼</span><br><span class="line">    &#125;￼</span><br><span class="line">    <span class="keyword">return</span> instance;￼</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;￼</span><br><span class="line">    Singleton.getInstance();￼</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们把它转换成指令码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">0x01a3de0f</span>: mov    $<span class="number">0x3375cdb0</span>,%esi      ;...beb0cd75 <span class="number">33</span>￼</span><br><span class="line">                                         ;   &#123;oop(<span class="string">'Singleton'</span>)&#125;￼</span><br><span class="line"><span class="number">0x01a3de14</span>: mov    %eax,<span class="number">0x150</span>(%esi)      ;...<span class="number">89865001</span> <span class="number">0000</span>￼</span><br><span class="line"><span class="number">0x01a3de1a</span>: shr    $<span class="number">0x9</span>,%esi             ;...c1ee09￼</span><br><span class="line"><span class="number">0x01a3de1d</span>: movb   $<span class="number">0x0</span>,<span class="number">0x1104800</span>(%esi)  ;...c6860048 <span class="number">100100</span>￼</span><br><span class="line"><span class="number">0x01a3de24</span>: lock addl $<span class="number">0x0</span>,(%esp)        ;...f0830424 <span class="number">00</span>￼</span><br><span class="line">                                         ;＊putstatic instance￼</span><br><span class="line">                                         ;-￼</span><br><span class="line">Singleton::getInstance@<span class="number">24</span></span><br></pre></td></tr></table></figure>
+<p>我们可以发现变化在于用 volatile 修饰的变量，赋值后（<code>mov %esp ...</code>）多执行了一条 <code>lock addl ...</code> 指令 ，这个操作相当于<strong>内存屏障</strong>，指<strong>重排序的时候不能把后面的指令重排序到内存屏障之前的位置</strong>。</p>
+<p>单 CPU 的时候不需要内存屏障，但如果有两个或更多 CPU 访问一块内存，且其中有一个在观测另外一个，就需要内存屏障来保证一致性。它的操作是 <code>addl $0x0, (%esp)</code> 把 ESP 寄存器的值加0，显然，这是无意义的操作，而关键不是这里，而是前面的 <strong>lock</strong> ，这个指令的作用是使本 CPU 的 Cache 写入内存，该写入操作使得其他 CPU 的 Cache 无效化，相当于对 Cache 中的变量做了一次 store + write ，工作内存到主内存，通过这个操作可以让前面 volatile 的变量的修改对其他 CPU 是立即可见。</p>
+<blockquote>
+<p>空操作前的 lock 使其他工作内存的变量无效，从而重新去主内存读取，因此对 volatile 可见。</p>
+</blockquote>
+<p>关于指令重排，比如现在有如下指令：</p>
+<ol>
+<li>A + 10</li>
+<li>A * 2</li>
+<li>B - 3</li>
+</ol>
+<p>指令1和指令2明显是相互依赖的，因为 (A + 10) <em> 2 和 A </em> 2 + 10 是不一样的，但指令3可以插入到指令1和2的中间，所以我们上面的 <code>lock addl $0x0, (%esp)</code> 指令把修改同步到内存时，意味着之前的操作已经完成，这样便形成了<strong>指令重排序无法越过内存屏障的效果</strong>。</p>
+<blockquote>
+<p>可以这么理解，volatile 变量的读写都意味着产生一个内存屏障，由内存屏障分割的指令不能越过内存屏障，这才是影响重排的含义，而不是重排不存在了。</p>
+</blockquote>
+<p>如果让 volatile 自己与自己比较，那可以确定一个原则：volatile 变量读操作的性能消耗与普通变量几乎没有什么差别，但是写操作则可能会慢一些，因为<strong>它需要在本地代码中插入许多内存屏障指令来保证处理器不发生乱序执行</strong>。</p>
+<p>尽管如此，大多数场景下 volatile 的总开销还是低于锁的，<strong>我们在 volatile 和锁之间选择的唯一依据仅仅是 volatile 能不能满足需求</strong>。</p>
+<p>JMM 对 volatile 变量定义了特殊规则，假定 T 是一个线程，V 和 W 都是 volatile 的变量，那么在进行<strong>基本操作</strong>(read load use 等)的时候，需要满足以下规则：</p>
+<ul>
+<li>只有当线程 T 对变量 V 执行的前一个动作是 load 的时候，线程 T 才能对变量 V 执行 use 动作；并且，只有当线程 T 对变量 V 执行的后一个动作是 use 的时候，线程 T 才能对变量 V 执行 load 动作。线程 T 对变量 V 的 use 动作可以认为是和线程 T 对变量 V 的 load 、 read 动作相关联，必须连续一起出现（这条规则要求在工作内存中，<strong>每次使用 V 前都必须先从主内存刷新最新的值</strong>，用于保证能看见其他线程对变量 V 所做的修改后的值）。</li>
+</ul>
+<blockquote>
+<p>回忆一下，load 操作执行在工作内存，把主内存的值加载到工作内存。</p>
+<p>use 操作执行在工作内存，把工作内存的值传递给执行引擎。</p>
+</blockquote>
+<ul>
+<li>只有当线程 T 对变量 V 执行的前一个动作是 assign 的时候，线程 T 才能对变量 V 执行 store 动作；并且，只有当线程 T 对变量 V 执行的后一个动作是 store 的时候，线程 T 才能对变量 V 执行 assign 动作。线程 T 对变量 V 的 assign 动作可以认为是和线程 T 对变量 V 的 store 、 write 动作相关联，必须连续一起出现（这条规则要求在工作内存中，<strong>每次修改 V 后都必须立刻同步回主内存中</strong>，用于保证其他线程可以看到自己对变量 V 所做的修改）。</li>
+</ul>
+<blockquote>
+<p>assign 操作执行在工作内存，把执行引擎的值传递到工作内存。</p>
+<p>store 操作执行在工作内存，把工作内存的值存到主内存。</p>
+</blockquote>
+<ul>
+<li>￼假定动作 A 是线程 T 对变量 V 实施的 use 或 assign 动作，假定动作 F 是和动作 A 相关联的 load 或 store 动作，假定动作 P 是和动作 F 相应的对变量 V 的 read 或 write 动作；类似的，假定动作 B 是线程 T 对变量 W 实施的 use 或 assign 动作，假定动作 G 是和动作 B 相关联的 load 或 store 动作，假定动作 Q 是和动作 G 相应的对变量 W 的 read 或 write 动作。如果 A 先于 B ，那么 P 先于 Q （<strong>这条规则要求 volatile 修饰的变量不会被指令重排序优化，保证代码的执行顺序与程序的顺序相同</strong>）。</li>
+</ul>
+<blockquote>
+<p>T 对 V</p>
+<p>A : use 、 assign</p>
+<p>F : load 、 store</p>
+<p>P : read 、 write</p>
+<p>T 对 W</p>
+<p>B : use 、 assign</p>
+<p>G : load 、 store</p>
+<p>Q : read 、 write</p>
+<hr>
+<p>主内存          工作内存           主内存</p>
+<p>read 以后 load ； store 以后 write</p>
+</blockquote>
+<h3 id="1-4-对-long-和-double-型变量的特殊规则"><a href="#1-4-对-long-和-double-型变量的特殊规则" class="headerlink" title="1.4 对 long 和 double 型变量的特殊规则"></a>1.4 对 long 和 double 型变量的特殊规则</h3><p>对于64位的数据，特指 double 和 long ，允许虚拟机将没有被 volatile 修饰的64位数据的读写操作划分为两次32位的操作来进行，即允许虚拟机实现选择<strong>可以不保证</strong>64位数据类型的 load 、 store 、 read 和 write 这4个操作的原子性，这点就是所谓的 long 和 double 的<strong>非原子性协定</strong>。</p>
+<p>目前各种平台下的商用虚拟机几乎都选择把64位数据的读写操作作为原子操作来对待，因此我们在编写代码时一般<strong>不需要把用到的 long 和 double 变量专门声明为 volatile </strong>。</p>
+<blockquote>
+<p>JMM 没有保证 long 和 double 的原子性，但是 JVM 保证了。</p>
+</blockquote>
+<h3 id="1-5-原子性、可见性与有序性"><a href="#1-5-原子性、可见性与有序性" class="headerlink" title="1.5 原子性、可见性与有序性"></a>1.5 原子性、可见性与有序性</h3><ul>
+<li>原子性（Atomicity）：由 Java 内存模型来直接保证的原子性变量操作包括 read 、 load 、 assign 、 use 、 store 和 write ，我们大致可以认为<strong>基本数据类型的访问读写是具备原子性的</strong>（例外就是 long 和 double 的非原子性协定，读者只要知道这件事情就可以了，无须太过在意这些几乎不会发生的例外情况）。</li>
+<li>可见性（Visibility）：可见性是指当<strong>一个线程修改了共享变量的值，其他线程能够立即得知这个修改</strong>。普通变量与 volatile 变量的区别是，volatile 的特殊规则保证了新值能立即同步到主内存，以及每次使用前立即从主内存刷新。<strong>除了 volatile 之外，Java 还有两个关键字能实现可见性，即 synchronized 和 final </strong>。</li>
+</ul>
+<blockquote>
+<p>同步块的可见性是由“对一个变量执行 unlock 操作之前，必须先把此变量同步回主内存中（执行 store 、 write 操作）”这条规则获得的；</p>
+<p>final 关键字的可见性是指：被 final 修饰的字段在构造器中一旦初始化完成，并且构造器没有把 “this” 的引用传递出去（ this 引用逃逸是一件很危险的事情，其他线程有可能通过这个引用访问到“初始化了一半”的对象），那在其他线程中就能看见 final 字段的值。</p>
+</blockquote>
+<ul>
+<li>有序性（Ordering）：如果在本线程内观察，所有的操作都是有序的；如果在一个线程中观察另一个线程，所有的操作都是无序的。前半句是指“线程内表现为串行的语义”（Within-Thread As-If-Serial Semantics），后半句是指“指令重排序”现象和“工作内存与主内存同步延迟”现象。</li>
+</ul>
+<blockquote>
+<p>Java 语言提供了 volatile 和 synchronized 两个关键字来保证线程之间操作的有序性，volatile 关键字本身就包含了禁止指令重排序的语义，而 synchronized 则是由“一个变量在同一个时刻只允许一条线程对其进行 lock 操作”这条规则获得的，这条规则决定了持有同一个锁的两个同步块只能串行地进入。</p>
+</blockquote>
+<h3 id="1-6-先行发生原则"><a href="#1-6-先行发生原则" class="headerlink" title="1.6 先行发生原则"></a>1.6 先行发生原则</h3><p>happen-before 原则，先行发生是 Java 内存模型中定义的两项操作之间的偏序关系，如果说操作 A 先行发生于操作 B ，其实就是说在发生操作 B 之前，<strong>操作 A 产生的影响能被操作 B 观察到</strong>，“影响”包括修改了内存中共享变量的值、发送了消息、调用了方法等。</p>
+<p>JMM 下有一些天然的先行发生关系，这些先行发生关系无须任何同步器协助就存在了，可以在编码中直接使用，如果两个操作的关系不在此列，<strong>且无法从这些规则推导</strong>，就无法保证顺序性，JVM 可以对它们随意重排序。</p>
+<ul>
+<li>程序次序规则（Program Order Rule）：<strong>在一个线程内，按照程序代码顺序，书写在前面的操作先行发生于书写在后面的操作</strong>。准确地说，应该是控制流顺序而不是程序代码顺序，因为要考虑分支、循环等结构。</li>
+<li>管程锁定规则（Monitor Lock Rule）：<strong>一个 unlock 操作先行发生于后面对同一个锁的 lock 操作</strong>。这里必须强调的是同一个锁，而“后面”是指时间上的先后顺序。</li>
+<li>volatile 变量规则（Volatile Variable Rule）：对一个 volatile 变量的写操作先行发生于后面对这个变量的读操作，这里的“后面”同样是指时间上的先后顺序。</li>
+<li>线程启动规则（Thread Start Rule）：Thread 对象的 start() 方法先行发生于此线程的每一个动作。</li>
+<li>线程终止规则（Thread Termination Rule）：线程中的所有操作都先行发生于对此线程的终止检测，我们可以通过 Thread.join() 方法结束、 Thread.isAlive() 的返回值等手段检测到线程已经终止执行。</li>
+<li>线程中断规则（Thread Interruption Rule）：对线程 interrupt() 方法的调用先行发生于被中断线程的代码检测到中断事件的发生，可以通过 Thread.interrupted() 方法检测到是否有中断发生。</li>
+<li>对象终结规则（Finalizer Rule）：一个对象的初始化完成（构造函数执行结束）先行发生于它的 finalize() 方法的开始。</li>
+<li>传递性（Transitivity）：如果操作 A 先行发生于操作 B ，操作 B 先行发生于操作 C ，那就可以得出操作 A 先行发生于操作 C 的结论。</li>
+</ul>
+<p>有一个很有意思的地方，就是上文提及的<strong>时间上的先后顺序</strong>。<strong>先行发生</strong>和<strong>时间上的先后顺序</strong>有什么关系呢？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> value = <span class="number">0</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(<span class="keyword">int</span> value)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.value = value;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里是一个非常平产的 getter/setter ，假设有两个线程 A 和 B ，线程 A 先（时间上的先后）调用了“setValue(1)”，然后线程 B 调用了同一个对象的“getValue()”，那么线程 B 收到的返回值是什么？</p>
+<p>答案是不确定的，因为在两个线程里，所以上面的<strong>先行发生规则</strong>不适用。对于它的修改有两种：</p>
+<ol>
+<li>把 getter/setter 都定义为 synchronized ，可以套用<strong>管程锁定规则</strong>；</li>
+<li>把 value 定义为 volatile ，可以套用 <strong>volatile 变量规则</strong>。</li>
+</ol>
+<p>一个操作“时间上的先发生”<strong>不代表</strong>这个操作会是“先行发生”，那如果一个操作“先行发生”是否就能推导出这个操作必定是“时间上的先发生”呢？很遗憾，这个推论也是不成立的！一个典型的例子就是多次提到的“指令重排序”。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> i = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">int</span> j = <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<p>在同一个线程之中，根据程序次序规则，“int i=1”的操作先行发生于“int j=2”，但是“int j=2”的代码完全可能先被处理器执行，这并不影响先行发生原则的正确性，因为我们在这条线程之中没有办法感知到这点。</p>
+<p><strong>时间先后顺序与先行发生原则之间基本没有太大的关系</strong>，所以我们衡量并发安全问题的时候不要受到时间顺序的干扰，一切必须以先行发生原则为准。</p>
+<blockquote>
+<p>时间顺序不是我们衡量问题的标准。</p>
+</blockquote>
+<h2 id="2-Java-与线程"><a href="#2-Java-与线程" class="headerlink" title="2. Java 与线程"></a>2. Java 与线程</h2><p><strong>每个已经执行 start() 且还未结束的 java.lang.Thread 类的实例就代表了一个线程</strong>。我们注意到 Thread 类与大部分的 Java API 有显著的差别，它的所有关键方法都是声明为 Native 的。<strong>在 Java API 中，一个 Native 方法往往意味着这个方法没有使用或无法使用平台无关的手段来实现（当然也可能是为了执行效率而使用 Native 方法，不过，通常最高效率的手段也就是平台相关的手段）</strong>。正因为如此，作者把本节的标题定为“线程的实现”而不是“Java线程的实现”。</p>
+<p>实现线程主要有3种方式：使用内核线程实现、使用用户线程实现和使用用户线程加轻量级进程混合实现。</p>
+<blockquote>
+<p>这里我们不细究具体三种实现。</p>
+<p>我们先只看具体的线程。</p>
+</blockquote>
+<p>Java 语言定义了5种线程状态，在任意一个时间点，一个线程只能有且只有其中的一种状态。</p>
+<ul>
+<li>新建（New）：创建后尚未启动的线程处于这种状态。</li>
+<li>运行（Runable）：Runable 包括了操作系统线程状态中的 Running 和 Ready ，也就是处于此状态的线程有可能正在执行，也有可能正在等待着 CPU 为它分配执行时间。</li>
+<li>￼无限期等待（Waiting）：处于这种状态的线程不会被分配 CPU 执行时间，它们要等待被其他线程显式地唤醒。以下方法会让线程陷入无限期的等待状态：<ul>
+<li>没有设置 Timeout 参数的 Object.wait() 方法。</li>
+<li>没有设置 Timeout 参数的 Thread.join() 方法。</li>
+<li>LockSupport.park() 方法。</li>
+</ul>
+</li>
+<li>限期等待（Timed Waiting）：处于这种状态的线程也不会被分配 CPU 执行时间，不过无须等待被其他线程显式地唤醒，在一定时间之后它们会由系统自动唤醒。以下方法会让线程进入限期等待状态：<ul>
+<li>Thread.sleep() 方法。</li>
+<li>设置了 Timeout 参数的 Object.wait() 方法。</li>
+<li>设置了 Timeout 参数的 Thread.join() 方法。</li>
+<li>LockSupport.parkNanos() 方法。</li>
+<li>LockSupport.parkUntil() 方法。</li>
+</ul>
+</li>
+<li>阻塞（Blocked）：线程被阻塞了，“阻塞状态”与“等待状态”的区别是：“阻塞状态”在等待着获取到一个排他锁，这个事件将在另外一个线程放弃这个锁的时候发生；而“等待状态”则是在等待一段时间，或者唤醒动作的发生。在程序等待进入同步区域的时候，线程将进入这种状态。</li>
+<li>结束（Terminated）：已终止线程的线程状态，线程已经结束执行。</li>
+</ul>
+<p>上述5种状态在遇到特定事件发生的时候将会互相转换。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190121165533.png" alt></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Java-内存模型"><span class="toc-number">1.</span> <span class="toc-text">1. Java 内存模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-主内存和工作内存"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 主内存和工作内存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-内存间的交互操作"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 内存间的交互操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-3-对于-volatile-型变量的特殊规则"><span class="toc-number">1.3.</span> <span class="toc-text">1.3 对于 volatile 型变量的特殊规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-4-对-long-和-double-型变量的特殊规则"><span class="toc-number">1.4.</span> <span class="toc-text">1.4 对 long 和 double 型变量的特殊规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-5-原子性、可见性与有序性"><span class="toc-number">1.5.</span> <span class="toc-text">1.5 原子性、可见性与有序性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-6-先行发生原则"><span class="toc-number">1.6.</span> <span class="toc-text">1.6 先行发生原则</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-Java-与线程"><span class="toc-number">2.</span> <span class="toc-text">2. Java 与线程</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&text=高效并发"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&title=高效并发"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&is_video=false&description=高效并发"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=高效并发&body=Check out this article: http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&title=高效并发"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&title=高效并发"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&title=高效并发"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&title=高效并发"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-12-22-jvm-understanding-chapter5/&name=高效并发&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

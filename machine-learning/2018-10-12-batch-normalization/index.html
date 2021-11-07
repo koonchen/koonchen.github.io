@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="前向传播阶段首先计算一个 batch 的平均：  \mu _ { \mathcal { B } } \leftarrow \frac { 1 } { m } \sum _ { i = 1 } ^ { m } x _ { i }然后计算这个 batch 的方差：  \sigma _ { \mathcal { B } } ^ { 2 } \leftarrow \frac { 1 } { m } \su">
+<meta name="keywords" content="机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Batch normalization 推导">
+<meta property="og:url" content="http://koon.cool/machine-learning/2018-10-12-batch-normalization/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="前向传播阶段首先计算一个 batch 的平均：  \mu _ { \mathcal { B } } \leftarrow \frac { 1 } { m } \sum _ { i = 1 } ^ { m } x _ { i }然后计算这个 batch 的方差：  \sigma _ { \mathcal { B } } ^ { 2 } \leftarrow \frac { 1 } { m } \su">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Batch normalization 推导">
+<meta name="twitter:description" content="前向传播阶段首先计算一个 batch 的平均：  \mu _ { \mathcal { B } } \leftarrow \frac { 1 } { m } \sum _ { i = 1 } ^ { m } x _ { i }然后计算这个 batch 的方差：  \sigma _ { \mathcal { B } } ^ { 2 } \leftarrow \frac { 1 } { m } \su">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>Batch normalization 推导</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/machine-learning/2018-10-24-boosting/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/machine-learning/2018-10-08-softmax/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/machine-learning/2018-10-12-batch-normalization/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&text=Batch normalization 推导"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&title=Batch normalization 推导"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&is_video=false&description=Batch normalization 推导"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Batch normalization 推导&body=Check out this article: http://koon.cool/machine-learning/2018-10-12-batch-normalization/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&title=Batch normalization 推导"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&title=Batch normalization 推导"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&title=Batch normalization 推导"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&title=Batch normalization 推导"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&name=Batch normalization 推导&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前向传播阶段"><span class="toc-number">1.</span> <span class="toc-text">前向传播阶段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#反向传播阶段"><span class="toc-number">2.</span> <span class="toc-text">反向传播阶段</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Batch normalization 推导
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-10-11T16:00:00.000Z" itemprop="datePublished">2018-10-12</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/machine-learning/">machine learning</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/机器学习/">机器学习</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="前向传播阶段"><a href="#前向传播阶段" class="headerlink" title="前向传播阶段"></a>前向传播阶段</h2><p>首先计算一个 batch 的平均：</p>
+<script type="math/tex; mode=display">
+\mu _ { \mathcal { B } } \leftarrow \frac { 1 } { m } \sum _ { i = 1 } ^ { m } x _ { i }</script><p>然后计算这个 batch 的方差：</p>
+<script type="math/tex; mode=display">
+\sigma _ { \mathcal { B } } ^ { 2 } \leftarrow \frac { 1 } { m } \sum _ { i = 1 } ^ { m } \left( x _ { i } - \mu _ { \mathcal { B } } \right) ^ { 2 }</script><p>然后就可以进行 normalization 了：</p>
+<script type="math/tex; mode=display">
+\widehat { x } _ { i } \leftarrow \frac { x _ { i } - \mu _ { \mathcal { B } } } { \sqrt { \sigma _ { \mathcal { B } } ^ { 2 } + \epsilon } }</script><blockquote>
+<p>这一步是为了让输入分布满足标准正态分布，其中在分母上加上 $\epsilon$ 是为了防止分母过小或为 0 。</p>
+</blockquote>
+<p>进行缩放和平移，得到最终结果：</p>
+<script type="math/tex; mode=display">
+y _ { i } \leftarrow \gamma \widehat { x } _ { i } + \beta \equiv \mathrm { B } \mathrm { N } _ { \gamma , \beta } \left( x _ { i } \right)</script><blockquote>
+<p>从另一个角度看，这个操作就是上一步的反操作，抵消上面 bn 的影响，增强算法的表达能力，在之后，我们还能进行一些其他变换，比如 relu 等。</p>
+</blockquote>
+<p>在训练时就不需要进行 normalization 了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> mode == <span class="string">'train'</span>:</span><br><span class="line">  sample_mean = np.mean(x, axis=<span class="number">0</span>)</span><br><span class="line">  sample_var = np.var(x, axis=<span class="number">0</span>)</span><br><span class="line">  x_hat = (x - sample_mean) / np.sqrt(sample_var + eps)</span><br><span class="line">  out = gamma * x_hat + beta</span><br><span class="line">  cache = (gamma, x, sample_mean, sample_var, eps, x_hat)</span><br><span class="line"></span><br><span class="line">  running_mean = momentum * running_mean + (<span class="number">1</span> - momentum) * sample_mean</span><br><span class="line">  running_var = momentum * running_var + (<span class="number">1</span> - momentum) * sample_var</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">  <span class="comment"># 不需要进行 normalization</span></span><br><span class="line">  x_hat = (x - running_mean) / np.sqrt(running_var + eps)</span><br><span class="line">  out = gamma * x_hat + beta</span><br></pre></td></tr></table></figure>
+<h2 id="反向传播阶段"><a href="#反向传播阶段" class="headerlink" title="反向传播阶段"></a>反向传播阶段</h2><p>对于 bn 的反向传播，能一步步进行推导，具体可以参考：</p>
+<p><a href="https://kratzert.github.io/2016/02/12/understanding-the-gradient-flow-through-the-batch-normalization-layer.html" target="_blank" rel="noopener">Understanding the backward pass through Batch Normalization Layer</a></p>
+<blockquote>
+<p>关键在于仔细。</p>
+</blockquote>
+<p>对于 alternative backward 的推导：</p>
+<p><a href="http://cthorey.github.io./backpropagation/" target="_blank" rel="noopener">What does the gradient flowing through batch normalization looks like</a></p>
+<p>其中最关键的是对于链式损失函数的推导：</p>
+<script type="math/tex; mode=display">
+\begin{aligned} \frac { d \mathcal { L } } { d x _ { i j } } &= \sum _ { k , l } \frac { d \mathcal { L } } { d y _ { k l } } \frac { d y _ { k l } } { d \hat { x } _ { k l } } \frac { d \hat { x } _ { k l } } { d x _ { i j } } \\ \frac { d \mathcal { L } } { d \gamma _ { j } } &= \sum _ { k l } \frac { d \mathcal { L } } { d y _ { k l } } \frac { d y _ { k l } } { d \gamma _ { j } } \\ \frac { d \mathcal { L } } { d \beta _ { j } } &= \sum _ { k l } \frac { d \mathcal { L } } { d y _ { k l } } \frac { d y _ { k l } } { d \beta _ { j } } \end{aligned}</script><hr>
+<p>假设，我们对于 x 的 normalization 的情况如下：</p>
+<script type="math/tex; mode=display">
+\stackrel { \wedge } { x _ { k l } } = x _ { k l } - \mu _ { l }</script><p>也就是说只有位移，没有缩放，那么：</p>
+<script type="math/tex; mode=display">
+\frac { d \hat { x } _ { k l } } { d x _ { i j } } = \delta _ { i , k } \delta _ { j , l } - \frac { 1 } { N } \delta _ { j , l }</script><p>这里就是该推导的核心部分，对于 $\delta _{i,j}$ 只有当 $i=j$ 时，$\delta$ 为 1 否则为 0 。所以对于上面的式子而言，第一个式子为 1 只有当 $k=i$ 且 $l=j$ ，第二个式子为 $1/N$ 只有当 $l=j$ 。</p>
+<hr>
+<p>从最简单 beta 的开始：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} \frac { d \mathcal { L } } { d \beta _ { j } } & = \sum _ { k l } \frac { d \mathcal { L } } { d y _ { k l } } \frac { d y _ { k l } } { d \beta _ { j } } \\ & = \sum _ { k l } \frac { d \mathcal { L } } { d y _ { k l } } \delta _ { l j } \\ & = \sum _ { k } \frac { d \mathcal { L } } { d y _ { k j } } \end{aligned} \right.</script><hr>
+<p>然后是次简单的 gamma ：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} \frac { d \mathcal { L } } { d \gamma _ { j } } & = \sum _ { k l } \frac { d \mathcal { L } } { d y _ { k l } } \frac { d y _ { k l } } { d \gamma _ { j } } \\ & = \sum _ { k l } \frac { d \mathcal { L } } { d y _ { k l } } \hat { x } _ { k l } \delta _ { l j } \\ & = \sum _ { k } \frac { d \mathcal { L } } { d y _ { k j } } \left( x _ { k j } - \mu _ { j } \right) \left( \sigma _ { j } ^ { 2 } + \epsilon \right) ^ { - 1 / 2 } \end{aligned} \right.</script><hr>
+<p>最后的第一条链式推导：</p>
+<script type="math/tex; mode=display">
+\frac { d \mathcal { L } } { d x _ { i j } } = \sum _ { k , l } \frac { d \mathcal { L } } { d y _ { k l } } \frac { d y _ { k l } } { d \hat { x } _ { k l } } \frac { d \hat { x } _ { k l } } { d x _ { i j } }</script><p>首先我们知道：</p>
+<script type="math/tex; mode=display">
+\hat { x _ { k l } } = \left( x _ { k l } - \mu _ { l } \right) \left( \sigma _ { l } ^ { 2 } + \epsilon \right) ^ { - 1 / 2 }</script><p>所以：</p>
+<script type="math/tex; mode=display">
+\frac { d \hat { x } _ { k l } } { d x _ { i j } } = \left( \delta _ { i k } \delta _ { j l } - \frac { 1 } { N } \delta _ { j l } \right) \left( \sigma _ { l } ^ { 2 } + \epsilon \right) ^ { - 1 / 2 } - \frac { 1 } { 2 } \left( x _ { k l } - \mu _ { l } \right) \frac { d \sigma _ { l } ^ { 2 } } { d x _ { i j } } \left( \sigma _ { l } ^ { 2 } + \epsilon \right) ^ { - 3 / 2 }</script><p>还没完，我们知道：</p>
+<script type="math/tex; mode=display">
+\sigma _ { l } ^ { 2 } = \frac { 1 } { N } \sum _ { p } \left( x _ { p l } - \mu _ { l } \right) ^ { 2 }</script><p>于是：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} \frac { d \sigma _ { l } ^ { 2 } } { d x _ { i j } } & = \frac { 1 } { N } \sum _ { p } 2 \left( \delta _ { i p } \delta _ { j l } - \frac { 1 } { N } \delta _ { j l } \right) \left( x _ { p l } - \mu _ { l } \right) \\ & = \frac { 2 } { N } \left( x _ { i l } - \mu _ { l } \right) \delta _ { j l } - \frac { 2 } { N ^ { 2 } } \sum _ { p } \delta _ { j l } \left( x _ { p l } - \mu _ { l } \right) \\ & = \frac { 2 } { N } \left( x _ { i l } - \mu _ { l } \right) \delta _ { j l } - \frac { 2 } { N } \delta _ { j l } \left( \frac { 1 } { N } \sum _ { p } x _ { p l } - \mu _ { l } \right) \\ & = \frac { 2 } { N } \left( x _ { i l } - \mu _ { l } \right) \delta _ { j l } \end{aligned} \right.</script><p>组合一下：</p>
+<script type="math/tex; mode=display">
+\frac { d \hat { x } _ { k l } } { d x _ { i j } } = \left( \delta _ { i k } \delta _ { j l } - \frac { 1 } { N } \delta _ { j l } \right) \left( \sigma _ { l } ^ { 2 } + \epsilon \right) ^ { - 1 / 2 } - \frac { 1 } { N } \left( x _ { k l } - \mu _ { l } \right) \left( x _ { i l } - \mu _ { l } \right) \delta _ { j l } \left( \sigma _ { l } ^ { 2 } + \epsilon \right) ^ { - 3 / 2 }</script><p>最后：</p>
+<script type="math/tex; mode=display">
+\left.\begin{aligned} \frac { d \mathcal { L } } { d x _ { i j } } & = \sum _ { k l } \frac { d \mathcal { L } } { d y _ { k l } } \frac { d y _ { k l } } { d \hat { x } _ { k l } } \frac { d \hat{x} _ { k l } } { d x _ { i j } } \\ & = \sum _ { k l } \frac { d \mathcal { L } } { d y _ { k l } } \gamma _ { l } \left( \left( \delta _ { i k } \delta _ { j l } - \frac { 1 } { N } \delta _ { j l } \right) \left( \sigma _ { l } ^ { 2 } + \epsilon \right) ^ { - 1 / 2 } - \frac { 1 } { N } \left( x _ { k l } - \mu _ { l } \right) \left( x _ { i l } - \mu _ { l } \right) \delta _ { j l } \left( \sigma _ { l } ^ { 2 } + \epsilon \right) ^ { - 3 / 2 } \right) \\ &= \sum _ { k l } \frac { d \mathcal { L } } { d y _ { k l } } \gamma _ { l } \left( \left( \delta _ { i k } \delta _ { j l } - \frac { 1 } { N } \delta _ { j l } \right) \left( \sigma _ { l } ^ { 2 } + \epsilon \right) ^ { - 1 / 2 } \right) - \sum _ { k l } \frac { d \mathcal { L } } { d y _ { k l } } \gamma _ { l } \left( \frac { 1 } { N } \left( x _ { k l } - \mu _ { l } \right) \left( x _ { i l } - \mu _ { l } \right) \delta _ { j l } \left( \sigma _ { l } ^ { 2 } + \epsilon \right) ^ { - 3 / 2 } \right) \\ &= \frac { d \mathcal { L } } { d y _ { i j } } \gamma _ { j } \left( \sigma _ { j } ^ { 2 } + \epsilon \right) ^ { - 1 / 2 } - \frac { 1 } { N } \sum _ { k } \frac { d \mathcal { L } } { d y _ { k j } } \gamma _ { j } \left( \sigma _ { j } ^ { 2 } + \epsilon \right) ^ { - 1 / 2 } - \frac { 1 } { N } \sum _ { k } \frac { d \mathcal { L } } { d y _ { k j } } \gamma _ { j } \left( \left( x _ { k j } - \mu _ { j } \right) \left( x _ { i j } - \mu _ { j } \right) \left( \sigma _ { j } ^ { 2 } + \epsilon \right) ^ { - 3 / 2 } \right) \\ &=\frac { 1 } { N } \gamma _ { j } \left( \sigma _ { j } ^ { 2 } + \epsilon \right) ^ { - 1 / 2 } \left( N \frac { d \mathcal { L } } { d y _ { i j } } - \sum _ { k } \frac { d \mathcal { L } } { d y _ { k j } } - \left( x _ { i j } - \mu _ { j } \right) \left( \sigma _ { j } ^ { 2 } + \epsilon \right) ^ { - 1 } \sum _ { k } \frac { d \mathcal { L } } { d y _ { k j } } \left( x _ { k j } - \mu _ { j } \right) \right) \end{aligned}\right.</script><p>该推导对应的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mean = <span class="number">1.</span>/N*np.sum(x, axis = <span class="number">0</span>)</span><br><span class="line">var = <span class="number">1.</span>/N*np.sum((x-mean)**<span class="number">2</span>, axis = <span class="number">0</span>)</span><br><span class="line">dbeta = np.sum(dy, axis=<span class="number">0</span>)</span><br><span class="line">dgamma = np.sum((h - mean) * (var + eps)**(<span class="number">-1.</span> / <span class="number">2.</span>) * dy, axis=<span class="number">0</span>)</span><br><span class="line">dx = (<span class="number">1.</span> / N) * gamma * (var + eps)**(<span class="number">-1.</span> / <span class="number">2.</span>) * (N * dy - np.sum(dy, axis=<span class="number">0</span>)</span><br><span class="line">    - (x - mean) * (var + eps)**(<span class="number">-1.0</span>) * np.sum(dy * (x - mean), axis=<span class="number">0</span>))</span><br></pre></td></tr></table></figure>
+<p>这个推导非常富有想象力，然而有一种更简单的推导方式：</p>
+<p><a href="https://kevinzakka.github.io/2016/09/14/batch_normalization/" target="_blank" rel="noopener">Deriving the Gradient for the Backward Pass of Batch Normalization</a></p>
+<p>新代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">batchnorm_backward</span><span class="params">(dout, cache)</span>:</span></span><br><span class="line">	N, D = dout.shape</span><br><span class="line">	x_mu, inv_var, x_hat, gamma = cache</span><br><span class="line"></span><br><span class="line">	<span class="comment"># intermediate partial derivatives</span></span><br><span class="line">	dxhat = dout * gamma</span><br><span class="line"></span><br><span class="line">	<span class="comment"># final partial derivatives</span></span><br><span class="line">	dx = (<span class="number">1.</span> / N) * inv_var * (N*dxhat - np.sum(dxhat, axis=<span class="number">0</span>) </span><br><span class="line">		- x_hat*np.sum(dxhat*x_hat, axis=<span class="number">0</span>))</span><br><span class="line">	dbeta = np.sum(dout, axis=<span class="number">0</span>)</span><br><span class="line">	dgamma = np.sum(x_hat*dout, axis=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> dx, dgamma, dbeta</span><br></pre></td></tr></table></figure>
+<p>LN 和 BN 的不同在于方向不同， LN 是纵向， BN 是横向。不再赘述。</p>
+<p>LN：$\mathbf { x } : \mathbf { N } \times D \rightarrow \boldsymbol { \mu } , \boldsymbol { \sigma } : \boldsymbol { 1 } \times \mathbf { D }$ </p>
+<p>BN：$\mathbf { x } : \mathbf { N } \times D \rightarrow \boldsymbol { \mu } , \boldsymbol { \sigma } : \mathbf { N } \times \mathbf { 1 }$ </p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前向传播阶段"><span class="toc-number">1.</span> <span class="toc-text">前向传播阶段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#反向传播阶段"><span class="toc-number">2.</span> <span class="toc-text">反向传播阶段</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/machine-learning/2018-10-12-batch-normalization/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&text=Batch normalization 推导"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&title=Batch normalization 推导"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&is_video=false&description=Batch normalization 推导"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Batch normalization 推导&body=Check out this article: http://koon.cool/machine-learning/2018-10-12-batch-normalization/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&title=Batch normalization 推导"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&title=Batch normalization 推导"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&title=Batch normalization 推导"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&title=Batch normalization 推导"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/machine-learning/2018-10-12-batch-normalization/&name=Batch normalization 推导&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

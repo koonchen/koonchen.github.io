@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="1. 单例模式不再赘述 2. 不变模式重点在于给类加上「final」关键字，使其无法拥有子类。 12345678910// 主要的不变模式类型java.lang.Stringjava.lang.Booleanjava.lang.Bytejava.lang.Characterjava.lang.Doublejava.lang.Floatjava.lang.Integerjava.lang.Longj">
+<meta name="keywords" content="java,高并发程序设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并行模式与算法">
+<meta property="og:url" content="http://koon.cool/technology/2019-02-23-parallel-pattern/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="1. 单例模式不再赘述 2. 不变模式重点在于给类加上「final」关键字，使其无法拥有子类。 12345678910// 主要的不变模式类型java.lang.Stringjava.lang.Booleanjava.lang.Bytejava.lang.Characterjava.lang.Doublejava.lang.Floatjava.lang.Integerjava.lang.Longj">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190222153638.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190222153844.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190222161317.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223143856.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223144054.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223144158.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223144216.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223144906.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223145418.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223150109.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223150241.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223151040.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223151119.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223151148.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223151321.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223152552.png">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="并行模式与算法">
+<meta name="twitter:description" content="1. 单例模式不再赘述 2. 不变模式重点在于给类加上「final」关键字，使其无法拥有子类。 12345678910// 主要的不变模式类型java.lang.Stringjava.lang.Booleanjava.lang.Bytejava.lang.Characterjava.lang.Doublejava.lang.Floatjava.lang.Integerjava.lang.Longj">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190222153638.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>并行模式与算法</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2019-03-01-java8-parallel/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/technology/2019-02-21-lock-optimize/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-02-23-parallel-pattern/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&text=并行模式与算法"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&title=并行模式与算法"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&is_video=false&description=并行模式与算法"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=并行模式与算法&body=Check out this article: http://koon.cool/technology/2019-02-23-parallel-pattern/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&title=并行模式与算法"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&title=并行模式与算法"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&title=并行模式与算法"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&title=并行模式与算法"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&name=并行模式与算法&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-单例模式"><span class="toc-number">1.</span> <span class="toc-text">1. 单例模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-不变模式"><span class="toc-number">2.</span> <span class="toc-text">2. 不变模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-生产者-消费者模式"><span class="toc-number">3.</span> <span class="toc-text">3. 生产者-消费者模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-无锁生产者-消费者模式"><span class="toc-number">4.</span> <span class="toc-text">4. 无锁生产者-消费者模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-无锁缓存框架：Disruptor"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 无锁缓存框架：Disruptor</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Future-模式"><span class="toc-number">5.</span> <span class="toc-text">5. Future 模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-Future-模式的主要角色"><span class="toc-number">5.1.</span> <span class="toc-text">5.1 Future 模式的主要角色</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-Future-模式简单实现"><span class="toc-number">5.2.</span> <span class="toc-text">5.2 Future 模式简单实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-JDK-中的-Future-模式"><span class="toc-number">5.3.</span> <span class="toc-text">5.3 JDK 中的 Future 模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-并行流水线"><span class="toc-number">6.</span> <span class="toc-text">6. 并行流水线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-并行搜索"><span class="toc-number">7.</span> <span class="toc-text">7. 并行搜索</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-并行排序"><span class="toc-number">8.</span> <span class="toc-text">8. 并行排序</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-奇偶交换排序"><span class="toc-number">8.1.</span> <span class="toc-text">8.1 奇偶交换排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-改进插入排序：希尔排序"><span class="toc-number">8.2.</span> <span class="toc-text">8.2 改进插入排序：希尔排序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-矩阵乘法"><span class="toc-number">9.</span> <span class="toc-text">9. 矩阵乘法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-NIO"><span class="toc-number">10.</span> <span class="toc-text">10. NIO</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-基于-Socket-的服务端多线程模式"><span class="toc-number">10.1.</span> <span class="toc-text">10.1 基于 Socket 的服务端多线程模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-使用-NIO-进行网络编程"><span class="toc-number">10.2.</span> <span class="toc-text">10.2 使用 NIO 进行网络编程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-AIO"><span class="toc-number">11.</span> <span class="toc-text">11. AIO</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        并行模式与算法
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-02-22T16:00:00.000Z" itemprop="datePublished">2019-02-23</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/java/">java</a>, <a class="tag-link" href="/tags/高并发程序设计/">高并发程序设计</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-单例模式"><a href="#1-单例模式" class="headerlink" title="1. 单例模式"></a>1. 单例模式</h2><p>不再赘述</p>
+<h2 id="2-不变模式"><a href="#2-不变模式" class="headerlink" title="2. 不变模式"></a>2. 不变模式</h2><p>重点在于给类加上「final」关键字，使其无法拥有子类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 主要的不变模式类型</span></span><br><span class="line">java.lang.String</span><br><span class="line">java.lang.Boolean</span><br><span class="line">java.lang.Byte</span><br><span class="line">java.lang.Character</span><br><span class="line">java.lang.Double</span><br><span class="line">java.lang.Float</span><br><span class="line">java.lang.Integer</span><br><span class="line">java.lang.Long</span><br><span class="line">java.lang.Short</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>不变模式通过回避问题而不是解决问题的方式来处理多线程并发访问控制。</p>
+</blockquote>
+<h2 id="3-生产者-消费者模式"><a href="#3-生产者-消费者模式" class="headerlink" title="3. 生产者-消费者模式"></a>3. 生产者-消费者模式</h2><ul>
+<li>生产者线程负责提交用户请求</li>
+<li>消费者线程负责处理生产者提交的任务</li>
+<li>生产者和消费者共享内存缓存区进行通信。</li>
+</ul>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190222153638.png" alt></p>
+<blockquote>
+<p>上图中，三个「生产者」将任务提交到「共享内存缓存区」，「消费者」不直接和生产者线程通信，而是在共享内存缓存区中获取任务，并进行处理。</p>
+</blockquote>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190222153844.png" alt></p>
+<p>这里使用了『BlockingQueue』充当内存缓存区，维护任务和数据队列，『PCData』充当一个生产任务，「生产者」和「消费者」将引用同一个『BlockingQueue』实例。</p>
+<blockquote>
+<p>生产者消费者模式对「生产者」和「消费者」线程进行了解耦，优化了系统整体结构，又由于缓存区的作用，允许「生产者」和「消费者」在执行上的性能差异，从一定程度上环节了性能瓶颈对系统性能的影响。</p>
+</blockquote>
+<h2 id="4-无锁生产者-消费者模式"><a href="#4-无锁生产者-消费者模式" class="headerlink" title="4. 无锁生产者-消费者模式"></a>4. 无锁生产者-消费者模式</h2><p>『BlockingQueue』是一个不错的选择，但是并不是一个高性能的实现，<strong>它完全使用锁和阻塞来实现线程间同步</strong>，高并发场合『ConcurrentLinkedQueue』是一个高性能队列，使用『BlockingQueue』仅仅是为了方便数据共享。</p>
+<p>而『ConcurrentLinkedQueue』成功的秘诀在于大量使用了无锁的 CAS 操作，使用 CAS 来进行编程非常困难，目前有一个现成的 Disruptor 框架，它已经实现了这个功能。</p>
+<h3 id="4-1-无锁缓存框架：Disruptor"><a href="#4-1-无锁缓存框架：Disruptor" class="headerlink" title="4.1 无锁缓存框架：Disruptor"></a>4.1 无锁缓存框架：Disruptor</h3><p>它使用<strong>环形队列</strong>实行一个数组，只需要一个当前位置的指针即可，这个指针用于出队和入队，由于环形队列，总大小需要预先指定，<strong>不能动态扩展</strong>，为了快速从一个序列 sequence 对应到数组的实际位置，需要数组大小是2的整数次方，这样通过 <code>sequence &amp; (queueSize - 1)</code> 就能立即定位实际的元素位置 index ，这要比取模快得多。</p>
+<blockquote>
+<p>queueSize 是2的整数次方，这样通过这行代码就能将 sequence 限定在 queueSize - 1 的范围内，不会有任何一位浪费。</p>
+</blockquote>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190222161317.png" alt></p>
+<p>现在，「生产者」写入数据的时候使用 CAS 操作，「消费者」读取数据的时候，为了防止多个「消费者」同时处理一个数据，也使用 CAS 进行数据保护。</p>
+<p>另外一个好处就是完全做到内存复用，不会有新的空间需要分配或者老的空间需要回收，大大减少系统分配空间以及回收空间的额外开销。</p>
+<h2 id="5-Future-模式"><a href="#5-Future-模式" class="headerlink" title="5. Future 模式"></a>5. Future 模式</h2><blockquote>
+<p>Future 模式是多线程中非常常见的设计模式，核心思想是异步调用。</p>
+</blockquote>
+<p>我们对比一下传统的程序调用流程：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223143856.png" alt></p>
+<blockquote>
+<p>然后再看看广义 Future 模式的实现，虽然 call 本身的执行时间很长，但是服务程序不等数据处理完成便立即返回客户端一个伪造的数据。</p>
+</blockquote>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223144054.png" alt></p>
+<h3 id="5-1-Future-模式的主要角色"><a href="#5-1-Future-模式的主要角色" class="headerlink" title="5.1 Future 模式的主要角色"></a>5.1 Future 模式的主要角色</h3><p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223144158.png" alt></p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223144216.png" alt></p>
+<h3 id="5-2-Future-模式简单实现"><a href="#5-2-Future-模式简单实现" class="headerlink" title="5.2 Future 模式简单实现"></a>5.2 Future 模式简单实现</h3><p>「RealData」是最终使用的数据模型，它的构造很慢，「FutureData」是 Future 模式的关键，它是真实数据的代理，封装了「RealData」的等待过程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FutureData</span> <span class="keyword">implements</span> <span class="title">Data</span> </span>&#123;</span><br><span class="line">  <span class="keyword">protected</span> RealData realdata = <span class="keyword">null</span>; <span class="comment">// FutureData是 RealData的包装</span></span><br><span class="line">  <span class="keyword">protected</span> <span class="keyword">boolean</span> isReady = <span class="keyword">false</span>;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">setRealData</span><span class="params">(RealData realdata)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (isReady) &#123;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.realdata = realdata;</span><br><span class="line">    ready = <span class="keyword">true</span>;</span><br><span class="line">    notifyAll(); <span class="comment">// RealData已经被注入,通知 getResult()</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> String <span class="title">getResult</span><span class="params">()</span></span>&#123; <span class="comment">//会等待 RealData构造完成</span></span><br><span class="line">    <span class="keyword">while</span> (!isReady) &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        wait(); <span class="comment">//一直等待,知道 RealData被注入</span></span><br><span class="line">      &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> realdata.result; <span class="comment">//由 RealData实现</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="5-3-JDK-中的-Future-模式"><a href="#5-3-JDK-中的-Future-模式" class="headerlink" title="5.3 JDK 中的 Future 模式"></a>5.3 JDK 中的 Future 模式</h3><p>JDK 已经在内部准备好了一套完整的实现：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223144906.png" alt></p>
+<p>其中『Future』接口就类似于前文描述的订单或者说是契约。通过它,你可以得到真实的数据。『RunnableFuture』继承了『Future』和『Runnable』两个接口，其中 <code>run</code> 方法用于构造真实的数据。</p>
+<p>它有一个具体的实现『FutureTask』类。『FutureTask』有一个内部类『Sync』，一些实质性的工作，会委托『Sync』类实现。而『Sync』类最终会调用『Callable』接口，完成实际数据的组装工作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FutureMain</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">RealData</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">String</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String data;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RealData</span><span class="params">(String data)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.data = data;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">call</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; ++i) &#123;</span><br><span class="line">        sb.append(data);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          Thread.sleep(<span class="number">100</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> sb.toString();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ExecutionException, InterruptedException </span>&#123;</span><br><span class="line">    <span class="comment">// 构造 FutureTask</span></span><br><span class="line">    FutureTask&lt;String&gt; future = <span class="keyword">new</span> FutureTask&lt;&gt;(<span class="keyword">new</span> RealData(<span class="string">"a"</span>));</span><br><span class="line">    ExecutorService executor = Executors.newFixedThreadPool(<span class="number">1</span>);</span><br><span class="line">    <span class="comment">// 执行 FutureTask</span></span><br><span class="line">    <span class="comment">// 这里开启线程进行 call 方法调用</span></span><br><span class="line">    executor.submit(future);</span><br><span class="line">    System.out.println(<span class="string">"请求完毕"</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// 用 sleep 代替业务逻辑</span></span><br><span class="line">      Thread.sleep(<span class="number">2000</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// call 没有结束就继续等待</span></span><br><span class="line">    System.out.println(<span class="string">"数据:"</span> + future.get());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="6-并行流水线"><a href="#6-并行流水线" class="headerlink" title="6. 并行流水线"></a>6. 并行流水线</h2><p>假设我们现在要计算 $(B+C)*B/2$ ，但是因为 $B+C$ 没有完成，数据之间存在依赖性，无法进行并行化，此时，我们可以参考「流水线思想」。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223145418.png" alt></p>
+<p>即使上面的式子我们无法并行，但是如果有一大堆的 B 和 C ，我们可以使用流水线，将该计算流程分为三步：</p>
+<ol>
+<li>A = B + C</li>
+<li>D = A X B</li>
+<li>D = D / 2</li>
+</ol>
+<p>上述三步可以使用三个线程单独计算。</p>
+<h2 id="7-并行搜索"><a href="#7-并行搜索" class="headerlink" title="7. 并行搜索"></a>7. 并行搜索</h2><p>搜索是一个软件并不可少的功能，对于有序的数据，通常采用二分搜索，对于无序数据，只能挨个查找。</p>
+<blockquote>
+<p>一种简单的策略，是将数据分割，如果使用两个线程并行，则分成两个数组，每个数组独立搜索。</p>
+</blockquote>
+<h2 id="8-并行排序"><a href="#8-并行排序" class="headerlink" title="8. 并行排序"></a>8. 并行排序</h2><p>这里有几种相对简单，但也足以让人脑洞大开的排序算法。</p>
+<h3 id="8-1-奇偶交换排序"><a href="#8-1-奇偶交换排序" class="headerlink" title="8.1 奇偶交换排序"></a>8.1 奇偶交换排序</h3><p>对于一般的冒泡，我们使用下面的代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">bubbleSort</span><span class="params">(<span class="keyword">int</span>[] arr)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = arr.length - <span class="number">1</span>; i &gt; <span class="number">0</span>; --i) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; i; ++j) &#123;</span><br><span class="line">      <span class="keyword">if</span> (arr[j] &gt; arr[j + <span class="number">1</span>]) &#123;</span><br><span class="line">        <span class="keyword">int</span> temp = arr[j];</span><br><span class="line">        arr[j] = arr[j + <span class="number">1</span>];</span><br><span class="line">        arr[j + <span class="number">1</span>] = temp;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>流程如下：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223150109.png" alt></p>
+<p>问题在于，这样排序很难并行化，因此可以进行分离，对于奇交换而言，总是比较奇搜索以及其相邻的后续元素；而偶交换总是比较偶索引和其相邻的后续元素，如下所示：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223150241.png" alt></p>
+<h3 id="8-2-改进插入排序：希尔排序"><a href="#8-2-改进插入排序：希尔排序" class="headerlink" title="8.2 改进插入排序：希尔排序"></a>8.2 改进插入排序：希尔排序</h3><p>插入排序的思想是：一个数组分成两个部分，一部分是排序的，一部分是未排序的，把未排序的内容插入排序的部分，实现排序的效果。</p>
+<p>简单插入很难实现并行化，因此，我们对其扩展，就是希尔排序，对整个数组间隔 h 分割为多个子数组，数组互相插在一起，每次对一个子数组排序；每一组排序完成，递减 h 的值，进行下一轮排序，直到 h 为1。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223151040.png" alt></p>
+<h2 id="9-矩阵乘法"><a href="#9-矩阵乘法" class="headerlink" title="9. 矩阵乘法"></a>9. 矩阵乘法</h2><p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223151119.png" alt></p>
+<p>这个很好理解，分割矩阵即可。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223151148.png" alt></p>
+<h2 id="10-NIO"><a href="#10-NIO" class="headerlink" title="10. NIO"></a>10. NIO</h2><p>NIO 是 New IO 的简称，涉及通道和缓存区。</p>
+<h3 id="10-1-基于-Socket-的服务端多线程模式"><a href="#10-1-基于-Socket-的服务端多线程模式" class="headerlink" title="10.1 基于 Socket 的服务端多线程模式"></a>10.1 基于 Socket 的服务端多线程模式</h3><p>服务端多线程处理的结构如下：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223151321.png" alt></p>
+<p>服务器为每一个客户端连接启动一个线程，为了接受客户端连接，服务器还需要一个派发线程。</p>
+<blockquote>
+<p>结果自然是慢吞吞的，因为服务器先读入客户端的输入，而客户端缓慢的处理速度，使得服务端花费不少时间用于等待。</p>
+</blockquote>
+<p>下面看看服务端 Demo 吧：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SocketDemo</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> <span class="keyword">static</span> ExecutorService tp = Executors.newCachedThreadPool();</span><br><span class="line">  <span class="comment">// 服务端</span></span><br><span class="line">  <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">HandleMsg</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    Socket clientSocket;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">HandleMsg</span><span class="params">(Socket clientSocket)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.clientSocket = clientSocket;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      BufferedReader is = <span class="keyword">null</span>;</span><br><span class="line">      PrintWriter os = <span class="keyword">null</span>;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        is = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(clientSocket.getInputStream()));</span><br><span class="line">        os = <span class="keyword">new</span> PrintWriter(clientSocket.getOutputStream(), <span class="keyword">true</span>);</span><br><span class="line">        <span class="comment">// 从 InputStream 中读取客户端所发送的数据</span></span><br><span class="line">        String inputLine = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">long</span> b = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">while</span> ((inputLine = is.readLine()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">          System.out.println(inputLine);</span><br><span class="line">          os.println(inputLine);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">long</span> e = System.currentTimeMillis();</span><br><span class="line">        System.out.println(<span class="string">"spend"</span> + (e - b) + <span class="string">"ms"</span>);</span><br><span class="line">      &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">      &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="keyword">if</span> (is != <span class="keyword">null</span>) is.close();</span><br><span class="line">          <span class="keyword">if</span> (os != <span class="keyword">null</span>) os.close();</span><br><span class="line">          clientSocket.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">          e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    ServerSocket echoServer = <span class="keyword">null</span>;</span><br><span class="line">    Socket clientSocket = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      echoServer = <span class="keyword">new</span> ServerSocket(<span class="number">8000</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">      System.out.println(e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        clientSocket = echoServer.accept();</span><br><span class="line">        System.out.println(clientSocket.getRemoteSocketAddress() + <span class="string">" connect!"</span>);</span><br><span class="line">        tp.execute(<span class="keyword">new</span> HandleMsg(clientSocket)); <span class="comment">// 用线程池处理每一个请求</span></span><br><span class="line">      &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        System.out.println(e);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后是客户端：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SocketClientDemo</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 客户端</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    Socket client = <span class="keyword">null</span>;</span><br><span class="line">    PrintWriter writer = <span class="keyword">null</span>;</span><br><span class="line">    BufferedReader reader = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      client = <span class="keyword">new</span> Socket();</span><br><span class="line">      client.connect(<span class="keyword">new</span> InetSocketAddress(<span class="string">"localhost"</span>, <span class="number">8000</span>));</span><br><span class="line">      writer = <span class="keyword">new</span> PrintWriter(client.getOutputStream(), <span class="keyword">true</span>);</span><br><span class="line">      writer.println(<span class="string">"hello"</span>);</span><br><span class="line">      writer.flush();</span><br><span class="line">      reader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(client.getInputStream()));</span><br><span class="line">      System.out.println(<span class="string">"from server: "</span> + reader.readLine());</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">      e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      <span class="keyword">if</span> (writer != <span class="keyword">null</span>) writer.close();</span><br><span class="line">      <span class="keyword">if</span> (reader != <span class="keyword">null</span>) reader.close();</span><br><span class="line">      <span class="keyword">if</span> (client != <span class="keyword">null</span>) client.close();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>它的致命弱点就是客户端输入缓慢，服务端一直等待，主要时间都花费在等待上。</p>
+<h3 id="10-2-使用-NIO-进行网络编程"><a href="#10-2-使用-NIO-进行网络编程" class="headerlink" title="10.2 使用 NIO 进行网络编程"></a>10.2 使用 NIO 进行网络编程</h3><p>通道，类似于流，一个「Channel」可以和文件或者网络「Socket」对应，和它一起使用的另外一个组件是「Buffer」，可以理解成一个内存区域或者 byte 数组，数据包装成「Buffer」的形式才能和「Channel」进行交互。</p>
+<p>另外一个和「Channel」相关的是「Selector」，在「Channel」众多实现中，有一个是「SelectableChannel」，表示可被选择的通道，任何一个「SelectableChannel」可以被注册到一个「Selector」中，这样一个「Channel」就能被「Selector」所管理，而一个「Selector」可以管理多个「SelectableChannel」，当「SelectableChannel」数据准备好了，「Selector」就会接到通知，得到已经准备好的数据。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190223152552.png" alt></p>
+<p>当与客户端连接的数据没有准备好时，「Selector」处于等待状态，一旦任何一个「Channel」准备好了数据，「Selector」就能立即得到通知，获取数据并处理。</p>
+<h2 id="11-AIO"><a href="#11-AIO" class="headerlink" title="11. AIO"></a>11. AIO</h2><p>这是异步 IO 的缩写，即 Asynchronized 。对于 AIO 而言，它不是在 IO 准备好时通知线程，而是 IO 操作完成以后，再通知线程，因为它完全不会阻塞。</p>
+<p>使用特殊的『AsynchronousServerSocketChannel』实现。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-单例模式"><span class="toc-number">1.</span> <span class="toc-text">1. 单例模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-不变模式"><span class="toc-number">2.</span> <span class="toc-text">2. 不变模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-生产者-消费者模式"><span class="toc-number">3.</span> <span class="toc-text">3. 生产者-消费者模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-无锁生产者-消费者模式"><span class="toc-number">4.</span> <span class="toc-text">4. 无锁生产者-消费者模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-无锁缓存框架：Disruptor"><span class="toc-number">4.1.</span> <span class="toc-text">4.1 无锁缓存框架：Disruptor</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-Future-模式"><span class="toc-number">5.</span> <span class="toc-text">5. Future 模式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-Future-模式的主要角色"><span class="toc-number">5.1.</span> <span class="toc-text">5.1 Future 模式的主要角色</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-Future-模式简单实现"><span class="toc-number">5.2.</span> <span class="toc-text">5.2 Future 模式简单实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-JDK-中的-Future-模式"><span class="toc-number">5.3.</span> <span class="toc-text">5.3 JDK 中的 Future 模式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-并行流水线"><span class="toc-number">6.</span> <span class="toc-text">6. 并行流水线</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-并行搜索"><span class="toc-number">7.</span> <span class="toc-text">7. 并行搜索</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-并行排序"><span class="toc-number">8.</span> <span class="toc-text">8. 并行排序</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-奇偶交换排序"><span class="toc-number">8.1.</span> <span class="toc-text">8.1 奇偶交换排序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-改进插入排序：希尔排序"><span class="toc-number">8.2.</span> <span class="toc-text">8.2 改进插入排序：希尔排序</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-矩阵乘法"><span class="toc-number">9.</span> <span class="toc-text">9. 矩阵乘法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-NIO"><span class="toc-number">10.</span> <span class="toc-text">10. NIO</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-基于-Socket-的服务端多线程模式"><span class="toc-number">10.1.</span> <span class="toc-text">10.1 基于 Socket 的服务端多线程模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-使用-NIO-进行网络编程"><span class="toc-number">10.2.</span> <span class="toc-text">10.2 使用 NIO 进行网络编程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-AIO"><span class="toc-number">11.</span> <span class="toc-text">11. AIO</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-02-23-parallel-pattern/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&text=并行模式与算法"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&title=并行模式与算法"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&is_video=false&description=并行模式与算法"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=并行模式与算法&body=Check out this article: http://koon.cool/technology/2019-02-23-parallel-pattern/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&title=并行模式与算法"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&title=并行模式与算法"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&title=并行模式与算法"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&title=并行模式与算法"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-02-23-parallel-pattern/&name=并行模式与算法&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

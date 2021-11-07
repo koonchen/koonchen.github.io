@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="python 语言的使用中，不得不说非常方便，但是对于从 java 系转 python 开发的学习者，还是存在多处难以理解的地方，这里我们讨论一下 python 的设计问题。  资料柜：Design and History FAQ  为什么 python 使用缩进来分组？设计者 ( Guido van Rossum ) 认为使用缩进来分组会很优雅这是一点，也不会出现下面 c++ 代码的歧义： 12">
+<meta name="keywords" content="python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python 的设计和问题">
+<meta property="og:url" content="http://koon.cool/technology/2018-06-05-python-why/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="python 语言的使用中，不得不说非常方便，但是对于从 java 系转 python 开发的学习者，还是存在多处难以理解的地方，这里我们讨论一下 python 的设计问题。  资料柜：Design and History FAQ  为什么 python 使用缩进来分组？设计者 ( Guido van Rossum ) 认为使用缩进来分组会很优雅这是一点，也不会出现下面 c++ 代码的歧义： 12">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python 的设计和问题">
+<meta name="twitter:description" content="python 语言的使用中，不得不说非常方便，但是对于从 java 系转 python 开发的学习者，还是存在多处难以理解的地方，这里我们讨论一下 python 的设计问题。  资料柜：Design and History FAQ  为什么 python 使用缩进来分组？设计者 ( Guido van Rossum ) 认为使用缩进来分组会很优雅这是一点，也不会出现下面 c++ 代码的歧义： 12">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>python 的设计和问题</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2018-06-07-magic-methods/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/design-pattern/2018-06-04-singleton/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-06-05-python-why/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-06-05-python-why/&text=python 的设计和问题"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-06-05-python-why/&title=python 的设计和问题"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-06-05-python-why/&is_video=false&description=python 的设计和问题"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python 的设计和问题&body=Check out this article: http://koon.cool/technology/2018-06-05-python-why/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-06-05-python-why/&title=python 的设计和问题"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-06-05-python-why/&title=python 的设计和问题"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-06-05-python-why/&title=python 的设计和问题"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-06-05-python-why/&title=python 的设计和问题"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-06-05-python-why/&name=python 的设计和问题&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-python-使用缩进来分组？"><span class="toc-number">1.</span> <span class="toc-text">为什么 python 使用缩进来分组？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么浮点运算很奇怪？"><span class="toc-number">2.</span> <span class="toc-text">为什么浮点运算很奇怪？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么在方法中明确使用-self-参数？"><span class="toc-number">3.</span> <span class="toc-text">为什么在方法中明确使用 self 参数？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么有的方法用-“-”-调用，有的用-“-”-？"><span class="toc-number">4.</span> <span class="toc-text">为什么有的方法用 “.” 调用，有的用 “()” ？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-python-没有-switch-case-？"><span class="toc-number">5.</span> <span class="toc-text">为什么 python 没有 switch case ？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#可以在解释器中实现线程而不依赖系统的线程吗？"><span class="toc-number">6.</span> <span class="toc-text">可以在解释器中实现线程而不依赖系统的线程吗？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-lambda-表达式不能包含语句？"><span class="toc-number">7.</span> <span class="toc-text">为什么 lambda 表达式不能包含语句？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#python-如何管理内存？"><span class="toc-number">8.</span> <span class="toc-text">python 如何管理内存？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-cpython-不使用更传统的垃圾回收机制？"><span class="toc-number">9.</span> <span class="toc-text">为什么 cpython 不使用更传统的垃圾回收机制？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么当-cpython-退出时不会释放所有的内存？"><span class="toc-number">10.</span> <span class="toc-text">为什么当 cpython 退出时不会释放所有的内存？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么需要单独的元组和列表类型？"><span class="toc-number">11.</span> <span class="toc-text">为什么需要单独的元组和列表类型？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何实现字典？"><span class="toc-number">12.</span> <span class="toc-text">如何实现字典？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么字典的键必须是不可变的？"><span class="toc-number">13.</span> <span class="toc-text">为什么字典的键必须是不可变的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-list-sort-不返回排序的列表？"><span class="toc-number">14.</span> <span class="toc-text">为什么 list.sort() 不返回排序的列表？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何在Python中指定并强制执行接口规范？"><span class="toc-number">15.</span> <span class="toc-text">如何在Python中指定并强制执行接口规范？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么没有-goto-？"><span class="toc-number">16.</span> <span class="toc-text">为什么没有 goto ？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-python-不能在-with-中直接进行属性赋值？"><span class="toc-number">17.</span> <span class="toc-text">为什么 python 不能在 with 中直接进行属性赋值？</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        python 的设计和问题
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-06-04T16:00:00.000Z" itemprop="datePublished">2018-06-05</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/python/">python</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <p>python 语言的使用中，不得不说非常方便，但是对于从 java 系转 python 开发的学习者，还是存在多处难以理解的地方，这里我们讨论一下 python 的设计问题。</p>
+<blockquote>
+<p>资料柜：<br><a href="https://docs.python.org/3.8/faq/design.html" target="_blank" rel="noopener">Design and History FAQ</a></p>
+</blockquote>
+<h2 id="为什么-python-使用缩进来分组？"><a href="#为什么-python-使用缩进来分组？" class="headerlink" title="为什么 python 使用缩进来分组？"></a>为什么 python 使用缩进来分组？</h2><p>设计者 ( Guido van Rossum ) 认为使用缩进来分组会很优雅这是一点，也不会出现下面 c++ 代码的歧义：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (x &lt;= y)</span><br><span class="line">  x++;</span><br><span class="line">  y--;</span><br><span class="line">z++;</span><br></pre></td></tr></table></figure>
+<p>条件如果是真，那么只会执行 <code>x++;</code> ，但是缩进让我们觉得，下面一行也会执行，让机器和人的感受相同这是第二点，最后统一了编码风格。</p>
+<h2 id="为什么浮点运算很奇怪？"><a href="#为什么浮点运算很奇怪？" class="headerlink" title="为什么浮点运算很奇怪？"></a>为什么浮点运算很奇怪？</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="number">1.2</span> - <span class="number">1.0</span></span><br><span class="line"><span class="number">0.19999999999999996</span></span><br></pre></td></tr></table></figure>
+<p>这是因为 python 中的 float 即 c 的 double 存储格式，它的浮点运算和 c 和 java 是十分相似的，都依赖于处理器的硬件。它可以精确到小数点后17位。</p>
+<p>比如 <code>1.2</code> 这个十进制数在机器中的二进制表示是：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1.0011001100110011001100110011001100110011001100110011</span><br></pre></td></tr></table></figure>
+<p>它所对应的十进制就是：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1.1999999999999999555910790149937383830547332763671875</span><br></pre></td></tr></table></figure>
+<p>对于必须的运算 ( 超过17位的精度 ) 可以采用 <code>decimal</code> 模块进行处理， decimal 默认精度到28位。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> decimal <span class="keyword">import</span> Decimal</span><br><span class="line">a = Decimal(repr(<span class="number">1.2</span>))</span><br><span class="line">b = Decimal(repr(<span class="number">1.0</span>))</span><br><span class="line">print(a - b)</span><br><span class="line"><span class="comment"># 0.2</span></span><br></pre></td></tr></table></figure>
+<p>当然也可以用 <code>round()</code> 四舍五入凑合。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding:utf8</span></span><br><span class="line">a = <span class="number">1.2</span></span><br><span class="line">b = <span class="number">1.0</span></span><br><span class="line">print(round(a - b , <span class="number">2</span>))</span><br><span class="line"><span class="comment"># 0.2</span></span><br></pre></td></tr></table></figure>
+<h2 id="为什么在方法中明确使用-self-参数？"><a href="#为什么在方法中明确使用-self-参数？" class="headerlink" title="为什么在方法中明确使用 self 参数？"></a>为什么在方法中明确使用 self 参数？</h2><p>我现在所能理解的原因还停留在 python 没有 <strong>声明</strong> 这一功能，使用 self 来保存实例的变量更加方便。</p>
+<p>事实上这也是主要原因之二 （方便保存，区分实例变量和局部变量) ，别的有一点在于在派生类中覆盖基类的方法以及调用。</p>
+<h2 id="为什么有的方法用-“-”-调用，有的用-“-”-？"><a href="#为什么有的方法用-“-”-调用，有的用-“-”-？" class="headerlink" title="为什么有的方法用 “.” 调用，有的用 “()” ？"></a>为什么有的方法用 “.” 调用，有的用 “()” ？</h2><p>比如 <code>list.index()</code> 使用 <code>.</code> 来调用，有的比如 <code>len(list)</code>  使用 <code>()</code> 来调用。一个对象在前面，一个对象在括号里。</p>
+<p>主要历史的原因导致，函数 <code>()</code> 对于一组类型通用的操作，比如 <code>map()</code> 和 <code>zip()</code> ；而例如 <code>len()</code> 、 <code>max()</code> 等内置的方法实际上它们已经存在了，所以无法再进行更改，就是这个理由…</p>
+<h2 id="为什么-python-没有-switch-case-？"><a href="#为什么-python-没有-switch-case-？" class="headerlink" title="为什么 python 没有 switch case ？"></a>为什么 python 没有 switch case ？</h2><p>我们不讨论 <code>if else</code> 的实现，对于大量可能性中选择，可以创建一个字典，或者使用 <code>getattr()</code> 检索方法。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding:utf8</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">visit_a</span><span class="params">(self)</span>:</span></span><br><span class="line">    print(<span class="string">'hello'</span>)</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">dispatch</span><span class="params">(self, value)</span>:</span></span><br><span class="line">    method_name = <span class="string">'visit_'</span> + str(value)</span><br><span class="line">    method = getattr(self, method_name)</span><br><span class="line">    method()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  a = A()</span><br><span class="line">  a.dispatch(<span class="string">'a'</span>)</span><br></pre></td></tr></table></figure>
+<p>在方法前加上统一的前缀是推荐的。</p>
+<h2 id="可以在解释器中实现线程而不依赖系统的线程吗？"><a href="#可以在解释器中实现线程而不依赖系统的线程吗？" class="headerlink" title="可以在解释器中实现线程而不依赖系统的线程吗？"></a>可以在解释器中实现线程而不依赖系统的线程吗？</h2><p>我们通常使用的是 cpython 解释器，而这个解释器的线程需要 c 的线程支持，或者使用完全重新设计的解释器绕过 c 栈。</p>
+<blockquote>
+<p><a href="https://github.com/stackless-dev" target="_blank" rel="noopener">stackless-dev/stackless</a></p>
+</blockquote>
+<p>python 的线程总是被人们诟病，因为 全局解释器锁 ( GIL ) 的存在， python 中只有一个线程在运行，对于 I/O 操作来说， GIL 会在 I/O 前释放，以允许其他线程在这个线程等待 I/O 的时候运行，而非 I/O 呢？它将等待。所以说： <strong>I/O密集型的Python程序比计算密集型的Python程序更能充分利用多线程</strong>。</p>
+<blockquote>
+<p>PS :<br>什么是 I/O 密集？涉及到网络、磁盘 I/O 的任务都是 I/O 密集型任务。（CPU 上的时间少）<br>什么是计算密集？消耗 CPU 资源，比如对视频进行解码等。</p>
+</blockquote>
+<p>python 的线程执行必须要 GIL ，所以无论多少核，单位时间里，多个核只能跑一个线程。怎么办？</p>
+<ul>
+<li>使用多进程，每个进程一个 GIL ，所以多进程是没问题的。</li>
+<li>用不带 GIL 的解释器。</li>
+<li>用其他语言扩展，比如 c ，不用 python 实现。</li>
+</ul>
+<h2 id="为什么-lambda-表达式不能包含语句？"><a href="#为什么-lambda-表达式不能包含语句？" class="headerlink" title="为什么 lambda 表达式不能包含语句？"></a>为什么 lambda 表达式不能包含语句？</h2><p>因为 python 的句法框架无法处理嵌套在表达式中的语句。</p>
+<p>使用 lambda 表达式的唯一好处是不再需要创建一个新的函数，并且 lambda 表达只是一个局部变量，而函数相当于 lambda 表达式生成的对象。python 中的 lambda 表达式冒号前是参数，冒号后面是返回值。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding:utf8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  add = <span class="keyword">lambda</span> x,y:x+y</span><br><span class="line">  print(add(<span class="number">1</span>, <span class="number">2</span>))</span><br></pre></td></tr></table></figure>
+<h2 id="python-如何管理内存？"><a href="#python-如何管理内存？" class="headerlink" title="python 如何管理内存？"></a>python 如何管理内存？</h2><p>python 根据解释器的不同，对于内存的管理也不相同。比如 cpython 使用引用计数来检测不可访问的对象；用另一种收集引用周期的机制：周期性地执行循环检测算法，寻找不可访问的循环并删除其中涉及的对象。 gc 模块提供垃圾收集、获取调试统计信息和调整收集器参数的功能。</p>
+<p>而其他实现，比如 jython 或 pypy ，可以采用不同的机制，比如非模块提供的垃圾收集器。</p>
+<p>在传统的 cpython 下，使用 gc 模块提供的垃圾回收机制，而对于一段开启文件的代码，我们最好的做法是明确关闭文件 ( <code>with</code> ) ，否则将以不同长的时间被收集和关闭。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">with</span> open(file) <span class="keyword">as</span> f:</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<h2 id="为什么-cpython-不使用更传统的垃圾回收机制？"><a href="#为什么-cpython-不使用更传统的垃圾回收机制？" class="headerlink" title="为什么 cpython 不使用更传统的垃圾回收机制？"></a>为什么 cpython 不使用更传统的垃圾回收机制？</h2><p>在 c 中，垃圾回收也不是其标准功能，因此无法移植。</p>
+<p>其次，当 python 嵌入到其他程序中时，它们可能有自己更好的内存垃圾回收方案。</p>
+<h2 id="为什么当-cpython-退出时不会释放所有的内存？"><a href="#为什么当-cpython-退出时不会释放所有的内存？" class="headerlink" title="为什么当 cpython 退出时不会释放所有的内存？"></a>为什么当 cpython 退出时不会释放所有的内存？</h2><p>python 在退出的时候会试图删除每一个对象，但是循环引用可能出现退出的时候无法删除。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a, b = Sth(), Sth()</span><br><span class="line">a.attr = b</span><br><span class="line">b.attr = a</span><br></pre></td></tr></table></figure>
+<p>如果想要强制摧毁，可以使用 atexit 模块，这个模块可以在退出的时候调用函数，只要在其中写摧毁的方法即可。</p>
+<h2 id="为什么需要单独的元组和列表类型？"><a href="#为什么需要单独的元组和列表类型？" class="headerlink" title="为什么需要单独的元组和列表类型？"></a>为什么需要单独的元组和列表类型？</h2><p>列表和元组类似，但是通常以不同的方式使用。元组被认为是 c 的结构体，它们可以是不同类型作为一组的集合，例如笛卡尔坐标被认为是两个或三个数字的集合；列表更像数组，它倾向于数量不同的相同类型对象。元组不可变，列表可变，只有不可变元素可以作为字典的键值，所以只有元组可以作为键。</p>
+<h2 id="如何实现字典？"><a href="#如何实现字典？" class="headerlink" title="如何实现字典？"></a>如何实现字典？</h2><p>python 中的字典是可调整大小的散列表，用内置 <code>hash()</code> 方法计算键值，可以在 O(1) 的时间里找到目标，这也意味着他没有维护键的排序顺序。</p>
+<h2 id="为什么字典的键必须是不可变的？"><a href="#为什么字典的键必须是不可变的？" class="headerlink" title="为什么字典的键必须是不可变的？"></a>为什么字典的键必须是不可变的？</h2><p>字典哈希表的实现是根据键的 hash 值来查找，如果 key 可变，那么值也在变化，所以对象就找不到了。</p>
+<h2 id="为什么-list-sort-不返回排序的列表？"><a href="#为什么-list-sort-不返回排序的列表？" class="headerlink" title="为什么 list.sort() 不返回排序的列表？"></a>为什么 list.sort() 不返回排序的列表？</h2><p>我们总会记错， <code>list.sort()</code> 在 list 上进行排序，而不会创建新的副本，如果想得到一个副本，可以使用 <code>sorted</code> 内置方法。</p>
+<h2 id="如何在Python中指定并强制执行接口规范？"><a href="#如何在Python中指定并强制执行接口规范？" class="headerlink" title="如何在Python中指定并强制执行接口规范？"></a>如何在Python中指定并强制执行接口规范？</h2><p>首先对于一个类可以用 <code>issubclass()</code> 判断子类，用 <code>isinstance()</code> 判断实例。</p>
+<p>python 的接口规范可以使用测试用例来限制， doctest 和 unittest 模块或第三方测试框架可用于构建详尽的测试套件，以便在模块中执行每行代码，并且推荐在测试中限制。</p>
+<h2 id="为什么没有-goto-？"><a href="#为什么没有-goto-？" class="headerlink" title="为什么没有 goto ？"></a>为什么没有 goto ？</h2><p>goto 确实不好，但是怎么实现呢？</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding:utf8</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">label</span><span class="params">(Exception)</span>:</span></span><br><span class="line">  print(<span class="string">'hello2'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</span><br><span class="line">  <span class="keyword">try</span>:</span><br><span class="line">    print(<span class="string">'hello3'</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="number">1</span>&lt;<span class="number">2</span>:</span><br><span class="line">      print(<span class="string">'hello1'</span>)</span><br><span class="line">      <span class="keyword">raise</span> label()</span><br><span class="line">  <span class="keyword">except</span> label:</span><br><span class="line">    print(<span class="string">'bye'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出结果是：231</span></span><br><span class="line"><span class="comment"># 为什么？解释器先执行了类啊...</span></span><br></pre></td></tr></table></figure>
+<h2 id="为什么-python-不能在-with-中直接进行属性赋值？"><a href="#为什么-python-不能在-with-中直接进行属性赋值？" class="headerlink" title="为什么 python 不能在 with 中直接进行属性赋值？"></a>为什么 python 不能在 with 中直接进行属性赋值？</h2><p>这句话需要解释一下，看下面的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding:utf8</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(a)</span>:</span></span><br><span class="line">  <span class="keyword">with</span> a:</span><br><span class="line">    print(a.x)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span>:</span></span><br><span class="line">  x = <span class="number">1</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__enter__</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__exit__</span><span class="params">(self, exc_type, exc_val, exc_tb)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  a = A()</span><br><span class="line">  foo(a)</span><br></pre></td></tr></table></figure>
+<p>它是对的，这里的 x 需要它的前缀，而不能直接用 x 代替，这是因为， python 作为动态语言，它不能像静态语言那样，永远知道变量的范围，所以现在我们也不知道这个 x 是全局的还是成员变量亦或是局部变量。</p>
+<p>动态语言的好处比如想要实现下面的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">function(args).mydict[index][index].a = <span class="number">21</span></span><br><span class="line">function(args).mydict[index][index].b = <span class="number">42</span></span><br><span class="line">function(args).mydict[index][index].c = <span class="number">63</span></span><br></pre></td></tr></table></figure>
+<p>不需要这么麻烦啦！</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ref = function(args).mydict[index][index]</span><br><span class="line">ref.a = <span class="number">21</span></span><br><span class="line">ref.b = <span class="number">42</span></span><br><span class="line">ref.c = <span class="number">63</span></span><br></pre></td></tr></table></figure>
+<hr>
+<p>有些问题这里没有讨论，比如:</p>
+<blockquote>
+<ul>
+<li>为什么不在表达式中赋值？</li>
+<li>为什么字符串不可变？</li>
+<li>为什么 join 作用在字符串而不是列表和元组？</li>
+<li>异常有多快？</li>
+<li>python 除了编译成机器码还能编译成什么语言？</li>
+<li>如何实现列表？</li>
+<li>为什么字符串不能以奇数个反斜杠结尾？</li>
+<li>为什么 if/while/def/class 语句后面要冒号？</li>
+<li>为什么 python 允许在列表和元组的结尾加逗号？</li>
+</ul>
+</blockquote>
+<p>我认为它们没有意义，或者我还没有意识到它们的重要性。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-python-使用缩进来分组？"><span class="toc-number">1.</span> <span class="toc-text">为什么 python 使用缩进来分组？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么浮点运算很奇怪？"><span class="toc-number">2.</span> <span class="toc-text">为什么浮点运算很奇怪？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么在方法中明确使用-self-参数？"><span class="toc-number">3.</span> <span class="toc-text">为什么在方法中明确使用 self 参数？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么有的方法用-“-”-调用，有的用-“-”-？"><span class="toc-number">4.</span> <span class="toc-text">为什么有的方法用 “.” 调用，有的用 “()” ？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-python-没有-switch-case-？"><span class="toc-number">5.</span> <span class="toc-text">为什么 python 没有 switch case ？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#可以在解释器中实现线程而不依赖系统的线程吗？"><span class="toc-number">6.</span> <span class="toc-text">可以在解释器中实现线程而不依赖系统的线程吗？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-lambda-表达式不能包含语句？"><span class="toc-number">7.</span> <span class="toc-text">为什么 lambda 表达式不能包含语句？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#python-如何管理内存？"><span class="toc-number">8.</span> <span class="toc-text">python 如何管理内存？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-cpython-不使用更传统的垃圾回收机制？"><span class="toc-number">9.</span> <span class="toc-text">为什么 cpython 不使用更传统的垃圾回收机制？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么当-cpython-退出时不会释放所有的内存？"><span class="toc-number">10.</span> <span class="toc-text">为什么当 cpython 退出时不会释放所有的内存？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么需要单独的元组和列表类型？"><span class="toc-number">11.</span> <span class="toc-text">为什么需要单独的元组和列表类型？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何实现字典？"><span class="toc-number">12.</span> <span class="toc-text">如何实现字典？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么字典的键必须是不可变的？"><span class="toc-number">13.</span> <span class="toc-text">为什么字典的键必须是不可变的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-list-sort-不返回排序的列表？"><span class="toc-number">14.</span> <span class="toc-text">为什么 list.sort() 不返回排序的列表？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何在Python中指定并强制执行接口规范？"><span class="toc-number">15.</span> <span class="toc-text">如何在Python中指定并强制执行接口规范？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么没有-goto-？"><span class="toc-number">16.</span> <span class="toc-text">为什么没有 goto ？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么-python-不能在-with-中直接进行属性赋值？"><span class="toc-number">17.</span> <span class="toc-text">为什么 python 不能在 with 中直接进行属性赋值？</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-06-05-python-why/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-06-05-python-why/&text=python 的设计和问题"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-06-05-python-why/&title=python 的设计和问题"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-06-05-python-why/&is_video=false&description=python 的设计和问题"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=python 的设计和问题&body=Check out this article: http://koon.cool/technology/2018-06-05-python-why/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-06-05-python-why/&title=python 的设计和问题"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-06-05-python-why/&title=python 的设计和问题"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-06-05-python-why/&title=python 的设计和问题"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-06-05-python-why/&title=python 的设计和问题"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-06-05-python-why/&name=python 的设计和问题&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

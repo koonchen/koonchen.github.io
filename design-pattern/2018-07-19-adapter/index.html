@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="代码链接koonchen/design-patterns/adapter 要点 将一个类的接口转换成客户希望的另外一个接口。该模式使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。  假设现在有一个绘图软件，我们可以绘制各种图形，并且这些图形可以进行编辑。所有的图形都实现于接口 Shape ，比如 LineShape 实现直线， PolygonShape 实现多边形，但是 TextShap">
+<meta name="keywords" content="适配器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="初探适配器模式">
+<meta property="og:url" content="http://koon.cool/design-pattern/2018-07-19-adapter/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="代码链接koonchen/design-patterns/adapter 要点 将一个类的接口转换成客户希望的另外一个接口。该模式使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。  假设现在有一个绘图软件，我们可以绘制各种图形，并且这些图形可以进行编辑。所有的图形都实现于接口 Shape ，比如 LineShape 实现直线， PolygonShape 实现多边形，但是 TextShap">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter.jpg">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter-pattern.jpg">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter-pattern2.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter-abstract.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter-agency.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter-parameter.png">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.397Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="初探适配器模式">
+<meta name="twitter:description" content="代码链接koonchen/design-patterns/adapter 要点 将一个类的接口转换成客户希望的另外一个接口。该模式使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。  假设现在有一个绘图软件，我们可以绘制各种图形，并且这些图形可以进行编辑。所有的图形都实现于接口 Shape ，比如 LineShape 实现直线， PolygonShape 实现多边形，但是 TextShap">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter.jpg">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>初探适配器模式</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/design-pattern/2018-07-22-bridge/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/design-pattern/2018-07-12-builder/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/design-pattern/2018-07-19-adapter/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/design-pattern/2018-07-19-adapter/&text=初探适配器模式"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/design-pattern/2018-07-19-adapter/&title=初探适配器模式"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/design-pattern/2018-07-19-adapter/&is_video=false&description=初探适配器模式"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=初探适配器模式&body=Check out this article: http://koon.cool/design-pattern/2018-07-19-adapter/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/design-pattern/2018-07-19-adapter/&title=初探适配器模式"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/design-pattern/2018-07-19-adapter/&title=初探适配器模式"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/design-pattern/2018-07-19-adapter/&title=初探适配器模式"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/design-pattern/2018-07-19-adapter/&title=初探适配器模式"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/design-pattern/2018-07-19-adapter/&name=初探适配器模式&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#代码链接"><span class="toc-number">1.</span> <span class="toc-text">代码链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#要点"><span class="toc-number">2.</span> <span class="toc-text">要点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">3.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java-实现"><span class="toc-number">3.1.</span> <span class="toc-text">java 实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#python-实现"><span class="toc-number">3.2.</span> <span class="toc-text">python 实现</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        初探适配器模式
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2018-07-18T16:00:00.000Z" itemprop="datePublished">2018-07-19</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/design-pattern/">design pattern</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/适配器/">适配器</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="代码链接"><a href="#代码链接" class="headerlink" title="代码链接"></a>代码链接</h2><p><a href="https://github.com/koonchen/design-patterns/tree/master/adapter" target="_blank" rel="noopener">koonchen/design-patterns/adapter</a></p>
+<h2 id="要点"><a href="#要点" class="headerlink" title="要点"></a>要点</h2><blockquote>
+<p>将一个类的接口转换成客户希望的另外一个接口。该模式使得原本由于接口不兼容而不能一起工作的那些类可以一起工作。</p>
+</blockquote>
+<p>假设现在有一个绘图软件，我们可以绘制各种图形，并且这些图形可以进行编辑。所有的图形都实现于接口 <code>Shape</code> ，比如 <code>LineShape</code> 实现直线， <code>PolygonShape</code> 实现多边形，但是 <code>TextShape</code> 就没有这么简单了，我们要考虑到屏幕刷新和缓冲区管理的问题，我们假设在工具箱中已经有一个成品工具叫做 <code>TextView</code> 它完成了编辑和显示的工作，但此时， <code>TextView</code> 和 <code>Shape</code> 对象不能互换。</p>
+<p>adapter 模式的解决方案是创建一个新的 <code>TextShape</code> 子类，由它适配 <code>TextView</code> 和 <code>Shape</code> 的接口。我们可以通过两种方法完成这件事：</p>
+<ol>
+<li>实现 <code>Shape</code> 接口和继承 <code>TextView</code> ，做单实现单继承或双继承，这称为 <strong>类适配器</strong> 。</li>
+<li>将 <code>TextView</code> 实例作为 <code>TextShape</code> 的组成部分，使用 <code>TextView</code> 的接口实现 <code>TextShape</code> ，此时 <code>TextView</code> 和 <code>TextShape</code> 之间的关系是关联，然后实现 <code>Shape</code> 接口，做单实现，这称为 <strong>对象适配器</strong> 。结构看下类图：</li>
+</ol>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter.jpg" alt="cover"></p>
+<p>这里我们将 <code>TextShape</code> 称为 <code>Adapter</code> 。</p>
+<p>Adapter 模式的使用情况：</p>
+<blockquote>
+<ul>
+<li>你想使用一个已经存在的类，而它的接口不符合你的需求。</li>
+<li>你想创建一个可以复用的类，该类可以与其他不相关的类或不可预见的类协同工作。</li>
+<li>你想使用一些已经存在的子类，但是不可能对每一个都进行子类化以适配它们的接口。<strong>此时适配器可以适配它的父类接口</strong>。</li>
+</ul>
+</blockquote>
+<p>他有以下参与者：</p>
+<blockquote>
+<ul>
+<li>Target ( Shape ) — 定义 Client 使用的与特定领域相关的接口。</li>
+<li>Client ( DrawingEditor ) — 与符合 Target 接口的对象协同。</li>
+<li>Adaptee ( TextView ) — 已经存在的接口，这个接口需要适配。</li>
+<li>Adapter ( TextShape ) — 对 Adaptee 的接口和 Target 接口进行适配。</li>
+</ul>
+</blockquote>
+<p>适配器结构已经呼之欲出了 ( 对象适配器 ) ：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter-pattern.jpg" alt="cover"></p>
+<blockquote>
+<p>事实上，对于适配器模式，还有另外一种的结构，称为类适配器：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter-pattern2.png" alt="cover"></p>
+<hr>
+<p><em>关于 <strong>对象适配器</strong> 和 <strong>类适配器</strong></em> ：</p>
+<p>他们的结构不同，造成了一些差别，类适配器：</p>
+<ul>
+<li>用一个具体的 Adapter 类对 Adaptee 和 Target 进行适配。结果是我们想要适配一个类以及它所有的子类是不能胜任的。</li>
+<li>使得 Adapter 可以重定义 Adaptee 的部分行为，因为 Adapter 此时是 Adaptee 的一个子类。</li>
+<li>仅仅引入了一个对象，并不需要额外的指针以间接得到 Adaptee。</li>
+</ul>
+<p>对象适配器：</p>
+<ul>
+<li>允许一个 Adapter 与多个 Adaptee 同时工作，即 Adaptee 本身以及它的所有子类同时工作。</li>
+<li>使得重定义 Adaptee 的行为比较困难，需要生成并引用 Adaptee 的子类并引用这个子类而非 Adaptee 本身。</li>
+</ul>
+<hr>
+<p><em>关于使用 Adapter 模式时需要考虑的其他一些因素</em> ：</p>
+<ul>
+<li>Adapter 的适配程度：各个 Adapter 对于 Adaptee 的接口和 Target 接口适配的工作量是不一样的，这取决于它们的相似程度。</li>
+<li>可插入的 Adapter ：当其他的类使用一个类时，如果所需的假定条件越少，这个类就更具有可复用性。如果将接口适配构建为一个类，就不需要假设对其他的类可见的是一个相同的接口，换句话说，接口适配使得我们可以将自己的类加入到一些现有的系统中去，这些系统对这个类的接口可能有所不同。</li>
+<li>使用双向适配器提供透明操作：使用适配器的一个潜在问题是，它们不对所有的客户都透明。比如被适配的对象不再兼容 Adaptee 的接口，因此并不是所有 Adaptee 对象可以被使用的地方它都可以被使用。双向适配器提供了这样的透明性，在两个不同的客户需要用不同的方式查看同一个对象时，双向适配器尤其有用。 <em>PS：所谓的双向适配器结构与类适配器相同，属于多重继承。</em></li>
+</ul>
+</blockquote>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>在实现中有以下注意点：</p>
+<blockquote>
+<p>在 c++ 实现时， Adapter 类应该采用公共方式继承 Target 类，并且用私有方式继承 Adaptee 类，因此 Adapter 类应该是 Target 的子类，但不是 Adaptee 的子类。有许多方法可以实现可插入的适配器。</p>
+<p>这里有三种实现方法，首先，是为 Adaptee 找到一个窄的接口，即可用于适配的最小操作集。因为包含较少操作的窄接口相对容易进行适配：</p>
+<ul>
+<li>使用抽象操作：在父类 ( Target ) 中使用子类 ( Adapter ) 方法，而该方法可能与 Adaptee 存在某关系，比如关联。如下图所示：</li>
+</ul>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter-abstract.png" alt="cover"></p>
+<ul>
+<li>使用代理对象：从下面的机构中可以发现，现在我们将 Client 和 Target 进行了分离， Adapter 仅继承自被委派的具体的 Target ，其他部分和抽象操作是一样的。</li>
+</ul>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter-agency.png" alt="cover"></p>
+<ul>
+<li>参数化适配器：在 Smalltalk 中可以用一个或多个模块对适配器进行参数化。一个模块可以适配一个请求，并且适配器可以为每个请求存储一个模块。在本例中，先将一个结构进行转换，另一个模块存储。这种方式相对子类化是更方便的。</li>
+</ul>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/adapter-parameter.png" alt="cover"></p>
+</blockquote>
+<h3 id="java-实现"><a href="#java-实现" class="headerlink" title="java 实现"></a>java 实现</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Target</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">request</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Adaptee</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">specificRequest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    System.out.println(<span class="string">"Adaptee instance has been created"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Adapter</span> <span class="keyword">implements</span> <span class="title">Target</span> </span>&#123;</span><br><span class="line">  Adaptee adaptee = <span class="keyword">new</span> Adaptee();</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">request</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    adaptee.specificRequest();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Client</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Adapter adapter = <span class="keyword">new</span> Adapter();</span><br><span class="line">    adapter.request();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AdapterClient</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> </span>&#123;</span><br><span class="line">    Client client = <span class="keyword">new</span> Client();</span><br><span class="line">    client.execute();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们按照对象适配器完成了单实现的 Adapter 模式。</p>
+<p>在实际使用中，我们常常会有这样的状况，我们先用接口实现一个类，这个类的方法在下一个需要实现的类中也要使用，再次从头创建比较浪费时间，此时，适配器模式很好地处理了这件事：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">TargetPro</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">requestPro</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AdapteePro</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">specificRequestPro</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    System.out.println(<span class="string">"AdapteePro instance has been created"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AdapterPro</span> <span class="keyword">implements</span> <span class="title">TargetPro</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  AdapteePro adapteePro;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">AdapterPro</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.adapteePro = <span class="keyword">new</span> AdapteePro();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">requestPro</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    adapteePro.specificRequestPro();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClientPro</span> <span class="keyword">implements</span> <span class="title">TargetPro</span> </span>&#123;</span><br><span class="line">  TargetPro targetPro;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">ClientPro</span><span class="params">(TargetPro targetPro)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.targetPro = targetPro;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">requestPro</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    targetPro.requestPro();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AdapterProClient</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String args[])</span> </span>&#123;</span><br><span class="line">    ClientPro client = <span class="keyword">new</span> ClientPro(<span class="keyword">new</span> AdapterPro());</span><br><span class="line">    client.requestPro();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>现在，如果我们继续实现具体的 <code>Target</code> ，只需要使用已有的 <code>Adapter</code> 作为参数即可。</p>
+<h3 id="python-实现"><a href="#python-实现" class="headerlink" title="python 实现"></a>python 实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> abstractmethod, ABCMeta</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Target</span><span class="params">(metaclass=ABCMeta)</span>:</span></span><br><span class="line"><span class="meta">  @abstractmethod</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">request</span><span class="params">(self)</span>:</span> <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Adaptee</span><span class="params">(object)</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">specificRequest</span><span class="params">(self)</span>:</span></span><br><span class="line">    print(<span class="string">'"Adaptee instance has been created"'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Adapter</span><span class="params">(Target)</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">    self._adaptee = Adaptee()</span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">request</span><span class="params">(self)</span>:</span></span><br><span class="line">    self._adaptee.specificRequest()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  adapter = Adapter()</span><br><span class="line">  adapter.request()</span><br></pre></td></tr></table></figure>
+<p>这样实现了基本的对象适配器。</p>
+<p>参考 <a href="https://github.com/faif/python-patterns/blob/master/structural/adapter.py" target="_blank" rel="noopener">python-patterns/structural/adapter.py</a> 。和 Smalltalk 类似，用 Python 也可以实现参数化的适配器。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span><span class="params">(object)</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">    self._name = <span class="string">"Dog"</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">bark</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"woof!"</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span><span class="params">(object)</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">    self._name = <span class="string">"Cat"</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">meow</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"meow!"</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Human</span><span class="params">(object)</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">    self._name = <span class="string">"Human"</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">speak</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"hello!"</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Adapter</span><span class="params">(object)</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, obj, **kwargs)</span>:</span></span><br><span class="line">    self._obj = obj</span><br><span class="line">    self.__dict__.update(kwargs)</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__getattr__</span><span class="params">(self, item)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> getattr(self._obj, item)</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">original_dict</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> self._obj.__dict__</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  dog = Dog()</span><br><span class="line">  objects = []</span><br><span class="line">  objects.append(Adapter(dog, make_noise = dog.bark()))</span><br><span class="line">  cat = Cat()</span><br><span class="line">  objects.append(Adapter(cat, make_noise = cat.meow()))</span><br><span class="line">  human = Human()</span><br><span class="line">  objects.append(Adapter(human, make_noise = human.speak()))</span><br><span class="line">  <span class="keyword">for</span> obj <span class="keyword">in</span> objects:</span><br><span class="line">    print(<span class="string">f'A <span class="subst">&#123;obj._name&#125;</span> goes <span class="subst">&#123;obj.make_noise&#125;</span>'</span>)</span><br></pre></td></tr></table></figure>
+<p>Brige 模式的结构和对象适配器类似，但是它们的出发点不同:</p>
+<ul>
+<li>Brige 的目的是将接口和实现分离。</li>
+<li>Adapter 的目的是改变一个已有对象的接口。</li>
+</ul>
+<p>Decorator 模式增强了其他对象的功能而同时不改变它的接口，因此 Decorator 模式对应用的透明性比 Adapter 模式好，同时 Decorator 支持递归组合，而纯粹的 Adapter 无法实现这一点。</p>
+<p>Proxy 模式在不改变它的接口的条件下，为另一个对象定义了一个代理。</p>
+<p>这些，我们将在未来将一探究竟。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#代码链接"><span class="toc-number">1.</span> <span class="toc-text">代码链接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#要点"><span class="toc-number">2.</span> <span class="toc-text">要点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实现"><span class="toc-number">3.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#java-实现"><span class="toc-number">3.1.</span> <span class="toc-text">java 实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#python-实现"><span class="toc-number">3.2.</span> <span class="toc-text">python 实现</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/design-pattern/2018-07-19-adapter/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/design-pattern/2018-07-19-adapter/&text=初探适配器模式"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/design-pattern/2018-07-19-adapter/&title=初探适配器模式"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/design-pattern/2018-07-19-adapter/&is_video=false&description=初探适配器模式"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=初探适配器模式&body=Check out this article: http://koon.cool/design-pattern/2018-07-19-adapter/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/design-pattern/2018-07-19-adapter/&title=初探适配器模式"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/design-pattern/2018-07-19-adapter/&title=初探适配器模式"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/design-pattern/2018-07-19-adapter/&title=初探适配器模式"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/design-pattern/2018-07-19-adapter/&title=初探适配器模式"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/design-pattern/2018-07-19-adapter/&name=初探适配器模式&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

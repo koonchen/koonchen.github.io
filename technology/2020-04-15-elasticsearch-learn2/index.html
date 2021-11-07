@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="1. 基于词项和基于全文的检索1.1 基于 Term 查询 Term 是语义的最小单位，Term Level Query 包括了 Term Query / Range Query / Exists Query / Prefix Query /Wildcard Query 等。由 query 嵌套 term 组成。 在 es 中的 Term 不会对输入进行分词，而是将输入作为一个整体，在倒排索引中查">
+<meta name="keywords" content="elasticsearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Elasticsearch 探索">
+<meta property="og:url" content="http://koon.cool/technology/2020-04-15-elasticsearch-learn2/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="1. 基于词项和基于全文的检索1.1 基于 Term 查询 Term 是语义的最小单位，Term Level Query 包括了 Term Query / Range Query / Exists Query / Prefix Query /Wildcard Query 等。由 query 嵌套 term 组成。 在 es 中的 Term 不会对输入进行分词，而是将输入作为一个整体，在倒排索引中查">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.401Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Elasticsearch 探索">
+<meta name="twitter:description" content="1. 基于词项和基于全文的检索1.1 基于 Term 查询 Term 是语义的最小单位，Term Level Query 包括了 Term Query / Range Query / Exists Query / Prefix Query /Wildcard Query 等。由 query 嵌套 term 组成。 在 es 中的 Term 不会对输入进行分词，而是将输入作为一个整体，在倒排索引中查">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>Elasticsearch 探索</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2020-04-16-linux-optimize1/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/technology/2020-04-01-elasticsearch-learn1/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&text=Elasticsearch 探索"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&title=Elasticsearch 探索"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&is_video=false&description=Elasticsearch 探索"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Elasticsearch 探索&body=Check out this article: http://koon.cool/technology/2020-04-15-elasticsearch-learn2/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&title=Elasticsearch 探索"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&title=Elasticsearch 探索"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&title=Elasticsearch 探索"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&title=Elasticsearch 探索"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&name=Elasticsearch 探索&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-基于词项和基于全文的检索"><span class="toc-number">1.</span> <span class="toc-text">1. 基于词项和基于全文的检索</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-基于-Term-查询"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 基于 Term 查询</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-全文查询"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 全文查询</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-结构化搜索"><span class="toc-number">2.</span> <span class="toc-text">2. 结构化搜索</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-搜索的相关性算分"><span class="toc-number">3.</span> <span class="toc-text">3. 搜索的相关性算分</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Query-amp-Filtering-与多字符串多字段查询"><span class="toc-number">4.</span> <span class="toc-text">4. Query &amp; Filtering 与多字符串多字段查询</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-单字符串多字段查询-Dis-Max-Query"><span class="toc-number">5.</span> <span class="toc-text">5. 单字符串多字段查询 Dis Max Query</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-单字符串多字段查询-Multi-Match"><span class="toc-number">6.</span> <span class="toc-text">6. 单字符串多字段查询 Multi Match</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-多语言和中文分词与检索"><span class="toc-number">7.</span> <span class="toc-text">7. 多语言和中文分词与检索</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-Space-Jam-全文搜索"><span class="toc-number">8.</span> <span class="toc-text">8. Space Jam 全文搜索</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-Search-Template-和-Index-Alias-查询"><span class="toc-number">9.</span> <span class="toc-text">9. Search Template 和 Index Alias 查询</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-综合排序-Function-Score-Query-优化算分"><span class="toc-number">10.</span> <span class="toc-text">10. 综合排序 Function Score Query 优化算分</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-Term-amp-Phrase-Suggester"><span class="toc-number">11.</span> <span class="toc-text">11. Term &amp; Phrase Suggester</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-自动补全与基于上下文的提示"><span class="toc-number">12.</span> <span class="toc-text">12. 自动补全与基于上下文的提示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-配置跨集群搜索"><span class="toc-number">13.</span> <span class="toc-text">13. 配置跨集群搜索</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Elasticsearch 探索
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2020-04-14T16:00:00.000Z" itemprop="datePublished">2020-04-15</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/elasticsearch/">elasticsearch</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-基于词项和基于全文的检索"><a href="#1-基于词项和基于全文的检索" class="headerlink" title="1. 基于词项和基于全文的检索"></a>1. 基于词项和基于全文的检索</h2><h3 id="1-1-基于-Term-查询"><a href="#1-1-基于-Term-查询" class="headerlink" title="1.1 基于 Term 查询"></a>1.1 基于 Term 查询</h3><ul>
+<li>Term 是语义的最小单位，Term Level Query 包括了 Term Query / Range Query / Exists Query / Prefix Query /Wildcard Query 等。由 <code>query</code> 嵌套 <code>term</code> 组成。</li>
+<li>在 es 中的 Term 不会对输入进行分词，而是将输入作为一个整体，在倒排索引中查找准确的词项，并且使⽤相关度算分公式，为每个包含该词项的⽂档进⾏相关度算分。</li>
+<li>可以通过 Constant Score 将查询转换成一个 Filtering，避免算分，利用了缓存。</li>
+<li>Term 查询不会做分词，如果希望完全匹配，应该用 <code>xxx.keyword</code> 字段来进行查询。</li>
+<li><code>query</code> 内嵌套 <code>constant_score</code> 和 <code>filter</code> 可以将 Query 转换成 Fileter，忽略 TF-IDF 计算，避免算分性能开销。</li>
+</ul>
+<h3 id="1-2-全文查询"><a href="#1-2-全文查询" class="headerlink" title="1.2 全文查询"></a>1.2 全文查询</h3><ul>
+<li>全文查询包括了 Match Query / Match Phrase Query / Query String Query 等。由 <code>query</code> 嵌套 <code>match</code> 组成。</li>
+<li>索引和搜索对会进行分词，查询字符串会先传递到一个分词器，然后生成一个可以查询的词项列表。</li>
+<li>查询时，会先对输入进行分词，然后逐个进行底层查询，最终合并结果，并为每个文档生成一个算分。</li>
+<li>可以通过 <code>operator</code> 对分词关系进行控制，或者直接使用 <code>+</code> <code>-</code> 符号也一样。</li>
+<li>可以通过 <code>minimum_should_match</code> 参数控制最小匹配，用 <code>~</code> 符号也一样。</li>
+<li>可以通过 <code>match_phrase</code> 嵌套 <code>slop</code> 允许误差，设置范围。</li>
+</ul>
+<h2 id="2-结构化搜索"><a href="#2-结构化搜索" class="headerlink" title="2. 结构化搜索"></a>2. 结构化搜索</h2><ul>
+<li>所谓结构化的数据指日期、布尔、数字，文本也可以是结构化的，比如颜色、标签、标识。</li>
+<li>结构化数据即有精确的格式，可以逻辑操作，同时有范围课比较。</li>
+<li>结构话数据可以 Term 查询或 Perfix 前缀查询。</li>
+<li>结构化的结构只有是或否两个值。</li>
+<li>在 <code>query</code> 中嵌套 <code>constant_score</code> 和 <code>filter</code> 和 <code>range</code> 可以进行范围查询。<code>gte</code> 是大于等于，<code>lte</code> 是小于等于。</li>
+<li>在日期的查询中可以使用 <code>now-1y</code> 这样的语法，y 是年，M 是月，w 是周，d 是天，H/h 是小时，m 是分钟，s 是秒。</li>
+<li>可以通过 <code>constant_score</code> 嵌套 <code>filter</code> 和 <code>exists</code> 来确定非空字段。</li>
+<li>es 中的 Term 查询是包含而不是相等，需要增加一个 count 字段，通过 bool query 进行精确匹配。</li>
+</ul>
+<h2 id="3-搜索的相关性算分"><a href="#3-搜索的相关性算分" class="headerlink" title="3. 搜索的相关性算分"></a>3. 搜索的相关性算分</h2><ul>
+<li>相关性是指一个文档和语句的匹配程度，es 5 前使用 TF-IDF，之后使用 BM25。</li>
+<li>Term Frequency 检索词在文档中出现的词频。</li>
+<li>最简单的方式是将各个词的 TF 相加，需要考虑一些 Stop Word 是否需要算进去。</li>
+<li>Document Frequency 检索词在所有文档中出现的词频。</li>
+<li>Inverse Document Frequency 是 log(全部文档数/检索词出现的文档数)。从 IDF 中可以知道一个词的重要性。</li>
+<li>TF-IDF 算法本质上是 TF 求和变成加权求和。<ul>
+<li>将各个词的 TF*IDF 相加求和。</li>
+</ul>
+</li>
+<li>BM25 在 TF 无限增加时，TF-IDF 会不断增加分值，而 BM25 会趋向一个值。</li>
+<li>在 lucene 中有 boosting 的概念，它也会影响打分，可以在 <code>query</code> 下嵌套 <code>boosting</code> 使用。<ul>
+<li>当 boosting &gt; 1 时，打分的相关度提升</li>
+<li>当 0 &lt; boosting &lt; 1 时，打分相关性下降</li>
+<li>当 boosting &lt; 0 时，贡献为负</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-Query-amp-Filtering-与多字符串多字段查询"><a href="#4-Query-amp-Filtering-与多字符串多字段查询" class="headerlink" title="4. Query &amp; Filtering 与多字符串多字段查询"></a>4. Query &amp; Filtering 与多字符串多字段查询</h2><ul>
+<li>在 es 中有 Query 和 Filter 两种不同的上下文。<ul>
+<li>Query 有相关性算分。</li>
+<li>Filter 不需要算分。</li>
+</ul>
+</li>
+<li>bool query 在 <code>query</code> 中嵌套 <code>bool</code> 使用，是一个或多个查询的组合。<ul>
+<li>must 必须满足条件，算分。</li>
+<li>should 选择性匹配，算分。</li>
+<li>must_not 必须不能匹配，Filter Context 中不算分。</li>
+<li>filter 必须匹配，Filter COntext 中不算分。</li>
+<li><code>bool</code> 下可以嵌套 must should 等四种等级继续嵌套 <code>bool</code>，这样算分的等级就变了。</li>
+<li>同样通过设置 <code>boost</code> 的值也能影响算分的权重。</li>
+</ul>
+</li>
+<li>可以在 <code>query</code> 中嵌套 <code>boosting</code> 进行查询，可以指定 <code>positive</code> 项、<code>negative</code> 项，同时可以指定 <code>negative_boost</code> 的值，他们都是在影响 Query 的算分结果，最后得到的排名会有变化。</li>
+</ul>
+<h2 id="5-单字符串多字段查询-Dis-Max-Query"><a href="#5-单字符串多字段查询-Dis-Max-Query" class="headerlink" title="5. 单字符串多字段查询 Dis Max Query"></a>5. 单字符串多字段查询 Dis Max Query</h2><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">PUT /blogs/_doc/<span class="number">1</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"title"</span>: <span class="string">"Quick brown rabbits"</span>,</span><br><span class="line">    <span class="string">"body"</span>:  <span class="string">"Brown rabbits are commonly seen."</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">PUT /blogs/_doc/<span class="number">2</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"title"</span>: <span class="string">"Keeping pets healthy"</span>,</span><br><span class="line">    <span class="string">"body"</span>:  <span class="string">"My quick brown fox eats rabbits on a regular basis."</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">POST /blogs/_search</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"query"</span>: &#123;</span><br><span class="line">        <span class="string">"bool"</span>: &#123;</span><br><span class="line">            <span class="string">"should"</span>: [</span><br><span class="line">                &#123; <span class="string">"match"</span>: &#123; <span class="string">"title"</span>: <span class="string">"Brown fox"</span> &#125;&#125;,</span><br><span class="line">                &#123; <span class="string">"match"</span>: &#123; <span class="string">"body"</span>:  <span class="string">"Brown fox"</span> &#125;&#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>在上面的例子中，我们希望第二个查询排在第一个之前，但是事实是第一个排在第二个之前。</p>
+</blockquote>
+<p><code>should</code> 的算分过程：</p>
+<ul>
+<li>查询 should 语句中的两个查询。</li>
+<li>对查询评分求和，求和乘以匹配总数，最后除以所有语句数，得到一个平均值。</li>
+</ul>
+<p>上面的例子不应该是简单的相加，而是找到最匹配的字段，因此可以使用 Disjunction Max Query，它将查询文档中最高的内容评分作为最终评分。 </p>
+<ul>
+<li>在 <code>query</code> 下嵌套 <code>dis_max</code> 和 <code>queries</code> 组成 Disjunction Max Query。</li>
+<li>单纯使用 Disjunction Max Query 可能结果总是相同的，因此可以使用 <code>tie_breaker</code> (最好在 0 ~ 1 之间)，它将其他匹配语句的评分与 tie_breaker 相乘，让分数不都相同。</li>
+</ul>
+<h2 id="6-单字符串多字段查询-Multi-Match"><a href="#6-单字符串多字段查询-Multi-Match" class="headerlink" title="6. 单字符串多字段查询 Multi Match"></a>6. 单字符串多字段查询 Multi Match</h2><p>单字符串多字段查询有三种场景：</p>
+<ul>
+<li>最佳字段 Best Fields<ul>
+<li>当字段之间相互竞争，又相互关联时，评分来自最匹配的字段。</li>
+</ul>
+</li>
+<li>多数字段 Most Fields<ul>
+<li>在处理英文内容时，在主字段抽取词干，加入同义词，用以匹配更多的文档。对于相同的文本，加入子字段，以提供更加精确的匹配，其他字段则作为匹配文档提高相关度的信号，匹配字段越多越好。</li>
+</ul>
+</li>
+<li>混合字段 Cross Fields<ul>
+<li>对于某些实体，例如人名、地址、图书信息。需要在多个字段中确认信息，单个字段只能作为整体的一部分，希望在任何这些列出的字段中找到尽可能多的词。</li>
+</ul>
+</li>
+</ul>
+<p>Multi Match Query 在 <code>query</code> 下使用 <code>multi_match</code> 进行声明，其中要说明 <code>type</code> 类型，默认为 Best Fields，同时在 <code>fields</code> 中说明在哪些字段上，<code>tie_breaker</code> 也可以进行指定，而 <code>minimum_should_match</code> 用来说明最小匹配度，说明最小匹配多少个条件。</p>
+<p>比如在使用英文分词器进行搜索时，可能两个句子中短的那条容易排在前面，可以通过增加一个字段，使用 standard 分词器，同时在搜索时使用 <code>multi_match</code> 的 <code>most_fields</code> 找内容，在 <code>fields</code> 中可以使用 <code>&quot;title^10&quot;,&quot;title.std&quot;</code> 来指定权重。</p>
+<p>在使用 <code>operator</code> 为 <code>and</code> 的时候往往比较严格，如果用 copy to 处理会需要额外的存储空间，这个时候使用 <code>type</code> 为 <code>cross_fields</code> 就比较好了。</p>
+<h2 id="7-多语言和中文分词与检索"><a href="#7-多语言和中文分词与检索" class="headerlink" title="7. 多语言和中文分词与检索"></a>7. 多语言和中文分词与检索</h2><ul>
+<li>当处理语言时，可能搜索和原文不完全匹配，但是希望能够搜索。<ul>
+<li>Quick brown fox 和 Fast brown fox / Jumping fox 和 Jumped foxes 。</li>
+</ul>
+</li>
+<li>可用策略：<ul>
+<li>归一化词元，清除变音符号。</li>
+<li>抽取词根，清除单复数和时态。</li>
+<li>包含同义词。</li>
+<li>拼写错误，处理同音异形词。</li>
+</ul>
+</li>
+</ul>
+<h2 id="8-Space-Jam-全文搜索"><a href="#8-Space-Jam-全文搜索" class="headerlink" title="8. Space Jam 全文搜索"></a>8. Space Jam 全文搜索</h2><h2 id="9-Search-Template-和-Index-Alias-查询"><a href="#9-Search-Template-和-Index-Alias-查询" class="headerlink" title="9. Search Template 和 Index Alias 查询"></a>9. Search Template 和 Index Alias 查询</h2><h2 id="10-综合排序-Function-Score-Query-优化算分"><a href="#10-综合排序-Function-Score-Query-优化算分" class="headerlink" title="10. 综合排序 Function Score Query 优化算分"></a>10. 综合排序 Function Score Query 优化算分</h2><h2 id="11-Term-amp-Phrase-Suggester"><a href="#11-Term-amp-Phrase-Suggester" class="headerlink" title="11. Term &amp; Phrase Suggester"></a>11. Term &amp; Phrase Suggester</h2><h2 id="12-自动补全与基于上下文的提示"><a href="#12-自动补全与基于上下文的提示" class="headerlink" title="12. 自动补全与基于上下文的提示"></a>12. 自动补全与基于上下文的提示</h2><h2 id="13-配置跨集群搜索"><a href="#13-配置跨集群搜索" class="headerlink" title="13. 配置跨集群搜索"></a>13. 配置跨集群搜索</h2>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-基于词项和基于全文的检索"><span class="toc-number">1.</span> <span class="toc-text">1. 基于词项和基于全文的检索</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-基于-Term-查询"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 基于 Term 查询</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-全文查询"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 全文查询</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-结构化搜索"><span class="toc-number">2.</span> <span class="toc-text">2. 结构化搜索</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-搜索的相关性算分"><span class="toc-number">3.</span> <span class="toc-text">3. 搜索的相关性算分</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-Query-amp-Filtering-与多字符串多字段查询"><span class="toc-number">4.</span> <span class="toc-text">4. Query &amp; Filtering 与多字符串多字段查询</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-单字符串多字段查询-Dis-Max-Query"><span class="toc-number">5.</span> <span class="toc-text">5. 单字符串多字段查询 Dis Max Query</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-单字符串多字段查询-Multi-Match"><span class="toc-number">6.</span> <span class="toc-text">6. 单字符串多字段查询 Multi Match</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-多语言和中文分词与检索"><span class="toc-number">7.</span> <span class="toc-text">7. 多语言和中文分词与检索</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-Space-Jam-全文搜索"><span class="toc-number">8.</span> <span class="toc-text">8. Space Jam 全文搜索</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-Search-Template-和-Index-Alias-查询"><span class="toc-number">9.</span> <span class="toc-text">9. Search Template 和 Index Alias 查询</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-综合排序-Function-Score-Query-优化算分"><span class="toc-number">10.</span> <span class="toc-text">10. 综合排序 Function Score Query 优化算分</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-Term-amp-Phrase-Suggester"><span class="toc-number">11.</span> <span class="toc-text">11. Term &amp; Phrase Suggester</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-自动补全与基于上下文的提示"><span class="toc-number">12.</span> <span class="toc-text">12. 自动补全与基于上下文的提示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-配置跨集群搜索"><span class="toc-number">13.</span> <span class="toc-text">13. 配置跨集群搜索</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&text=Elasticsearch 探索"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&title=Elasticsearch 探索"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&is_video=false&description=Elasticsearch 探索"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Elasticsearch 探索&body=Check out this article: http://koon.cool/technology/2020-04-15-elasticsearch-learn2/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&title=Elasticsearch 探索"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&title=Elasticsearch 探索"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&title=Elasticsearch 探索"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&title=Elasticsearch 探索"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2020-04-15-elasticsearch-learn2/&name=Elasticsearch 探索&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>

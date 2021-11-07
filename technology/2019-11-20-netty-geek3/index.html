@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="description" content="1. Netty 总览Netty 编译需要操作系统 64 位，保证下载 jar 包为 64 位，下图是 Netty 的核心包。  底部是工具类，左边是 Netty 实现的 tcp 等协议支持，右边是编解码和 handler 。 codec 主要存放编解码；common 方工具类、过线程包、日志；example 用来抄代码；handler 用来实现人性化功能，方便大家使用；proxy 代理；micr">
+<meta name="keywords" content="netty">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从请求处理剖析 Netty">
+<meta property="og:url" content="http://koon.cool/technology/2019-11-20-netty-geek3/index.html">
+<meta property="og:site_name" content="空城">
+<meta property="og:description" content="1. Netty 总览Netty 编译需要操作系统 64 位，保证下载 jar 包为 64 位，下图是 Netty 的核心包。  底部是工具类，左边是 Netty 实现的 tcp 等协议支持，右边是编解码和 handler 。 codec 主要存放编解码；common 方工具类、过线程包、日志；example 用来抄代码；handler 用来实现人性化功能，方便大家使用；proxy 代理；micr">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200429125759.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200504211532.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200504225721.png">
+<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200504231226.png">
+<meta property="og:updated_time" content="2021-11-07T17:34:44.401Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从请求处理剖析 Netty">
+<meta name="twitter:description" content="1. Netty 总览Netty 编译需要操作系统 64 位，保证下载 jar 包为 64 位，下图是 Netty 的核心包。  底部是工具类，左边是 Netty 实现的 tcp 等协议支持，右边是编解码和 handler 。 codec 主要存放编解码；common 方工具类、过线程包、日志；example 用来抄代码；handler 用来实现人性化功能，方便大家使用；proxy 代理；micr">
+<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200429125759.png">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>从请求处理剖析 Netty</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" href="/technology/2019-12-10-netty-geek4/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" href="/technology/2019-10-15-netty-geek2/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-11-20-netty-geek3/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-11-20-netty-geek3/&text=从请求处理剖析 Netty"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-11-20-netty-geek3/&title=从请求处理剖析 Netty"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-11-20-netty-geek3/&is_video=false&description=从请求处理剖析 Netty"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=从请求处理剖析 Netty&body=Check out this article: http://koon.cool/technology/2019-11-20-netty-geek3/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-11-20-netty-geek3/&title=从请求处理剖析 Netty"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-11-20-netty-geek3/&title=从请求处理剖析 Netty"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-11-20-netty-geek3/&title=从请求处理剖析 Netty"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-11-20-netty-geek3/&title=从请求处理剖析 Netty"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-11-20-netty-geek3/&name=从请求处理剖析 Netty&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Netty-总览"><span class="toc-number">1.</span> <span class="toc-text">1. Netty 总览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-启动服务"><span class="toc-number">2.</span> <span class="toc-text">2. 启动服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-构建连接"><span class="toc-number">3.</span> <span class="toc-text">3. 构建连接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-接收数据"><span class="toc-number">4.</span> <span class="toc-text">4. 接收数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-业务处理"><span class="toc-number">5.</span> <span class="toc-text">5. 业务处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-发送数据"><span class="toc-number">6.</span> <span class="toc-text">6. 发送数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-断开连接"><span class="toc-number">7.</span> <span class="toc-text">7. 断开连接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-关闭服务"><span class="toc-number">8.</span> <span class="toc-text">8. 关闭服务</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        从请求处理剖析 Netty
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-11-19T16:00:00.000Z" itemprop="datePublished">2019-11-20</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/technology/">technology</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/netty/">netty</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-Netty-总览"><a href="#1-Netty-总览" class="headerlink" title="1. Netty 总览"></a>1. Netty 总览</h2><p>Netty 编译需要操作系统 64 位，保证下载 jar 包为 64 位，下图是 Netty 的核心包。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200429125759.png" alt></p>
+<p>底部是工具类，左边是 Netty 实现的 tcp 等协议支持，右边是编解码和 handler 。</p>
+<p>codec 主要存放编解码；common 方工具类、过线程包、日志；example 用来抄代码；handler 用来实现人性化功能，方便大家使用；proxy 代理；microbench 测试用；resolver 地址解析；transport 主要是 tcp udp ；rxtx 和 udt 被放弃。</p>
+<h2 id="2-启动服务"><a href="#2-启动服务" class="headerlink" title="2. 启动服务"></a>2. 启动服务</h2><blockquote>
+<p>记录顺序：主线、源码、知识点</p>
+</blockquote>
+<ul>
+<li>our thread<ul>
+<li>创建 selector</li>
+<li>创建 server socket channel</li>
+<li>初始化 server socket channel</li>
+<li>给 server socket channel 从 boss group 选择一个 NioEventLoop</li>
+</ul>
+</li>
+<li>boss thread<ul>
+<li>将 server socket channel 注册到选择的 NioEventLoop 的 selector</li>
+<li>绑定地址启动</li>
+<li>注册接受连接事件 OP_ACCEPT 到 selector 上</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Selector selector = sun.nio.ch.SelectorProviderImpl.openSelector()</span><br><span class="line"></span><br><span class="line">ServerSocketChannel serverSocketChannel = provider.openServerSocketChannel()</span><br><span class="line"></span><br><span class="line">selectionKey = javaChannel().register(eventLoop().unwrappedSelector(), <span class="number">0</span>, <span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">javaChannel().bind(localAddress, config.getBacklog());</span><br><span class="line"></span><br><span class="line">selectionKey.interestOps(OP_ACCEPT);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Selector 是在 <code>new NioEventLoopGroup()</code>（创建一批 NioEventLoop）时创建。</li>
+<li>第一次 Register 并不是监听 OP_ACCEPT，而是 0:<ul>
+<li><code>javaChannel().register(eventLoop().unwrappedSelector(), 0, this)</code></li>
+</ul>
+</li>
+<li>最终监听 OP_ACCEPT 是通过 bind 完成后的 <code>fireChannelActive()</code> 来触发的。</li>
+<li>NioEventLoop 是通过 Register 操作的执行来完成启动的。</li>
+<li>类似 ChannelInitializer，一些 Hander 可以设计成一次性的，用完就移除，例如授权。</li>
+</ul>
+<blockquote>
+<p>channel 是连接；</p>
+<p>eventloop 是为连接服务的执行器，或者说一个死循环 loop 轮询，处理 channel 上的事件 event ；</p>
+<p>一个 channel 只会绑定到一个 eventloop ，但是一个 eventloop 可以服务多个 channel ；</p>
+<p>eventloopgroup 相当于 eventloop 的多线程。</p>
+</blockquote>
+<h2 id="3-构建连接"><a href="#3-构建连接" class="headerlink" title="3. 构建连接"></a>3. 构建连接</h2><ul>
+<li>boss thread<ul>
+<li>NioEventLoop 中的 selector 轮询创建连接事件（OP_ACCEPT）</li>
+<li>创建 socket channel</li>
+<li>初始化 socket channel 并从 worker group 中选择一个 NioEventLoop</li>
+</ul>
+</li>
+<li>worker thread<ul>
+<li>将 socket channel 注册到选择的 NioEventLoop 的 selector</li>
+<li>注册读事件（OP_READ）到 selector 上</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">接收连接：</span><br><span class="line"></span><br><span class="line">selector.select()/selectNow()/select(timeoutMillis)</span><br><span class="line"></span><br><span class="line">发现 OP_ACCEPT 事件，处理：</span><br><span class="line"></span><br><span class="line">SocketChannel socketChannel = serverSocketChannel.accept();</span><br><span class="line"></span><br><span class="line">selectionKey = javaChannel().register(eventLoop().unwrappedSelector(), <span class="number">0</span>, <span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">selectionKey.interestOps(OP_READ);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建连接的初始化和注册是通过 pipeline.fireChannelRead 在 ServerBootstrapAcceptor 中完成的。</li>
+<li>第一次 Register 并不是监听 OP_READ ，而是 0 ：<ul>
+<li><code>javaChannel().register(eventLoop().unwrappedSelector(), 0, this)</code></li>
+</ul>
+</li>
+<li>最终监听 OP_READ 是通过“Register”完成后的 fireChannelActive （<code>io.netty.channel.AbstractChannel.AbstractUnsafe#register0</code>中）来触发的。</li>
+<li>Worker’s NioEventLoop 是通过 Register 操作执行来启动。</li>
+<li>接受连接的读操作，不会尝试读取更多次（16次）。</li>
+</ul>
+<h2 id="4-接收数据"><a href="#4-接收数据" class="headerlink" title="4. 接收数据"></a>4. 接收数据</h2><p>读数据技巧：</p>
+<ol>
+<li>自适应数据大小的分配器 AdaptiveRecvByteBufAllocator ：发放东西时，用多大桶装？小了不够，大了浪费。</li>
+<li>连续度 defaultMaxMessagesPerRead ：加入发放时，桶装满了，如果还要继续所以直接拿新的桶装，直到没有了或者需要给别人机会了才放弃。</li>
+</ol>
+<hr>
+<ul>
+<li>worker thread<ul>
+<li>多路复用器（ Selector ）接收到 OP_READ 事件</li>
+<li>处理 OP_READ 事件：<code>NioSocketChannel.NioSocketChannelUnsafe.read()</code><ul>
+<li>分配一个初始 1024 字节的 byte buffer 来接受数据</li>
+<li>从 Channel 接受数据到 byte buffer</li>
+<li>记录实际接受数据大小，调整下次分配 byte buffer 大小</li>
+<li>触发 <code>pipeline.fireChannelRead(byteBuf)</code> 把读取到的数据传播出去</li>
+<li>判断接受 byte buffer 是否满载而归：是，尝试继续读取直到没有数据或满 16 次； 否，结束本轮读取，等待下次 OP_READ 事件</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li>读取数据本质：<code>sun.nio.ch.SocketChannelImpl#read(java.nio.ByteBuffer)</code></li>
+<li><code>NioSocketChannel read()</code> 是读数据， <code>NioServerSocketChannel read()</code>是创建连接</li>
+<li><code>pipeline.fireChannelReadComplete()</code> 一次读事件处理完成</li>
+<li><code>pipeline.fireChannelRead(byteBuf)</code> 一次读数据完成，一次读事件处理可能会包含多次读数据操作。</li>
+<li>为什么最多只尝试读取 16 次？NioEventLoop 是复用的，需要“雨露均沾”。</li>
+<li>AdaptiveRecvByteBufAllocator 对 bytebuf 的猜测：放大果断，缩小谨慎（需要连续 2 次判断）。</li>
+</ul>
+<h2 id="5-业务处理"><a href="#5-业务处理" class="headerlink" title="5. 业务处理"></a>5. 业务处理</h2><ul>
+<li>worker thread<ul>
+<li><del>多路复用器（ Selector ）接收到 OP_READ 事件</del></li>
+<li><del>处理 OP_READ 事件：<code>NioSocketChannel.NioSocketChannelUnsafe.read()</code></del><ul>
+<li><del>分配一个初始 1024 字节的 byte buffer 来接受数据</del></li>
+<li><del>从 Channel 接受数据到 byte buffer</del></li>
+<li><del>记录实际接受数据大小，调整下次分配 byte buffer 大小</del></li>
+<li><strong>触发 <code>pipeline.fireChannelRead(byteBuf)</code> 把读取到的数据传播出去</strong></li>
+<li><del>判断接受 byte buffer 是否满载而归：是，尝试继续读取直到没有数据或满 16 次； 否，结束本轮读取，等待下次 OP_READ 事件</del></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200504211532.png" alt></p>
+<p>在 pipline 上的 handler 不会都执行，需要实现 <code>ChannelInboundHandler</code> ，同时不能加注解 @Skip 。</p>
+<ul>
+<li>处理业务本质：数据在 pipeline 中所有的 handler 的 <code>channelRead()</code> 执行过程</li>
+<li>Handler 要实现 <code>io.netty.channel.ChannelInboundHandler#channelRead (ChannelHandlerContext ctx, Object msg)</code>，且不能加注解 @Skip 才能被执行到。</li>
+<li>中途可退出，不保证执行到 Tail Handler。</li>
+<li>默认处理线程就是 Channel 绑定的 NioEventLoop 线程，也可以设置其他：<code>pipeline.addLast(new UnorderedThreadPoolEventExecutor(10), serverHandler)</code></li>
+</ul>
+<h2 id="6-发送数据"><a href="#6-发送数据" class="headerlink" title="6. 发送数据"></a>6. 发送数据</h2><ul>
+<li>write : 将数据放到一个 buffer 里；</li>
+<li>flush : 从 buffer 中将数据发送出去；</li>
+<li>writeAndFlush : 写到 buffer 并发送；</li>
+<li>write 与 flush 之间有一个 ChannelOutboundBuffer 。</li>
+</ul>
+<hr>
+<p>写数据技巧：</p>
+<ol>
+<li><p>Netty 写数据，写不进去时，会停止写，然后注册一个 OP_WRITE 事件，来通知什么时候可以写进去了再写。</p>
+</li>
+<li><p>Netty 批量写数据时，如果想写的都写进去了，接下来的尝试写更多（调整maxBytesPerGatheringWrite）。</p>
+</li>
+<li><p>Netty 只要有数据要写，且能写的出去，则一直尝试，直到写不出去或者满 16 次（writeSpinCount）。</p>
+</li>
+<li><p>Netty 待写数据太多，超过一定的水位线 <code>writeBufferWaterMark.high()</code> ，会将可写的标志位改成false ，让应用端自己做决定要不要发送数据了。</p>
+</li>
+</ol>
+<hr>
+<ul>
+<li>Write - 写数据到 buffer ：<ul>
+<li><code>ChannelOutboundBuffer#addMessage</code></li>
+</ul>
+</li>
+<li>Flush - 发送 buffer 里面的数据：<ul>
+<li><code>AbstractChannel.AbstractUnsafe#flush</code></li>
+<li>准备数据: <code>ChannelOutboundBuffer#addFlush</code></li>
+<li>发送：<code>NioSocketChannel#doWrite</code></li>
+</ul>
+</li>
+</ul>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200504225721.png" alt></p>
+<hr>
+<ul>
+<li>写的本质：<ul>
+<li>single write: <code>sun.nio.ch.SocketChannelImpl#write(java.nio.ByteBuffer)</code></li>
+<li>gathering write：<code>sun.nio.ch.SocketChannelImpl#write(java.nio.ByteBuffer[], int, int)</code></li>
+</ul>
+</li>
+<li>写数据写不进去时，会停止写，注册一个 OP_WRITE 事件，来通知什么时候可以写进去了，再来 flush。</li>
+<li><strong>OP_WRITE 不是说有数据可写，而是说可以写进去</strong>，所以正常情况，不能注册，否则一直触发。</li>
+<li>批量写数据时，如果尝试写的都写进去了，接下来会尝试写更多（ maxBytesPerGatheringWrite ）。</li>
+<li>只要有数据要写，且能写，则一直尝试，直到 16 次（ writeSpinCount ），写 16 次还没有写完，就直 接 schedule 一个 task 来继续写，而不是用注册写事件来触发，更简洁有力。</li>
+<li>待写数据太多，超过一定的水位线（ <code>writeBufferWaterMark .high()</code>），会将可写的标志位改成 false ， 让应用端自己做决定要不要继续写。</li>
+<li><code>channelHandlerContext.channel().write()</code> ：从 TailContext 开始执行。</li>
+<li><code>channelHandlerContext.write()</code> : 从当前的 Context 开始。</li>
+</ul>
+<h2 id="7-断开连接"><a href="#7-断开连接" class="headerlink" title="7. 断开连接"></a>7. 断开连接</h2><ul>
+<li>多路复用器（Selector）接收到 OP_READ 事件。</li>
+<li>处理 OP_READ 事件，即 <code>NioSocketChannel.NioSocketChannelUnsafe.read()</code>：<ul>
+<li>接受数据</li>
+<li>判断接受的数据大小是否 &lt; 0 , 如果是，说明是关闭，开始执行关闭：<ul>
+<li>关闭 channel（包含 cancel 多路复用器的 key）。</li>
+<li>清理消息：不接受新信息，fail 掉所有 queue 中消息。</li>
+<li>触发 fireChannelInactive 和 fireChannelUnregistered 。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li>关闭连接本质：<ul>
+<li><code>java.nio.channels.spi.AbstractInterruptibleChannel#close</code><ul>
+<li><code>java.nio.channels.SelectionKey#cancel</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>要点：<ul>
+<li>关闭连接，会触发 OP_READ 方法。读取字节数是 -1 代表关闭。</li>
+<li>数据读取进行时，强行关闭，触发 IO Exception，进而执行关闭。</li>
+<li>Channel 的关闭包含了 SelectionKey 的 cancel 。</li>
+</ul>
+</li>
+</ul>
+<h2 id="8-关闭服务"><a href="#8-关闭服务" class="headerlink" title="8. 关闭服务"></a>8. 关闭服务</h2><ul>
+<li><code>bossGroup.shutdownGracefully();</code></li>
+<li><code>workerGroup.shutdownGracefully();</code></li>
+<li>关闭所有 Group 中的 NioEventLoop ：<ul>
+<li>修改 NioEventLoop 的 State 标志位</li>
+<li>NioEventLoop 判断 State 执行退出</li>
+</ul>
+</li>
+</ul>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200504231226.png" alt></p>
+<hr>
+<ul>
+<li>关闭服务本质：<ul>
+<li>关闭所有连接及 Selector ：<ul>
+<li><code>java.nio.channels.Selector#keys</code><ul>
+<li><code>java.nio.channels.spi.AbstractInterruptibleChannel#close</code></li>
+<li><code>java.nio.channels.SelectionKey#cancel</code></li>
+</ul>
+</li>
+<li><code>selector.close()</code></li>
+</ul>
+</li>
+<li>关闭所有线程：退出循环体 for (;;)</li>
+</ul>
+</li>
+</ul>
+<hr>
+<ul>
+<li>关闭服务要点：<ul>
+<li>优雅（DEFAULT_SHUTDOWN_QUIET_PERIOD），静默期</li>
+<li>可控（DEFAULT_SHUTDOWN_TIMEOUT），默认退出时间</li>
+<li>先不接活，后尽量干完手头的活（先关 boss 后关 worker：不是100%保证）</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>Netty 的主线就是基于 Java NIO 的编程。</p>
+</blockquote>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Netty-总览"><span class="toc-number">1.</span> <span class="toc-text">1. Netty 总览</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-启动服务"><span class="toc-number">2.</span> <span class="toc-text">2. 启动服务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-构建连接"><span class="toc-number">3.</span> <span class="toc-text">3. 构建连接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-接收数据"><span class="toc-number">4.</span> <span class="toc-text">4. 接收数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-业务处理"><span class="toc-number">5.</span> <span class="toc-text">5. 业务处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-发送数据"><span class="toc-number">6.</span> <span class="toc-text">6. 发送数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-断开连接"><span class="toc-number">7.</span> <span class="toc-text">7. 断开连接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-关闭服务"><span class="toc-number">8.</span> <span class="toc-text">8. 关闭服务</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-11-20-netty-geek3/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-11-20-netty-geek3/&text=从请求处理剖析 Netty"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-11-20-netty-geek3/&title=从请求处理剖析 Netty"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-11-20-netty-geek3/&is_video=false&description=从请求处理剖析 Netty"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=从请求处理剖析 Netty&body=Check out this article: http://koon.cool/technology/2019-11-20-netty-geek3/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-11-20-netty-geek3/&title=从请求处理剖析 Netty"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-11-20-netty-geek3/&title=从请求处理剖析 Netty"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-11-20-netty-geek3/&title=从请求处理剖析 Netty"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-11-20-netty-geek3/&title=从请求处理剖析 Netty"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-11-20-netty-geek3/&name=从请求处理剖析 Netty&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2021 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
