@@ -6,22 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="一、几点建议锁将导致整体性能下降，这里有几点建议。 1.1 减小锁持有时间程序应该减少对某个锁的占有时间，减少互斥的可能。下面的代码为例： 12345public synchronized void syncMethod() &amp;#123;  othercode1();  mutextMethod();  othercode2();&amp;#125; 假设在 syncMethod 方法中只有 mutext">
-<meta name="keywords" content="java,高并发程序设计">
-<meta property="og:type" content="article">
-<meta property="og:title" content="锁的优化及注意事项">
-<meta property="og:url" content="https://chenzeping.com/technology/2019-02-21-lock-optimize/index.html">
-<meta property="og:site_name" content="空城">
-<meta property="og:description" content="一、几点建议锁将导致整体性能下降，这里有几点建议。 1.1 减小锁持有时间程序应该减少对某个锁的占有时间，减少互斥的可能。下面的代码为例： 12345public synchronized void syncMethod() &amp;#123;  othercode1();  mutextMethod();  othercode2();&amp;#125; 假设在 syncMethod 方法中只有 mutext">
-<meta property="og:locale" content="default">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190219230459.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190221133013.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190219233222.png">
-<meta property="og:updated_time" content="2021-11-07T18:38:51.131Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="锁的优化及注意事项">
-<meta name="twitter:description" content="一、几点建议锁将导致整体性能下降，这里有几点建议。 1.1 减小锁持有时间程序应该减少对某个锁的占有时间，减少互斥的可能。下面的代码为例： 12345public synchronized void syncMethod() &amp;#123;  othercode1();  mutextMethod();  othercode2();&amp;#125; 假设在 syncMethod 方法中只有 mutext">
-<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190219230459.png">
     
     
         

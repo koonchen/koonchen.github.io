@@ -6,26 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="上一节引出了分布式数据访问层的各种问题，这里讲讲数据访问层的设计与实现。 1. 对外提供数据访问层的方式数据访问层有多种提供能力的方式：  专用 API ，不推荐，通用性差； 通用方式，使用 JDBC 的方式，数据层作为一个 JDBC 的实现，暴露 JDBC 接口给应用，成本低； ORM 类别的接口，介入上两种之间，一般都会使用类 ORM 框架，如 iBatis、hibernate、Spring">
-<meta name="keywords" content="分布式,大型网站系统与 Java 中间件开发实践">
-<meta property="og:type" content="article">
-<meta property="og:title" content="数据层访问层的设计与实现">
-<meta property="og:url" content="https://chenzeping.com/technology/2019-06-11-java-distributed-system-chapter5/index.html">
-<meta property="og:site_name" content="空城">
-<meta property="og:description" content="上一节引出了分布式数据访问层的各种问题，这里讲讲数据访问层的设计与实现。 1. 对外提供数据访问层的方式数据访问层有多种提供能力的方式：  专用 API ，不推荐，通用性差； 通用方式，使用 JDBC 的方式，数据层作为一个 JDBC 的实现，暴露 JDBC 接口给应用，成本低； ORM 类别的接口，介入上两种之间，一般都会使用类 ORM 框架，如 iBatis、hibernate、Spring">
-<meta property="og:locale" content="default">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/数据访问接口.jpg">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200324135201.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200324135801.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200324141741.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200324145752.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200324150233.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200324151451.png">
-<meta property="og:updated_time" content="2021-11-07T18:38:51.135Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="数据层访问层的设计与实现">
-<meta name="twitter:description" content="上一节引出了分布式数据访问层的各种问题，这里讲讲数据访问层的设计与实现。 1. 对外提供数据访问层的方式数据访问层有多种提供能力的方式：  专用 API ，不推荐，通用性差； 通用方式，使用 JDBC 的方式，数据层作为一个 JDBC 的实现，暴露 JDBC 接口给应用，成本低； ORM 类别的接口，介入上两种之间，一般都会使用类 ORM 框架，如 iBatis、hibernate、Spring">
-<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/数据访问接口.jpg">
     
     
         

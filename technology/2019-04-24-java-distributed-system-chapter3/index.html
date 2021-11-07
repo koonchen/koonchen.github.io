@@ -6,36 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="服务拆分在项目中是有帮助的，但是有帮助的「度」也存在，因为还有诸如「不同系统中存在代码冗余」等问题。等好的方式应该是服务化，就是将系统分层。  服务化就是之前提到的概念，存在多层，比如：顶层 Web 系统，中间服务中心，底层数据库。  1. 远程调用服务化带来了各种各样的问题，内部系统依赖变得错综复杂，我们需要解决它所带来的问题。 没有服务化之前，我们通过「本地调用」的方式使用其他组件，服务化以后">
-<meta name="keywords" content="分布式,大型网站系统与 Java 中间件开发实践">
-<meta property="og:type" content="article">
-<meta property="og:title" content="从服务框架开始">
-<meta property="og:url" content="https://chenzeping.com/technology/2019-04-24-java-distributed-system-chapter3/index.html">
-<meta property="og:site_name" content="空城">
-<meta property="og:description" content="服务拆分在项目中是有帮助的，但是有帮助的「度」也存在，因为还有诸如「不同系统中存在代码冗余」等问题。等好的方式应该是服务化，就是将系统分层。  服务化就是之前提到的概念，存在多层，比如：顶层 Web 系统，中间服务中心，底层数据库。  1. 远程调用服务化带来了各种各样的问题，内部系统依赖变得错综复杂，我们需要解决它所带来的问题。 没有服务化之前，我们通过「本地调用」的方式使用其他组件，服务化以后">
-<meta property="og:locale" content="default">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190506131333.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190506132735.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190506135606.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190506135756.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190506192126.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190506221252.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190506221815.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190508201105.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190508203823.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190508203944.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190508204130.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190508204404.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190508204802.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190508205011.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190508205210.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190508205249.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190508205514.png">
-<meta property="og:updated_time" content="2021-11-07T18:38:51.135Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="从服务框架开始">
-<meta name="twitter:description" content="服务拆分在项目中是有帮助的，但是有帮助的「度」也存在，因为还有诸如「不同系统中存在代码冗余」等问题。等好的方式应该是服务化，就是将系统分层。  服务化就是之前提到的概念，存在多层，比如：顶层 Web 系统，中间服务中心，底层数据库。  1. 远程调用服务化带来了各种各样的问题，内部系统依赖变得错综复杂，我们需要解决它所带来的问题。 没有服务化之前，我们通过「本地调用」的方式使用其他组件，服务化以后">
-<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190506131333.png">
     
     
         

@@ -6,35 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="一、同步控制1. 重入锁重入锁可以替代 synchronized 关键字，在 jdk5.0 早期，重入锁的性能好于 synchronized，从 jdk6.0 开始，synchronized 优化，两者性能差不多了。 重入锁例子： 1234567891011121314151617181920212223242526public class ReenterLock implements Runna">
-<meta name="keywords" content="java,高并发程序设计">
-<meta property="og:type" content="article">
-<meta property="og:title" content="JDK 并发包小结">
-<meta property="og:url" content="https://chenzeping.com/technology/2019-02-14-jdk-concurrent-package/index.html">
-<meta property="og:site_name" content="空城">
-<meta property="og:description" content="一、同步控制1. 重入锁重入锁可以替代 synchronized 关键字，在 jdk5.0 早期，重入锁的性能好于 synchronized，从 jdk6.0 开始，synchronized 优化，两者性能差不多了。 重入锁例子： 1234567891011121314151617181920212223242526public class ReenterLock implements Runna">
-<meta property="og:locale" content="default">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190202154736.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190203140459.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190203233118.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190205163029.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190205163226.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190205225937.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190206233820.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190208234838.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190208235327.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190208235648.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190210110501.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190210170913.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190213233354.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190213235359.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190214004331.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190214004910.png">
-<meta property="og:updated_time" content="2021-11-07T18:38:51.131Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="JDK 并发包小结">
-<meta name="twitter:description" content="一、同步控制1. 重入锁重入锁可以替代 synchronized 关键字，在 jdk5.0 早期，重入锁的性能好于 synchronized，从 jdk6.0 开始，synchronized 优化，两者性能差不多了。 重入锁例子： 1234567891011121314151617181920212223242526public class ReenterLock implements Runna">
-<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190202154736.png">
     
     
         

@@ -6,31 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="1. Netty 下三种 I/O 阻塞与非阻塞：要不要死等，阻塞会等待直到有数据；非阻塞会直接返回。 同步与异步：数据就绪后谁来操作，自己去读是同步；主动回调是异步。  BIO——阻塞同步；NIO——非阻塞同步；AIO——非阻塞异步。  Netty 对三者都有过支持，阻塞导致资源占用多因此不用，而 AIO 的弃用是因为 Linux 下 AIO 相较于 NIO 性能提升不明显，效益不够高，同时 Li">
-<meta name="keywords" content="netty">
-<meta property="og:type" content="article">
-<meta property="og:title" content="从领域知识剖析 Netty">
-<meta property="og:url" content="https://chenzeping.com/technology/2019-10-15-netty-geek2/index.html">
-<meta property="og:site_name" content="空城">
-<meta property="og:description" content="1. Netty 下三种 I/O 阻塞与非阻塞：要不要死等，阻塞会等待直到有数据；非阻塞会直接返回。 同步与异步：数据就绪后谁来操作，自己去读是同步；主动回调是异步。  BIO——阻塞同步；NIO——非阻塞同步；AIO——非阻塞异步。  Netty 对三者都有过支持，阻塞导致资源占用多因此不用，而 AIO 的弃用是因为 Linux 下 AIO 相较于 NIO 性能提升不明显，效益不够高，同时 Li">
-<meta property="og:locale" content="default">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200409205216.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410011726.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410011855.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410012456.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410012731.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410012842.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410013023.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410142247.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200410142703.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200411020901.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200412174544.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200412174641.png">
-<meta property="og:updated_time" content="2021-11-07T18:38:51.135Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="从领域知识剖析 Netty">
-<meta name="twitter:description" content="1. Netty 下三种 I/O 阻塞与非阻塞：要不要死等，阻塞会等待直到有数据；非阻塞会直接返回。 同步与异步：数据就绪后谁来操作，自己去读是同步；主动回调是异步。  BIO——阻塞同步；NIO——非阻塞同步；AIO——非阻塞异步。  Netty 对三者都有过支持，阻塞导致资源占用多因此不用，而 AIO 的弃用是因为 Linux 下 AIO 相较于 NIO 性能提升不明显，效益不够高，同时 Li">
-<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200409205216.png">
     
     
         

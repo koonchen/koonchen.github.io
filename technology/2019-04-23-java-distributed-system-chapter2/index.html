@@ -6,35 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta name="description" content="中间件系统也是在大型网站的架构变化中出现并发展的。 访问量大的网站不一定是大型网站，大型网站应该有大量的数据，或者说是海量的数据，访问量和数据量缺一不可。 1.1 数据库与应用分离我们关注的重点是随着数据量、访问量，网站也将因此产生结构上的变化，而不关注具体的业务功能点。 随着数据访问量不断增大，服务器的负载持续升高，此时我们可以通过将数据库和应用从一台机器分到两台机器上来进行优化，即数据库与应用">
-<meta name="keywords" content="分布式,大型网站系统与 Java 中间件开发实践">
-<meta property="og:type" content="article">
-<meta property="og:title" content="网站架构演进过程">
-<meta property="og:url" content="https://chenzeping.com/technology/2019-04-23-java-distributed-system-chapter2/index.html">
-<meta property="og:site_name" content="空城">
-<meta property="og:description" content="中间件系统也是在大型网站的架构变化中出现并发展的。 访问量大的网站不一定是大型网站，大型网站应该有大量的数据，或者说是海量的数据，访问量和数据量缺一不可。 1.1 数据库与应用分离我们关注的重点是随着数据量、访问量，网站也将因此产生结构上的变化，而不关注具体的业务功能点。 随着数据访问量不断增大，服务器的负载持续升高，此时我们可以通过将数据库和应用从一台机器分到两台机器上来进行优化，即数据库与应用">
-<meta property="og:locale" content="default">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190427222026.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190427224601.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190427224807.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190427225014.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502175612.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502180715.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502181811.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502185114.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502192538.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502194611.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502195810.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502200143.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502200908.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502201556.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502201706.png">
-<meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190502202115.png">
-<meta property="og:updated_time" content="2021-11-07T18:38:51.131Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="网站架构演进过程">
-<meta name="twitter:description" content="中间件系统也是在大型网站的架构变化中出现并发展的。 访问量大的网站不一定是大型网站，大型网站应该有大量的数据，或者说是海量的数据，访问量和数据量缺一不可。 1.1 数据库与应用分离我们关注的重点是随着数据量、访问量，网站也将因此产生结构上的变化，而不关注具体的业务功能点。 随着数据访问量不断增大，服务器的负载持续升高，此时我们可以通过将数据库和应用从一台机器分到两台机器上来进行优化，即数据库与应用">
-<meta name="twitter:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190427222026.png">
     
     
         
