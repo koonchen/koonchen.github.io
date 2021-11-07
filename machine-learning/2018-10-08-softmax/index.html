@@ -10,11 +10,11 @@
 <meta name="keywords" content="机器学习,softmax">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Softmax 推导">
-<meta property="og:url" content="http://koon.cool/machine-learning/2018-10-08-softmax/index.html">
+<meta property="og:url" content="https://chenzeping.com/machine-learning/2018-10-08-softmax/index.html">
 <meta property="og:site_name" content="空城">
 <meta property="og:description" content="像一条咸鱼的学习让我不得不把这些记下来。  不过介个确实容易遗忘鸭😅。  前提概要首先我们知道：  \text { softmax } \left( f \left( \vec { x _ { i } } ; \vec { w } \right) \right) _ { j } = \frac { e ^ { f _ { j } } } { \sum _ { k = 1 } ^ { n } e">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2021-11-07T18:06:23.917Z">
+<meta property="og:updated_time" content="2021-11-07T18:26:19.531Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Softmax 推导">
 <meta name="twitter:description" content="像一条咸鱼的学习让我不得不把这些记下来。  不过介个确实容易遗忘鸭😅。  前提概要首先我们知道：  \text { softmax } \left( f \left( \vec { x _ { i } } ; \vec { w } \right) \right) _ { j } = \frac { e ^ { f _ { j } } } { \sum _ { k = 1 } ^ { n } e">
@@ -92,16 +92,16 @@
     <br>
     <div id="share" style="display: none">
       <ul>
-  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/machine-learning/2018-10-08-softmax/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/machine-learning/2018-10-08-softmax/&text=Softmax 推导"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/machine-learning/2018-10-08-softmax/&is_video=false&description=Softmax 推导"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=Softmax 推导&body=Check out this article: http://koon.cool/machine-learning/2018-10-08-softmax/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/machine-learning/2018-10-08-softmax/&name=Softmax 推导&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://chenzeping.com/machine-learning/2018-10-08-softmax/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&text=Softmax 推导"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&is_video=false&description=Softmax 推导"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Softmax 推导&body=Check out this article: https://chenzeping.com/machine-learning/2018-10-08-softmax/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&name=Softmax 推导&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -227,16 +227,16 @@ if \space (u != y_{i}) \space => \space \frac { d L ( \vec { w } ) } { d w _ { u
 
     <div id="share-footer" style="display: none">
       <ul>
-  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/machine-learning/2018-10-08-softmax/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/machine-learning/2018-10-08-softmax/&text=Softmax 推导"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/machine-learning/2018-10-08-softmax/&is_video=false&description=Softmax 推导"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=Softmax 推导&body=Check out this article: http://koon.cool/machine-learning/2018-10-08-softmax/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/machine-learning/2018-10-08-softmax/&name=Softmax 推导&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://chenzeping.com/machine-learning/2018-10-08-softmax/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&text=Softmax 推导"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&is_video=false&description=Softmax 推导"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Softmax 推导&body=Check out this article: https://chenzeping.com/machine-learning/2018-10-08-softmax/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&title=Softmax 推导"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://chenzeping.com/machine-learning/2018-10-08-softmax/&name=Softmax 推导&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>

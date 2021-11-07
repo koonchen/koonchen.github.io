@@ -10,7 +10,7 @@
 <meta name="keywords" content="分布式,大型网站系统与 Java 中间件开发实践">
 <meta property="og:type" content="article">
 <meta property="og:title" content="消息中间件小记">
-<meta property="og:url" content="http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/index.html">
+<meta property="og:url" content="https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/index.html">
 <meta property="og:site_name" content="空城">
 <meta property="og:description" content="1. 消息中间件的价值传统意义上来说，消息中间件为我们带来了异步的特性，同时解耦了系统。 假设我们做一个登录系统，那么可能需要有短信服务、安全系统…等等，这让系统变得越来越复杂，我们从新考虑可以发现，登录系统只要判断用户名和密码，而其他能力与原系统应该是可解耦的部分，因此通过消息中间件来解耦，我们不用关心有多少系统知道登录这件事，我们现在需要保证仅仅是一个消息发送到消息中间件，当然我们可以这样做：">
 <meta property="og:locale" content="default">
@@ -21,7 +21,7 @@
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415155707.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415160604.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415161031.png">
-<meta property="og:image" content="http://koon.cool/Users/ronnie/Library/Application%20Support/typora-user-images/image-20200415161417881.png">
+<meta property="og:image" content="https://chenzeping.com/Users/ronnie/Library/Application%20Support/typora-user-images/image-20200415161417881.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415233335.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200415234449.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200416233309.png">
@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428011722.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428012012.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428021824.png">
-<meta property="og:image" content="http://koon.cool/Users/ronnie/Library/Application%20Support/typora-user-images/image-20200428021935265.png">
+<meta property="og:image" content="https://chenzeping.com/Users/ronnie/Library/Application%20Support/typora-user-images/image-20200428021935265.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428112735.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428154420.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428154736.png">
@@ -43,7 +43,7 @@
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428163706.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428164121.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20200428022804.png">
-<meta property="og:updated_time" content="2021-11-07T18:06:23.921Z">
+<meta property="og:updated_time" content="2021-11-07T18:26:19.535Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="消息中间件小记">
 <meta name="twitter:description" content="1. 消息中间件的价值传统意义上来说，消息中间件为我们带来了异步的特性，同时解耦了系统。 假设我们做一个登录系统，那么可能需要有短信服务、安全系统…等等，这让系统变得越来越复杂，我们从新考虑可以发现，登录系统只要判断用户名和密码，而其他能力与原系统应该是可解耦的部分，因此通过消息中间件来解耦，我们不用关心有多少系统知道登录这件事，我们现在需要保证仅仅是一个消息发送到消息中间件，当然我们可以这样做：">
@@ -122,16 +122,16 @@
     <br>
     <div id="share" style="display: none">
       <ul>
-  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&text=消息中间件小记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&is_video=false&description=消息中间件小记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=消息中间件小记&body=Check out this article: http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&name=消息中间件小记&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&text=消息中间件小记"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&is_video=false&description=消息中间件小记"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=消息中间件小记&body=Check out this article: https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&name=消息中间件小记&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -453,16 +453,16 @@
 
     <div id="share-footer" style="display: none">
       <ul>
-  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&text=消息中间件小记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&is_video=false&description=消息中间件小记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=消息中间件小记&body=Check out this article: http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2019-07-11-java-distributed-sysmte-chapter6/&name=消息中间件小记&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&text=消息中间件小记"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&is_video=false&description=消息中间件小记"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=消息中间件小记&body=Check out this article: https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&title=消息中间件小记"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://chenzeping.com/technology/2019-07-11-java-distributed-sysmte-chapter6/&name=消息中间件小记&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>

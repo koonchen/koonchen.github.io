@@ -10,7 +10,7 @@
 <meta name="keywords" content="java,深入理解 JVM">
 <meta property="og:type" content="article">
 <meta property="og:title" content="内存区域与内存溢出">
-<meta property="og:url" content="http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/index.html">
+<meta property="og:url" content="https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/index.html">
 <meta property="og:site_name" content="空城">
 <meta property="og:description" content="1. 运行时数据区域 1.1 程序计数器Program Counter Register 是一块较小的内存空间，它可以看作是当前线程所执行的字节码的行号指示器。 字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖于这个计数器来完成。  线程的中断以及中断优先级，就是 Java 中线程由 wait 状态到 runni">
 <meta property="og:locale" content="default">
@@ -18,7 +18,7 @@
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190112135842.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190112142245.png">
 <meta property="og:image" content="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/20190112142423.png">
-<meta property="og:updated_time" content="2021-11-07T18:06:23.917Z">
+<meta property="og:updated_time" content="2021-11-07T18:26:19.531Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="内存区域与内存溢出">
 <meta name="twitter:description" content="1. 运行时数据区域 1.1 程序计数器Program Counter Register 是一块较小的内存空间，它可以看作是当前线程所执行的字节码的行号指示器。 字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖于这个计数器来完成。  线程的中断以及中断优先级，就是 Java 中线程由 wait 状态到 runni">
@@ -97,16 +97,16 @@
     <br>
     <div id="share" style="display: none">
       <ul>
-  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&text=内存区域与内存溢出"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&is_video=false&description=内存区域与内存溢出"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=内存区域与内存溢出&body=Check out this article: http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&name=内存区域与内存溢出&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&text=内存区域与内存溢出"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&is_video=false&description=内存区域与内存溢出"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=内存区域与内存溢出&body=Check out this article: https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&name=内存区域与内存溢出&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
@@ -430,16 +430,16 @@
 
     <div id="share-footer" style="display: none">
       <ul>
-  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://twitter.com/share?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&text=内存区域与内存溢出"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&is_video=false&description=内存区域与内存溢出"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="mailto:?subject=内存区域与内存溢出&body=Check out this article: http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="https://getpocket.com/save?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://reddit.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://digg.com/submit?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
-  <li><a class="icon" href="http://www.tumblr.com/share/link?url=http://koon.cool/technology/2018-12-08-jvm-understanding-chapter1/&name=内存区域与内存溢出&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&text=内存区域与内存溢出"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&is_video=false&description=内存区域与内存溢出"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=内存区域与内存溢出&body=Check out this article: https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&title=内存区域与内存溢出"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://chenzeping.com/technology/2018-12-08-jvm-understanding-chapter1/&name=内存区域与内存溢出&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
 </ul>
 
     </div>
