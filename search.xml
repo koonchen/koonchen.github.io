@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>快捷键记录</title>
+      <link href="/resource/2021-12-06-shortcut-record/"/>
+      <url>/resource/2021-12-06-shortcut-record/</url>
+      
+        <content type="html"><![CDATA[<h2 id="Iterm2-相关"><a href="#Iterm2-相关" class="headerlink" title="Iterm2 相关"></a>Iterm2 相关</h2><h3 id="光标移动"><a href="#光标移动" class="headerlink" title="光标移动"></a>光标移动</h3><ul><li>⌃ + a 移动到行首 （ahead）</li><li>⌃ + e 移动到行末 （end）</li><li>⌃ + f 光标向后移动一个字符（after）</li><li>^ + b 光标向前移动一个字符（before）</li></ul><h3 id="文字删除"><a href="#文字删除" class="headerlink" title="文字删除"></a>文字删除</h3><ul><li>^ + k 删除光标后面所有字符（有剪切功能）</li><li>^ + u 删除整行字符(有剪切功能)</li><li>^ + w 向前删除一个单词</li><li>^ + q 删除整行字符</li><li>^ + y （粘贴）</li><li>^ + h 删除光标之前的字符</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> resource </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 快捷键 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Linux CPU 性能优化2</title>
       <link href="/technology/2020-05-01-linux-optimize2/"/>
       <url>/technology/2020-05-01-linux-optimize2/</url>
