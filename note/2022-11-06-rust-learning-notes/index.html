@@ -92,7 +92,7 @@
 
     </div>
     <div id="toc">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-入门指南"><span class="toc-number">1.</span> <span class="toc-text">1. 入门指南</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-入门指南"><span class="toc-number">1.</span> <span class="toc-text">1. 入门指南</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-猜数游戏"><span class="toc-number">2.</span> <span class="toc-text">2. 猜数游戏</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -142,12 +142,27 @@
  -->
   <div class="content" itemprop="articleBody">
     <h2 id="1-入门指南"><a href="#1-入门指南" class="headerlink" title="1. 入门指南"></a>1. 入门指南</h2><ul>
+<li>安装 &amp; 更新 &amp; 卸载<ul>
 <li>安装指令 <code>curl --proto &#39;=https&#39; --tlsv1.2 -sSf https://sh.rustup.rs | sh</code></li>
 <li>默认启动 <code>export PATH=&quot;$HOME/.cargo/bin:$PATH</code></li>
 <li>更新 <code>rustup update</code></li>
 <li>卸载 <code>rustup self uninstall</code></li>
 </ul>
-
+</li>
+<li>文件编译 &amp; 执行<ul>
+<li>编译 <code>rustc xxx.rs</code> 生成二进制文件直接执行</li>
+</ul>
+</li>
+<li>项目编译 &amp; 执行<ul>
+<li>项目构建 <code>cargo new xxx</code></li>
+<li>项目编译 <code>cargo build</code> 在 debug 文件下生成二进制文件</li>
+<li>项目执行 <code>cargo run</code> 可以直接执行</li>
+<li>项目检查 <code>cargo check</code> 比 build 快，方便检查</li>
+<li>release 版本 <code>cargo build --release</code> 以及 <code>cargo run --release</code> 正式编译</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-猜数游戏"><a href="#2-猜数游戏" class="headerlink" title="2. 猜数游戏"></a>2. 猜数游戏</h2>
   </div>
 </article>
 
@@ -176,7 +191,7 @@
     </div>
 
     <div id="toc-footer" style="display: none">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-入门指南"><span class="toc-number">1.</span> <span class="toc-text">1. 入门指南</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-入门指南"><span class="toc-number">1.</span> <span class="toc-text">1. 入门指南</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-猜数游戏"><span class="toc-number">2.</span> <span class="toc-text">2. 猜数游戏</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">

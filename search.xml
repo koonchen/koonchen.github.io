@@ -8,7 +8,7 @@
       <link href="/note/2022-11-06-rust-learning-notes/"/>
       <url>/note/2022-11-06-rust-learning-notes/</url>
       
-        <content type="html"><![CDATA[<h2 id="1-入门指南"><a href="#1-入门指南" class="headerlink" title="1. 入门指南"></a>1. 入门指南</h2><ul><li>安装指令 <code>curl --proto &#39;=https&#39; --tlsv1.2 -sSf https://sh.rustup.rs | sh</code></li><li>默认启动 <code>export PATH=&quot;$HOME/.cargo/bin:$PATH</code></li><li>更新 <code>rustup update</code></li><li>卸载 <code>rustup self uninstall</code></li></ul>]]></content>
+        <content type="html"><![CDATA[<h2 id="1-入门指南"><a href="#1-入门指南" class="headerlink" title="1. 入门指南"></a>1. 入门指南</h2><ul><li>安装 &amp; 更新 &amp; 卸载<ul><li>安装指令 <code>curl --proto &#39;=https&#39; --tlsv1.2 -sSf https://sh.rustup.rs | sh</code></li><li>默认启动 <code>export PATH=&quot;$HOME/.cargo/bin:$PATH</code></li><li>更新 <code>rustup update</code></li><li>卸载 <code>rustup self uninstall</code></li></ul></li><li>文件编译 &amp; 执行<ul><li>编译 <code>rustc xxx.rs</code> 生成二进制文件直接执行</li></ul></li><li>项目编译 &amp; 执行<ul><li>项目构建 <code>cargo new xxx</code></li><li>项目编译 <code>cargo build</code> 在 debug 文件下生成二进制文件</li><li>项目执行 <code>cargo run</code> 可以直接执行</li><li>项目检查 <code>cargo check</code> 比 build 快，方便检查</li><li>release 版本 <code>cargo build --release</code> 以及 <code>cargo run --release</code> 正式编译</li></ul></li></ul><h2 id="2-猜数游戏"><a href="#2-猜数游戏" class="headerlink" title="2. 猜数游戏"></a>2. 猜数游戏</h2>]]></content>
       
       
       <categories>
