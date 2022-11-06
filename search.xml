@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>rust 学习笔记</title>
+      <link href="/note/2022-11-06-rust-learning-notes/"/>
+      <url>/note/2022-11-06-rust-learning-notes/</url>
+      
+        <content type="html"><![CDATA[<h2 id="1-入门指南"><a href="#1-入门指南" class="headerlink" title="1. 入门指南"></a>1. 入门指南</h2><ul><li>安装指令 <code>curl --proto &#39;=https&#39; --tlsv1.2 -sSf https://sh.rustup.rs | sh</code></li><li>默认启动 <code>export PATH=&quot;$HOME/.cargo/bin:$PATH</code></li><li>更新 <code>rustup update</code></li><li>卸载 <code>rustup self uninstall</code></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> note </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> aop </tag>
+            
+            <tag> ioc </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>初探依赖倒置</title>
       <link href="/design-pattern/2021-12-24-DIP/"/>
       <url>/design-pattern/2021-12-24-DIP/</url>
