@@ -92,7 +92,7 @@
 
     </div>
     <div id="toc">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-入门指南"><span class="toc-number">1.</span> <span class="toc-text">1. 入门指南</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-猜数游戏"><span class="toc-number">2.</span> <span class="toc-text">2. 猜数游戏</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-通用编程概念"><span class="toc-number">3.</span> <span class="toc-text">3. 通用编程概念</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-入门指南"><span class="toc-number">1.</span> <span class="toc-text">1. 入门指南</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-猜数游戏"><span class="toc-number">2.</span> <span class="toc-text">2. 猜数游戏</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-通用编程概念"><span class="toc-number">3.</span> <span class="toc-text">3. 通用编程概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-所有权"><span class="toc-number">4.</span> <span class="toc-text">4. 所有权</span></a></li></ol>
     </div>
   </span>
 </div>
@@ -193,6 +193,64 @@
 <h2 id="3-通用编程概念"><a href="#3-通用编程概念" class="headerlink" title="3. 通用编程概念"></a>3. 通用编程概念</h2><ul>
 <li>标量类型：整数、浮点数、布尔值、字符</li>
 <li>复合类型：元组、数组</li>
+<li>rust 使用蛇形命名<strong>snake case</strong>作为函数、变量名称的风格，全小写、下划线分割</li>
+<li>rust 中语句 statement 和表达式 expression 有区别<ul>
+<li>语句执行操作但是没有返回值，比如 <code>let x = 5;</code></li>
+<li>表达式会计算并产生一个值作为结果，比如 <code>{}</code></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">main</span></span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> y = &#123;</span><br><span class="line">        <span class="keyword">let</span> x = <span class="number">3</span>;</span><br><span class="line">        x + <span class="number">1</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">"&#123;&#125;"</span>, y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>rust 在函数中通过 <code>-&gt;</code> 表明返回类型，函数中返回值等同于函数中最后一个<strong>表达式的值</strong></li>
+<li>rust 中语句没有没有返回值，所以上面的大括号里的 <code>x + 1</code> 如果带上 <code>;</code> 反而会报错</li>
+<li>rust 中的<strong>条件表达式</strong>会返回一个 bool 结果</li>
+</ul>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">main</span></span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> condition = <span class="literal">true</span>;</span><br><span class="line">    <span class="keyword">let</span> number = <span class="keyword">if</span> condition &#123;</span><br><span class="line">        <span class="number">5</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="number">6</span></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">"&#123;&#125;"</span>, number);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>rust 中的 <code>break</code> 后可以跟返回结果</li>
+</ul>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">main</span></span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> <span class="keyword">mut</span> count = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">let</span> result = <span class="keyword">loop</span> &#123;</span><br><span class="line">        count += <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> count == <span class="number">10</span> &#123;</span><br><span class="line">            <span class="keyword">break</span> count * <span class="number">2</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">"&#123;&#125;"</span>, result);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>for</code> 循环遍历 list 时，可以通过 <code>list.iter()</code> 遍历集合</li>
+</ul>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">main</span></span>() &#123;</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> (<span class="number">1</span>..<span class="number">4</span>).rev() &#123;</span><br><span class="line">        <span class="built_in">println!</span>(<span class="string">"&#123;&#125;"</span>, i);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>可以通过 <code>..</code> 补充集合，其中 <code>rev()</code> 反转集合</li>
+</ul>
+<h2 id="4-所有权"><a href="#4-所有权" class="headerlink" title="4. 所有权"></a>4. 所有权</h2><ul>
+<li>rust 通过包含特定规则的所有权系统来管理系统，在编译过程中完成，不会产生运行时开销</li>
+<li>rust 中的每一个<strong>值</strong>都有一个对应的变量作为它的<strong>所有者</strong><ul>
+<li>在同一时间内，<strong>值</strong>有且仅有一个<strong>所有者</strong></li>
+<li>当<strong>所有者</strong>离开自己的<strong>作用域</strong>时，它持有的<strong>值</strong>就会被释放掉</li>
+</ul>
+</li>
+<li>rust 中为了避免二次释放内存，堆上如果有两个指针指向这片内存，被复制的指针（栈）会被废弃，因此以下代码会报错，这个不是浅拷贝，而是 move</li>
+</ul>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">main</span></span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> s1 = <span class="built_in">String</span>::from(<span class="string">"hello"</span>);</span><br><span class="line">    <span class="keyword">let</span> s2 = s1;</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">"&#123;&#125;"</span>, s1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>rust 永远不会自动地创建数据的深拷贝，确实需要深拷贝堆数据时，可以使用 <code>clone()</code> 方法，以下代码不会报错</li>
+</ul>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">main</span></span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> s1 = <span class="built_in">String</span>::from(<span class="string">"hello"</span>);</span><br><span class="line">    <span class="keyword">let</span> s2 = s1.clone();</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">"&#123;&#125;"</span>, s1);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>拥有 <code>Copy</code> 这种 trait 的类型可以在赋值其他变量后保持可用性，但是如果有 <code>Drop</code> 这种 trait 不能实现 <code>Copy</code><ul>
+<li>整数、bool、char、浮点、所有字段都可 <code>Copy</code> 的元组</li>
+</ul>
+</li>
+<li>堆变量进入函数以后，就离开了作用域，不再有效</li>
+</ul>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">main</span></span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> s1 = <span class="built_in">String</span>::from(<span class="string">"hello"</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">"main1&#123;&#125;"</span>, s1);</span><br><span class="line">    test(s1);</span><br><span class="line">    <span class="comment">// println!("main2&#123;&#125;", s1); // s1 已经离开了作用域</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">test</span></span>(s: <span class="built_in">String</span>) &#123;</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">"test&#123;&#125;"</span>, s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>rust 中将一个值赋值给另一个变量时就会转移所有权，当一个持有堆数据的变量离开作用域时，它的数据就会被 <code>Drop</code> 清理回收，除非这些数据的所有权移动到了另一个变量上</li>
+<li>rust 中可以通过 <code>&amp;</code> 引用变量，而同时不交出<strong>所有权</strong>，但是同时也不能在引用中修改变量本身，因为引用默认是不可变的</li>
+</ul>
+<figure class="highlight rust"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">main</span></span>() &#123;</span><br><span class="line">    <span class="keyword">let</span> s1 = <span class="built_in">String</span>::from(<span class="string">"hello"</span>);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">"main1&#123;&#125;"</span>, s1);</span><br><span class="line">    test(&amp;s1);</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">"main2&#123;&#125;"</span>, s1);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">fn</span> <span class="title">test</span></span>(s: &amp;<span class="built_in">String</span>) &#123;</span><br><span class="line">    <span class="built_in">println!</span>(<span class="string">"test&#123;&#125;"</span>, s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>rust 中可变引用，需要变量本身是可变的，同时<strong>在作用域内，一个变量只能声明一个可变引用</strong>，因此在作用域里一个变量超过一个可变引用会报错<ul>
+<li>此外，在拥有不可变引用的情况下，不能创建可变引用</li>
+</ul>
+</li>
+<li>假设当前有某个引用，在这个引用被销毁前，编译器会确保堆空间不被销毁，也就不会出现悬垂引用</li>
 </ul>
 
   </div>
@@ -223,7 +281,7 @@
     </div>
 
     <div id="toc-footer" style="display: none">
-      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-入门指南"><span class="toc-number">1.</span> <span class="toc-text">1. 入门指南</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-猜数游戏"><span class="toc-number">2.</span> <span class="toc-text">2. 猜数游戏</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-通用编程概念"><span class="toc-number">3.</span> <span class="toc-text">3. 通用编程概念</span></a></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-入门指南"><span class="toc-number">1.</span> <span class="toc-text">1. 入门指南</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-猜数游戏"><span class="toc-number">2.</span> <span class="toc-text">2. 猜数游戏</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-通用编程概念"><span class="toc-number">3.</span> <span class="toc-text">3. 通用编程概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-所有权"><span class="toc-number">4.</span> <span class="toc-text">4. 所有权</span></a></li></ol>
     </div>
 
     <div id="share-footer" style="display: none">
