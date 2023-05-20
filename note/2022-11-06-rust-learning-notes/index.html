@@ -459,6 +459,7 @@
 <li>在 <code>assert</code> 中还可以增加自定义的错误信息，当断言失败时，可以根据错误信息来判断是哪里出错了</li>
 <li>可以在 <code>#[test]</code> 下方使用 <code>#[shold_panic]</code> 表示预期出现 panic，如果没有出现 panic，测试将会失败，同时参数 <code>expect</code> 表示预期中的 panic 信息，如果 panic 信息不一致，测试也将会失败</li>
 <li>此外还可以使用 <code>Result&lt;T, E&gt;</code> 编写测试，此时不要加上 <code>#[shold_panic]</code>，而是应该直接返回一个 Err 值，同时可以使用 <code>?</code> 运算符来简化代码</li>
+<li><code>cargo test</code> 默认使用并行执行，可能因此出现测试错误，可以使用 <code>cargo test -- --test-threads=1</code> 控制执行线程数</li>
 </ul>
 <h2 id="12-命令行程序"><a href="#12-命令行程序" class="headerlink" title="12. 命令行程序"></a>12. 命令行程序</h2><h2 id="13-函数式"><a href="#13-函数式" class="headerlink" title="13. 函数式"></a>13. 函数式</h2><h2 id="14-Cargo"><a href="#14-Cargo" class="headerlink" title="14. Cargo"></a>14. Cargo</h2><h2 id="15-指针"><a href="#15-指针" class="headerlink" title="15. 指针"></a>15. 指针</h2><h2 id="16-并发"><a href="#16-并发" class="headerlink" title="16. 并发"></a>16. 并发</h2><h2 id="17-面向对象"><a href="#17-面向对象" class="headerlink" title="17. 面向对象"></a>17. 面向对象</h2><h2 id="18-模式匹配"><a href="#18-模式匹配" class="headerlink" title="18. 模式匹配"></a>18. 模式匹配</h2><h2 id="19-高级特性"><a href="#19-高级特性" class="headerlink" title="19. 高级特性"></a>19. 高级特性</h2><h2 id="20-web-服务器"><a href="#20-web-服务器" class="headerlink" title="20. web 服务器"></a>20. web 服务器</h2>
   </div>
