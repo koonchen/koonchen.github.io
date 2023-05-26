@@ -466,7 +466,11 @@
 <li>集成测试代码被放在 <code>src</code> 目录同级的 <code>tests</code> 文件中，集成测试中需要使用 <code>use xxx</code> 这是因为集成测试中每一个文件都是一个独立的包，同时不需要使用 <code>[cfg(test)]</code> 因为 rust 对 <code>tests</code> 目录做了特殊处理</li>
 <li>因为集成测试中的代码都是独立的包，所以需要一个库来引入其他包，如果没有 <code>src/lib.rs</code>，我们可以创建一个空的 <code>src/lib.rs</code> 文件，然后在 <code>Cargo.toml</code> 中增加 <code>[[bin]]</code> 来创建一个二进制包，这样就可以在 <code>tests</code> 中引入这个二进制包了</li>
 </ul>
-<h2 id="12-命令行程序"><a href="#12-命令行程序" class="headerlink" title="12. 命令行程序"></a>12. 命令行程序</h2><h2 id="13-函数式"><a href="#13-函数式" class="headerlink" title="13. 函数式"></a>13. 函数式</h2><h2 id="14-Cargo"><a href="#14-Cargo" class="headerlink" title="14. Cargo"></a>14. Cargo</h2><h2 id="15-指针"><a href="#15-指针" class="headerlink" title="15. 指针"></a>15. 指针</h2><h2 id="16-并发"><a href="#16-并发" class="headerlink" title="16. 并发"></a>16. 并发</h2><h2 id="17-面向对象"><a href="#17-面向对象" class="headerlink" title="17. 面向对象"></a>17. 面向对象</h2><h2 id="18-模式匹配"><a href="#18-模式匹配" class="headerlink" title="18. 模式匹配"></a>18. 模式匹配</h2><h2 id="19-高级特性"><a href="#19-高级特性" class="headerlink" title="19. 高级特性"></a>19. 高级特性</h2><h2 id="20-web-服务器"><a href="#20-web-服务器" class="headerlink" title="20. web 服务器"></a>20. web 服务器</h2>
+<h2 id="12-命令行程序"><a href="#12-命令行程序" class="headerlink" title="12. 命令行程序"></a>12. 命令行程序</h2><ul>
+<li><code>std::env</code> 可以获取输入信息，通知书 <code>&amp;x[0]</code> 存储的是程序的名称，<code>&amp;x[1]</code> 存储的是第一个参数，以此类推</li>
+<li>将程序拆分成 <code>main.rs</code> 和 <code>lib.rs</code> 做到关注点分离，<code>main.rs</code> 中只有一些简单的逻辑，而 <code>lib.rs</code> 中包含所有的业务逻辑，这样可以方便测试</li>
+</ul>
+<h2 id="13-函数式"><a href="#13-函数式" class="headerlink" title="13. 函数式"></a>13. 函数式</h2><h2 id="14-Cargo"><a href="#14-Cargo" class="headerlink" title="14. Cargo"></a>14. Cargo</h2><h2 id="15-指针"><a href="#15-指针" class="headerlink" title="15. 指针"></a>15. 指针</h2><h2 id="16-并发"><a href="#16-并发" class="headerlink" title="16. 并发"></a>16. 并发</h2><h2 id="17-面向对象"><a href="#17-面向对象" class="headerlink" title="17. 面向对象"></a>17. 面向对象</h2><h2 id="18-模式匹配"><a href="#18-模式匹配" class="headerlink" title="18. 模式匹配"></a>18. 模式匹配</h2><h2 id="19-高级特性"><a href="#19-高级特性" class="headerlink" title="19. 高级特性"></a>19. 高级特性</h2><h2 id="20-web-服务器"><a href="#20-web-服务器" class="headerlink" title="20. web 服务器"></a>20. web 服务器</h2>
   </div>
 </article>
 
