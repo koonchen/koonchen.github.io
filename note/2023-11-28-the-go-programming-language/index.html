@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>go 语言圣经</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/after-reading/2023-07-30-how-to-read-the-source-code/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://chenzeping.com/note/2023-11-28-the-go-programming-language/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&text=go 语言圣经"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&title=go 语言圣经"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&is_video=false&description=go 语言圣经"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=go 语言圣经&body=Check out this article: https://chenzeping.com/note/2023-11-28-the-go-programming-language/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&title=go 语言圣经"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&title=go 语言圣经"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&title=go 语言圣经"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&title=go 语言圣经"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&name=go 语言圣经&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-入门"><span class="toc-number">1.</span> <span class="toc-text">1. 入门</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-程序结构"><span class="toc-number">2.</span> <span class="toc-text">2. 程序结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-基础数据类型"><span class="toc-number">3.</span> <span class="toc-text">3. 基础数据类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-复合数据类型"><span class="toc-number">4.</span> <span class="toc-text">4. 复合数据类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-函数"><span class="toc-number">5.</span> <span class="toc-text">5. 函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-方法"><span class="toc-number">6.</span> <span class="toc-text">6. 方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-接口"><span class="toc-number">7.</span> <span class="toc-text">7. 接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-Goroutines-和-Channels"><span class="toc-number">8.</span> <span class="toc-text">8. Goroutines 和 Channels</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-基于共享变量的并发"><span class="toc-number">9.</span> <span class="toc-text">9. 基于共享变量的并发</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-包和工具"><span class="toc-number">10.</span> <span class="toc-text">10. 包和工具</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-测试"><span class="toc-number">11.</span> <span class="toc-text">11. 测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-反射"><span class="toc-number">12.</span> <span class="toc-text">12. 反射</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-底层编程"><span class="toc-number">13.</span> <span class="toc-text">13. 底层编程</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        go 语言圣经
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-11-27T16:00:00.000Z" itemprop="datePublished">2023-11-28</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/note/">note</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/go/">go</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <h2 id="1-入门"><a href="#1-入门" class="headerlink" title="1. 入门"></a>1. 入门</h2><p>go 使用 <code>gofmt</code> 工具格式化代码，这个工具没有任何调整参数的选项，它只有一种风格，就是官方的风格。此外 go 中可以使用 <code>get</code> 指令获取源码，<code>build</code> 指令编译源码，<code>install</code> 指令安装编译后的程序，<code>run</code> 指令编译并运行源码，<code>test</code> 指令测试源码，<code>doc</code> 指令查看文档，<code>list</code> 指令列出包中的内容，<code>env</code> 指令列出环境变量，<code>clean</code> 指令清除编译生成的文件，<code>tool</code> 指令运行 go 工具，<code>version</code> 指令查看版本信息。</p>
+<p>go 1.17.1 及其后版本不再支持 <code>get</code> 命令，统一改用 <code>install</code> 指令，<code>get</code> 在 <code>g.mod</code> 中同时用于更新依赖和安装命令，这种组合很混乱，使用起来也很不方便，比如开发人员不想同时进行更新和安装。</p>
+<h2 id="2-程序结构"><a href="#2-程序结构" class="headerlink" title="2. 程序结构"></a>2. 程序结构</h2><p><code>var</code> 声明时会直接初始化，如果没有显示赋值，会被赋予零值 zero value，数值对应 0、字符串对应 “”。</p>
+<p><code>:=</code> 是短变量声明，这是定义一个或多个变量并根据它们的初始值为这些变量赋予适当类型的语句。</p>
+<p>自增语句 <code>i++</code> 和 <code>i--</code> 不能作为左值，同时它们是『语句』而不是『表达式』，即不能出现在赋值语句的左边。</p>
+<p>循环语句 <code>for</code> 可以看做三个部分：<code>initialization; condition; post</code>，各部分可以省略：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// while loop</span></span><br><span class="line"><span class="keyword">for</span> condition &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// infinite loop</span></span><br><span class="line"><span class="keyword">for</span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面的循环，可以通过 <code>break</code> 或 <code>return</code> 跳出。</p>
+<p>当然也有类似 <code>python</code> 的写法，使用 <code>range</code> 语法同时获得索引和内容，如果某个内容不需要可以使用空标识符 blank identifier <code>_</code>。</p>
+<p>声明一个变量有多种方式，下面这些都等价：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">s := <span class="string">""</span> <span class="comment">// 短变量声明，只能用在函数内部，而不能用于包变量</span></span><br><span class="line"><span class="keyword">var</span> s <span class="keyword">string</span> <span class="comment">// 依赖零值机制</span></span><br><span class="line"><span class="keyword">var</span> s = <span class="string">""</span></span><br><span class="line"><span class="keyword">var</span> s <span class="keyword">string</span> = <span class="string">""</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>如何更新 go pkg mod 下的文件？</p>
+<ol>
+<li><code>cd /path/to/your/project</code> 2. <code>go get -u</code></li>
+</ol>
+</blockquote>
+<p><code>strings.Split</code> 的作用和 <code>strings.Join</code> 相反。</p>
+<p>如果程序中有问题，可以使用 <code>os.Exit</code> 结束程序，<code>os.Exit</code> 会立即终止当前程序，即使是 <code>defer</code> 语句也不会被执行。</p>
+<p>go 中使用 <code>go</code> 创建 goroutine，使用 <code>make</code> 创建 channel，channel 用来在 goroutine 间进行参数传递，main 本身也是一个 goroutine，每个 function 都是创建一个 goroutine。<br>当一个 goroutine 试图在一个 channel 上做 send 或 receive 操作时，这个 goroutine 会阻塞在调用处，直到另一个 goroutine 试图在这个 channel 上做 receive 或 send 操作，这样两个 goroutine 才会继续执行 channel 操作之后的逻辑。</p>
+<p>go 常用动词：</p>
+<ul>
+<li>%v: 默认格式的值</li>
+<li>%+v: 打印结构体时，会添加字段名</li>
+<li>%#v: Go 语法格式的值</li>
+<li>%T: Go 语法格式的类型</li>
+<li>%d: 十进制的整数</li>
+<li>%s: 字符串或者 []byte</li>
+<li>%q: 双引号包围的字符串或者字符</li>
+<li>%x: 十六进制，小写字母，a-f</li>
+<li>%X: 十六进制，大写字母，A-F</li>
+<li>%f: 浮点数</li>
+<li>%e: 科学计数法</li>
+<li>%t: 布尔值</li>
+</ul>
+<p><code>http.ResponseWriter</code> 和 <code>io.Writer</code> 有相同签名的 <code>Write([]byte) (int, error)</code> 方法，可以说 <code>http.ResponseWriter</code> 的类型也隐式地实现了 <code>io.Writer</code>，因此可以在需要 <code>io.Writer</code> 的地方使用 <code>http.ResponseWriter</code>。</p>
+<p>go 中的 <code>switch</code> 不需要主动写 <code>break</code>，当然也可以使用 <code>fallthrough</code> 强制执行下一个 case。同时可以不带表达式，这样可以实现 if-then-else 逻辑。</p>
+<p>go 中指针是可见的，但是不能进行指针运算，即不能对指针进行加减操作，也不能通过指针访问其它变量的值，只能通过指针访问其它变量的地址。<code>&amp;</code> 操作可以获取变量的地址，<code>*</code> 操作可以获取指针指向的变量的值。</p>
+<h2 id="3-基础数据类型"><a href="#3-基础数据类型" class="headerlink" title="3. 基础数据类型"></a>3. 基础数据类型</h2><h2 id="4-复合数据类型"><a href="#4-复合数据类型" class="headerlink" title="4. 复合数据类型"></a>4. 复合数据类型</h2><h2 id="5-函数"><a href="#5-函数" class="headerlink" title="5. 函数"></a>5. 函数</h2><h2 id="6-方法"><a href="#6-方法" class="headerlink" title="6. 方法"></a>6. 方法</h2><h2 id="7-接口"><a href="#7-接口" class="headerlink" title="7. 接口"></a>7. 接口</h2><h2 id="8-Goroutines-和-Channels"><a href="#8-Goroutines-和-Channels" class="headerlink" title="8. Goroutines 和 Channels"></a>8. Goroutines 和 Channels</h2><h2 id="9-基于共享变量的并发"><a href="#9-基于共享变量的并发" class="headerlink" title="9. 基于共享变量的并发"></a>9. 基于共享变量的并发</h2><h2 id="10-包和工具"><a href="#10-包和工具" class="headerlink" title="10. 包和工具"></a>10. 包和工具</h2><h2 id="11-测试"><a href="#11-测试" class="headerlink" title="11. 测试"></a>11. 测试</h2><h2 id="12-反射"><a href="#12-反射" class="headerlink" title="12. 反射"></a>12. 反射</h2><h2 id="13-底层编程"><a href="#13-底层编程" class="headerlink" title="13. 底层编程"></a>13. 底层编程</h2>
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-入门"><span class="toc-number">1.</span> <span class="toc-text">1. 入门</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-程序结构"><span class="toc-number">2.</span> <span class="toc-text">2. 程序结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-基础数据类型"><span class="toc-number">3.</span> <span class="toc-text">3. 基础数据类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-复合数据类型"><span class="toc-number">4.</span> <span class="toc-text">4. 复合数据类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-函数"><span class="toc-number">5.</span> <span class="toc-text">5. 函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-方法"><span class="toc-number">6.</span> <span class="toc-text">6. 方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-接口"><span class="toc-number">7.</span> <span class="toc-text">7. 接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-Goroutines-和-Channels"><span class="toc-number">8.</span> <span class="toc-text">8. Goroutines 和 Channels</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-基于共享变量的并发"><span class="toc-number">9.</span> <span class="toc-text">9. 基于共享变量的并发</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#10-包和工具"><span class="toc-number">10.</span> <span class="toc-text">10. 包和工具</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#11-测试"><span class="toc-number">11.</span> <span class="toc-text">11. 测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#12-反射"><span class="toc-number">12.</span> <span class="toc-text">12. 反射</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#13-底层编程"><span class="toc-number">13.</span> <span class="toc-text">13. 底层编程</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://chenzeping.com/note/2023-11-28-the-go-programming-language/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&text=go 语言圣经"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&title=go 语言圣经"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&is_video=false&description=go 语言圣经"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=go 语言圣经&body=Check out this article: https://chenzeping.com/note/2023-11-28-the-go-programming-language/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&title=go 语言圣经"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&title=go 语言圣经"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&title=go 语言圣经"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&title=go 语言圣经"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://chenzeping.com/note/2023-11-28-the-go-programming-language/&name=go 语言圣经&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2023 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+         
+          <li><a href="https://valeriehu1995.github.io">PigChain</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.2.0/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
