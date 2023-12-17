@@ -379,7 +379,48 @@
 <p><code>go doc</code> 命令，该命令打印其后所指定的实体（包、包成员、方法）的声明与文档注释。</p>
 <p>一个 <code>internal</code> 包只能被和 <code>internal</code> 目录有同一个父目录的包所导入。例如，<code>net/http/internal/chunked</code> 内部包只能被 <code>net/http/httputil</code> 或 <code>net/http</code> 包导入，但是不能被 <code>net/url</code> 包导入。</p>
 <p><code>go list</code> 命令可以查询可用包的信息，可以用 <code>...</code> 表示匹配任意的包的导入路径。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> go list ...xml...</span><br><span class="line">encoding/xml</span><br><span class="line">gopl.io/ch7/xmlselect</span><br></pre></td></tr></table></figure></p>
-<h2 id="11-测试"><a href="#11-测试" class="headerlink" title="11. 测试"></a>11. 测试</h2><h2 id="12-反射"><a href="#12-反射" class="headerlink" title="12. 反射"></a>12. 反射</h2><h2 id="13-底层编程"><a href="#13-底层编程" class="headerlink" title="13. 底层编程"></a>13. 底层编程</h2>
+<h2 id="11-测试"><a href="#11-测试" class="headerlink" title="11. 测试"></a>11. 测试</h2><p><code>go test</code> 按照一定的约定和组织来测试代码的程序，所有以 <code>_test.go</code> 为后缀名的源文件在执行 <code>go build</code> 时不会被构建成包的一部分，它们是 <code>go test</code> 测试的一部分。</p>
+<p>每个测试函数必须导入 <code>testing</code> 包。其中 <code>t</code> 参数用于报告测试失败和附加的日志信息。<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">TestName</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>-run=Coverage</code> 表示只运行测试用例，并生成覆盖率报告。<code>-coverprofile=c.out</code> 表示将覆盖率报告输出到文件 <code>c.out</code> 中。<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> go test -run=Coverage -coverprofile=c.out gopl.io/ch7/eval</span><br><span class="line">ok      gopl.io/ch7/eval         0.032s      coverage: 68.5% of statements</span><br></pre></td></tr></table></figure></p>
+<p>基准测试函数和普通测试函数写法类似，但是以 Benchmark 为前缀名，并且带有一个 <code>*testing.B</code> 类型的参数；<code>*testing.B</code> 参数除了提供和 <code>*testing.T</code> 类似的方法，还有额外一些和性能测量相关的方法。它还提供了一个整数 N，用于指定操作执行的循环次数。</p>
+<p>通过 <code>-bench</code> 命令行标志参数手工指定要运行的基准测试函数。该参数是一个正则表达式，用于匹配要执行的基准测试函数的名字，默认值是空的。其中“.”模式将可以匹配所有基准测试函数，但因为这里只有一个基准测试函数，因此和 <code>-bench=IsPalindrome</code> 参数是等价的效果。</p>
+<h2 id="12-反射"><a href="#12-反射" class="headerlink" title="12. 反射"></a>12. 反射</h2><p>没有办法来检查未知类型的表示方式，我们被卡住了。这就是我们需要反射的原因。</p>
+<p>反射是由 reflect 包提供的。它定义了两个重要的类型，Type 和 Value。一个 Type 表示一个类型，它是一个接口。</p>
+<blockquote>
+<p><code>interface{}</code> 类型是一个空接口，它可以表示任何类型。任何类型都至少实现了零个方法的接口，所以任何类型都满足 <code>interface{}</code>。</p>
+</blockquote>
+<p>函数 reflect.TypeOf 接受任意的 interface{} 类型，并以 reflect.Type 形式返回其动态类型：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">t := reflect.TypeOf(<span class="number">3</span>)  <span class="comment">// a reflect.Type</span></span><br><span class="line">fmt.Println(t.String()) <span class="comment">// "int"</span></span><br><span class="line">fmt.Println(t)          <span class="comment">// "int"</span></span><br></pre></td></tr></table></figure></p>
+<p><code>fmt.Printf</code> 提供了一个缩写 <code>%T</code> 参数，内部使用 <code>reflect.TypeOf</code> 来输出：<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fmt.Printf(<span class="string">"%T\n"</span>, <span class="number">3</span>) <span class="comment">// "int"</span></span><br></pre></td></tr></table></figure></p>
+<p>函数 <code>reflect.ValueOf</code> 接受任意的 <code>interface{}</code> 类型，并返回一个装载着其动态值的 <code>reflect.Value</code>。<br><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">v := reflect.ValueOf(<span class="number">3</span>) <span class="comment">// a reflect.Value</span></span><br><span class="line">fmt.Println(v)          <span class="comment">// "3"</span></span><br><span class="line">fmt.Printf(<span class="string">"%v\n"</span>, v)   <span class="comment">// "3"</span></span><br><span class="line">fmt.Println(v.String()) <span class="comment">// <span class="doctag">NOTE:</span> "&lt;int Value&gt;"</span></span><br></pre></td></tr></table></figure></p>
+<p><code>reflect.Value</code> 也满足 <code>fmt.Stringer</code> 接口，但是除非 Value 持有的是字符串，否则 String 方法只返回其类型。而使用 fmt 包的 <code>%v</code> 标志参数会对 <code>reflect.Values</code> 特殊处理。</p>
+<p><code>reflect.ValueOf</code> 的逆操作是 <code>reflect.Value.Interface</code> 方法。</p>
+<p>一个空的接口隐藏了值内部的表示方式和所有方法，因此只有我们知道具体的动态类型才能使用类型断言来访问内部的值。</p>
+<p>我们使用 <code>reflect.Value</code> 的 Kind 方法来替代之前的类型 switch。虽然还是有无穷多的类型，但是它们的 kinds 类型却是有限的。</p>
+<ul>
+<li>Bool、String 和 所有数字类型的基础类型；</li>
+<li>Array 和 Struct 对应的聚合类型；</li>
+<li>Chan、Func、Ptr、Slice 和 Map 对应的引用类型；</li>
+<li>interface 类型；还有表示空值的 Invalid 类型。（空的 <code>reflect.Value</code> 的 kind 即为 Invalid。）</li>
+</ul>
+<p>所有通过 <code>reflect.ValueOf(x)</code> 返回的 <code>reflect.Value</code> 都是不可取地址的；但是每当我们通过指针间接地获取的 <code>reflect.Value</code> 都是可取地址的。</p>
+<blockquote>
+<p>这是因为 <code>reflect.Value</code> 的内部表示方式，它包含了值的类型和值本身。当 <code>reflect.Value</code> 不可取地址时，Go 运行时可以安全地移动和复制 <code>reflect.Value</code>，而不会影响到其内部的值。</p>
+</blockquote>
+<p>对于指针类型，<code>Elem()</code> 方法返回指针指向的值；对于接口类型，<code>Elem()</code> 方法返回接口的动态值。</p>
+<blockquote>
+<p>只有接口、指针类型可以使用 <code>Elem()</code> 方法。</p>
+</blockquote>
+<p>反射可以越过 go 的导出规则的限制读取结构体中未导出的成员，但是并不能修改这些未导出的成员。</p>
+<p>每次 <code>reflect.ValueOf(x).Method(i)</code> 方法调用都返回一个 <code>reflect.Value</code> 以表示对应的值，也就是一个方法是绑到它的接收者的。使用 <code>reflect.Value.Call</code> 方法，将可以调用一个 Func 类型的 Value 。</p>
+<h2 id="13-底层编程"><a href="#13-底层编程" class="headerlink" title="13. 底层编程"></a>13. 底层编程</h2><p><code>unsafe.Offsetof</code> 函数的参数必须是一个字段 <code>x.f</code>，然后返回 <code>f</code> 字段相对于 <code>x</code> 起始地址的偏移量，包括可能的空洞。</p>
+<p><code>unsafe.Pointer</code> 和普通指针的区别在于：</p>
+<ul>
+<li>类型安全：<code>unsafe.Pointer</code> 可以被转换为任何其他类型的指针，而普通指针只能被转换为相同类型的指针。这意味着 <code>unsafe.Pointer</code> 可以绕过安全检查，而普通指针则不能。</li>
+<li>算术运算：<code>unsafe.Pointer</code> 可以进行算术运算，如加法和减法，而普通指针则不行。</li>
+<li>内存访问：<code>unsafe.Pointer</code> 可以直接访问内存，而普通指针则需要通过类型转换才能访问内存。</li>
+<li>使用限制：<code>unsafe.Pointer</code> 只能在 <code>unsafe</code> 包中使用，而不能在其他包中使用。</li>
+</ul>
+
   </div>
 </article>
 
