@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    
+        
+          
+              <link rel="shortcut icon" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+        
+          
+            <link rel="icon" type="image/png" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png" sizes="192x192">
+          
+        
+        
+          
+            <link rel="apple-touch-icon" sizes="180x180" href="//koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/fish_opt.png">
+          
+        
+    
+    <!-- title -->
+    <title>一种能够接受近乎无限长度文本的大模型框架</title>
+    <!-- styles -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- persian styles -->
+    
+      <link rel="stylesheet" href="/css/rtl.css">
+    
+    <!-- rss --><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+    
+    
+</head>
+
+<body class="max-width mx-auto px3 ltr">    
+      <!-- hexo-inject:begin --><!-- hexo-inject:end --><div id="header-post">
+  <a id="menu-icon" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+        
+      </ul>
+    </span>
+    <br>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" href="/after-reading/2023-12-19-golang-tips-in-ali/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&text=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&title=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&is_video=false&description=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=一种能够接受近乎无限长度文本的大模型框架&body=Check out this article: https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&title=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&title=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&title=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&title=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&name=一种能够接受近乎无限长度文本的大模型框架&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#方法"><span class="toc-number">2.</span> <span class="toc-text">方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Window-Attention-失效的原因"><span class="toc-number">2.1.</span> <span class="toc-text">1. Window Attention 失效的原因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-具有-attention-sinks-的滑动-KV-缓存"><span class="toc-number">2.2.</span> <span class="toc-text">2. 具有 attention sinks 的滑动 KV 缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-带有-attention-sinks-的预训练-LLMs"><span class="toc-number">2.3.</span> <span class="toc-text">3. 带有 attention sinks 的预训练 LLMs</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实验"><span class="toc-number">3.</span> <span class="toc-text">实验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-长文本语言建模测试"><span class="toc-number">3.1.</span> <span class="toc-text">1. 长文本语言建模测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Sink-Token-的有效性"><span class="toc-number">3.2.</span> <span class="toc-text">2. Sink Token 的有效性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        一种能够接受近乎无限长度文本的大模型框架
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">空城</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-04-29T16:00:00.000Z" itemprop="datePublished">2024-04-30</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fas fa-archive"></i>
+        <a class="category-link" href="/categories/machine-learning/">machine learning</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/StreamingLLM/">StreamingLLM</a>, <a class="tag-link" href="/tags/机器学习/">机器学习</a>
+    </div>
+
+
+    </div>
+  </header>
+  <!-- 
+ -->
+  <div class="content" itemprop="articleBody">
+    <p>使 LLM 模型可以处理无限长文本是一项重要挑战，因为存储之前所有的 KV 会受限于内存，模型很难生成超过其训练序列长度的文本。</p>
+<p>最近来自 MIT 高性能 AI 计算的研究者们发布了一个能够接受400万 token 的大模型结构，名叫 StreamingLLM，它只保留最新的 token 和 attention sinks，而丢弃中间的 token。这样，模型无需刷新缓存就能从最近的标记生成流畅的文本。这种方式不仅不会降低多少推理速度，而且理论上能够处理无限长度的输入。</p>
+<p>StreamingLLM 非常适合用在模型需要持续运行而不需要大量内存或依赖过去数据的场景，例如基于 LLM 的日常助手。截止该稿撰写时，此项目已获得4.6k的 Github Star。本文将和大家一起深入了解这项工作的细节。</p>
+<ul>
+<li>论文地址：<a href="https://arxiv.org/abs/2309.17453" target="_blank" rel="noopener">https://arxiv.org/abs/2309.17453</a></li>
+<li>源码地址：<a href="https://github.com/mit-han-lab/streaming-llm" target="_blank" rel="noopener">https://github.com/mit-han-lab/streaming-llm</a></li>
+</ul>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>将 LLM 应用于无限输入流时，会遇到两个主要挑战：</p>
+<ol>
+<li>缓存冗余：在解码阶段，基于 Transformer 的 LLM 会缓存之前所有 token 的 KV，这会导致内存使用过多，增加解码延迟；</li>
+<li>外推困境：现有模型的长度外推能力有限，即当序列长度超过预训练时设定的注意窗口大小时，其性能就会下降。</li>
+</ol>
+<p>一种直观的方法被称为 Window Attention，其仅在最近 token 的 KV 状态上维护一个固定大小的滑动窗口。虽然这种方法能保持稳定的内存使用率和解码速度，但一旦序列长度超过缓存大小，开始对 token 的 KV 进行删除，模型的性能就会急剧下降。如下图 b 所示：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/202404301037028.png" alt></p>
+<p>另一种策略是带重计算的滑动窗口（如上图 c 所示），这种方法会从最近的 token 中重建 KV 状态，虽然它在长文本中表现良好，但其速度明显较慢，在现实应用中并不实用。</p>
+<p>研究者探寻 Window Attention 失效的原因，发现了自回归 LLMs 的一个有趣现象：大模型的 Attention 计算中，大量 Attention 权重被分配给某些初始 token，无论这些 token 与语言建模任务是否相关。如下图所示：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/202404301038480.png" alt></p>
+<p>研究者们将这些 token 命名为 “attention sinks”。尽管这些初始 token 缺乏语义，但它们收集了显著的注意力分数。研究者将这个现象归因于计算中的 Softmax 操作，它要求注意力分数总和为 1 。因此当前 query 对许多先前 token 没有很强匹配的时候，仍需要在某个与语义不太相关的地方，分配这些不需要的注意力值，来使得最终分数总和为 1。初始 token 作为 sink token 的原因很直观：由于自回归语言建模的特性，初始 token 对几乎所有后续标记都是可见的，这使得它们更容易被训练成 attention sinks。</p>
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>借助上面的观察，研究者们提出了 StreamingLLM，一种简单而高效的框架。如图1 d 所示，该模型就是把初始 token 的 KV 保留下来，然后再拼上滑动窗口的 KV，就可以保持稳定的模型性能，因为保留 attention sinks 可以让窗口内的注意力分数分布接近正常。</p>
+<h3 id="1-Window-Attention-失效的原因"><a href="#1-Window-Attention-失效的原因" class="headerlink" title="1. Window Attention 失效的原因"></a>1. Window Attention 失效的原因</h3><p>在本节中，我们将使用 attention sinks 的概念来解释 Window Attention 失败的原因，并以此详细阐述 StreamingLLM 的灵感来源。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/202404301039034.png" alt></p>
+<p>上图很明显可以得到，当文本长度超过缓存大小时，由于排除了初始标记，困惑度会激增。这表明，无论初始词块与被预测词块的距离如何，初始词块对于保持 LLM 的稳定性都至关重要。</p>
+<p>图2 展示了 llama2 7b 模型的所有层和 head 的注意力图。可以发现，除了最下面两层之外，模型在所有层和 head 都始终专注于初始 token。这意味着：在注意力计算中，去掉这些初始 token 的 KV 将去掉 SoftMax 函数（公式 1）中分母的很大一部分。这种改变会导致注意力分数的分布发生显著变化，从而偏离正常推理设置中的预期。</p>
+<p>$\operatorname{SoftMax}(x)_i=\frac{e^{x_i}}{e^{x_i}+\sum_{j=2}^N e^{x_i}}, x_1 \gg x_j, j \in 2, \ldots, N$</p>
+<p>那么初始 token 为什么会如此重要，该论文的研究者给出了如下两种可能：</p>
+<ol>
+<li>初始 token 的语义至关重要；</li>
+<li>或者模型学习偏重于初始 token 的绝对位置</li>
+</ol>
+<p>研究者用 <code>\n</code> 替代前四个标记符，发现模型仍然会非常重视初始换行符。这表明，初始token的绝对位置比其语义价值更加重要。</p>
+<h3 id="2-具有-attention-sinks-的滑动-KV-缓存"><a href="#2-具有-attention-sinks-的滑动-KV-缓存" class="headerlink" title="2. 具有 attention sinks 的滑动 KV 缓存"></a>2. 具有 attention sinks 的滑动 KV 缓存</h3><p>研究者提出的 StreamingLLM 是一种直接的方法，其可以在不进行任何模型微调的情况下恢复窗口注意的困惑度。除了当前的滑动窗口 token 之外，研究者还在注意力计算中重新引入了几个初始 token 的 KV。如下图所示：</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/202404301040440.png" alt></p>
+<p>StreamingLLM 中的 KV 缓存在概念上可以分为两部分：</p>
+<ol>
+<li>attention sinks（四个initial tokens）稳定注意力计算；</li>
+<li>滑动 KV 缓存保留了最新的标记，这对于语言建模至关重要。</li>
+</ol>
+<p>在确定相对距离并将位置信息添加到 token 时，StreamingLLM 专注于缓存中的位置，而不是原始文本中的位置。这种区别对于 StreamingLLM 的性能至关重要。例如，如果当前缓存的 token 为 [0, 1, 2, 3, 6, 7, 8]，那么在解码第 9 个令牌的过程中，分配的位置为 [0, 1, 2, 3, 4, 5, 6, 7]，而不是原始文本中的位置 [0, 1, 2, 3, 6, 7, 8, 9]。</p>
+<h3 id="3-带有-attention-sinks-的预训练-LLMs"><a href="#3-带有-attention-sinks-的预训练-LLMs" class="headerlink" title="3. 带有 attention sinks 的预训练 LLMs"></a>3. 带有 attention sinks 的预训练 LLMs</h3><p>如1小节所述，模型过度关注多个初始 token 的一个重要原因是缺乏一个指定的 sink token 来卸载过多的注意力分数。因此，模型会无意中将全局可见的标记（主要是初始 token）指定为 attention sinks。一种可能的补救办法是有意识地加入一个可训练的全局 attention sinks 标记，称为 “Sink Token”，作为不必要注意力分数的存放处。另外，也可以用类似于 SoftMax-off-by-One 的变体来取代传统的 SoftMax 函数：</p>
+<p>$\operatorname{SoftMax}_1(x)_i=\frac{e^{x_i}}{1+\sum_{j=1}^N e^{x_i}}$</p>
+<p>这种 Softmax 方法不要求所有上下文 token 的注意力分数总和为 1。但要注意的是，这种替代方法等同于在注意力计算中使用 KV 特征全为零的 token 。作者将这种方法命名为 “Zero Sink”，以便与其提出的框架保持一致。</p>
+<h2 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h2><p>研究者使用四个著名的最新模型对 StreamingLLM 进行了评估：Llama-2、MPT、PyThia 和 Falcon。研究者将 StreamingLLM 与密集注意力、窗口注意力和带重计算的滑动窗口方法等既定基准进行比较。</p>
+<h3 id="1-长文本语言建模测试"><a href="#1-长文本语言建模测试" class="headerlink" title="1. 长文本语言建模测试"></a>1. 长文本语言建模测试</h3><p>研究者首先使用 PG19 测试集评估 StreamingLLM 的语言建模复杂度。如之前图3所示，在跨度为 20K token 的文本上，StreamingLLM 的困惑度可以与 Oracle 基准（滑动窗口与重新计算）相媲美。同时，当输入长度超过预训练窗口时，密集注意力技术就会失效，而当输入长度超过缓存大小时，窗口注意力技术就会陷入困境，导致初始标记被剔除。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/202404301041668.png" alt></p>
+<p>上图进一步证实了 StreamingLLM 可以可靠地处理异常扩展的文本。在 400 多万个 token 上，四种著名的 LLM 依托 StreamingLLM 框架表现出稳定的性能，其困惑度几乎与具有重新计算基线的滑动窗口的困惑度相匹配。</p>
+<h3 id="2-Sink-Token-的有效性"><a href="#2-Sink-Token-的有效性" class="headerlink" title="2. Sink Token 的有效性"></a>2. Sink Token 的有效性</h3><p>为了验证方法3中提出的 sink token 的有效性，即在所有预训练样本中引入 sink token 用于改善 StreamingLLM，研究者训练了两种语言模型，每个模型有160万个参数。在相同的条件下，一个模型采用原始训练设置上，另一个在每个训练样本的开头加入了一个 sink token。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/202404301042341.png" alt></p>
+<p>如上图所示，与普通模型相比，使用 sink token 训练的模型表现出相似的收敛动态。使用 sink token 预训练的模型与使用 vanilla 方法训练的模型的性能相似。值得注意的是，vanilla 模型需要将多个标记作为 attention sink 相加以保持稳定的困惑度。相比之下，使用 sink token 训练的模型仅使用 sink token 实现了令人满意的性能。</p>
+<p><img src="https://koonchenblog-1252050022.cos.ap-shanghai.myqcloud.com/img/blog/202404301042937.png" alt></p>
+<p>上图展示了使用和不使用 sink token 预训练的模型的注意力图。可以看到，没有 sink token 的模型，类似于 Llama2 7B（如图 2 所示），显示了早期层的局部注意力和更深的层关注初始标记。相比之下，使用 sink token 训练的模型始终集中在层和头部的接收器上，表明有效的注意力卸载机制。</p>
+<p>研究者还展示了使用 StreamingLLM 进行流式 QA 的结果，还有一系列消融实验，效率实验等，感兴趣的读者可以阅读论文原文了解其细节。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总的来说，该工作是一个非常典型的观察规律、分析原因、运用到实际方法的工作。其提出的 attention sink，也许像 BERT 中放在句首用于分类的 [CLS] 标记，或者是图神经网络中的 Super Node，接收的是全局或者说整个句子的信息。实际上这种方式不仅仅可以用在 LLM 上，所有 attention-based 的模型都可以参考这一方式将输入序列的长度变得更加灵活。而对于其他 AI 研究领域来说，则是很好的将解释模型与研发模型结合的例子。</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#方法"><span class="toc-number">2.</span> <span class="toc-text">方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-Window-Attention-失效的原因"><span class="toc-number">2.1.</span> <span class="toc-text">1. Window Attention 失效的原因</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-具有-attention-sinks-的滑动-KV-缓存"><span class="toc-number">2.2.</span> <span class="toc-text">2. 具有 attention sinks 的滑动 KV 缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-带有-attention-sinks-的预训练-LLMs"><span class="toc-number">2.3.</span> <span class="toc-text">3. 带有 attention sinks 的预训练 LLMs</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实验"><span class="toc-number">3.</span> <span class="toc-text">实验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-长文本语言建模测试"><span class="toc-number">3.1.</span> <span class="toc-text">1. 长文本语言建模测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Sink-Token-的有效性"><span class="toc-number">3.2.</span> <span class="toc-text">2. Sink Token 的有效性</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-number">4.</span> <span class="toc-text">总结</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&text=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&title=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&is_video=false&description=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=一种能够接受近乎无限长度文本的大模型框架&body=Check out this article: https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&title=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&title=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&title=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&title=一种能够接受近乎无限长度文本的大模型框架"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://chenzeping.com/machine-learning/2024-04-30-streaming-llm/&name=一种能够接受近乎无限长度文本的大模型框架&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy; 2024 Koon Chen
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/about/">About</a></li>
+         
+          <li><a href="/archives/">Articles</a></li>
+         
+          <li><a href="/search/">Search</a></li>
+         
+          <li><a href="https://github.com/koonchen">Projects</a></li>
+        
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+<!-- <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/font-awesome/5.15.2/css/all.min.css">
+<!-- <link rel="stylesheet" href="/lib/justified-gallery/css/justifiedGallery.min.css"> -->
+<link rel="stylesheet" href="//cdn.staticfile.org/justifiedGallery/3.6.5/css/justifiedGallery.min.css">
+
+    <!-- jquery -->
+<!-- <script src="/lib/jquery/jquery.min.js"></script> -->
+<script src="//cdn.staticfile.org/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="/lib/justified-gallery/js/jquery.justifiedGallery.min.js"></script> -->
+<script src="//cdn.staticfile.org/justifiedGallery/3.6.5/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/main.js"></script>
+<!-- search -->
+
+<!-- Google Analytics -->
+
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-109260587-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+<!-- Baidu Analytics -->
+
+<!-- Disqus Comments -->
+
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdn.bootcss.com/mathjax/2.7.6/MathJax.js?config=TeX-MML-AM_CHTML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+</body>
+</html>
